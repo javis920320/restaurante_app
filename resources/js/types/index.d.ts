@@ -49,3 +49,13 @@ export interface Categoria{
     created_at: string;
     updated_at: string; 
 }
+ export interface Plato{    
+    id: number;
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    categoria_id: number;
+    created_at: string;
+    updated_at: string; 
+    imagen: string; 
+ }

@@ -21,12 +21,12 @@ export default function ConfiguracionLayout({ children }: PropsWithChildren) {
         },
         {
             title: 'Mesas',
-            href: '/mesas',
+            href: '/configuracion/mesas',
             icon: null,
         },
         {
             title: 'Platos',
-            href: '/platos',
+            href: '/configuracion/platos',
             icon: null,
         },
         {

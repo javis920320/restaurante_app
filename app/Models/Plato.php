@@ -8,7 +8,8 @@ class Plato extends Model
 {
     protected $fillable = [
         'nombre',
-        'precio',
+        'precio', 
+        'descripcion',
         'categoria_id',
         'imagen',
         'estado',
