@@ -21,6 +21,7 @@ export default function  Formulario  ({ categorias }: { categorias: { id: number
       
             if (respuesta.status === 200) {
               setData({ nombre: '', precio: 0, descripcion: '', categoria_id: 0, imagen: null });
+              
       
             } else {
       

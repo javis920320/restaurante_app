@@ -15,41 +15,39 @@ export default function Index({ categorias, platos }: { categorias: { id: number
 
   const [ListaPlatos, setListPlatos] = React.useState<Plato[]>(platos); // Estado para los platos 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = React.useState<Categoria[]>([
-    {
-      id: 3,
-      nombre: 'Test',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
+
 
   ]);
 
-
   const handleClickCategoria = (categoriaId: number) => {
- /*    setCategoriaSeleccionada((prevCategorias) => {
-      const existeCategoria = prevCategorias.some((cat) => cat.id === categoriaId);
+    setCategoriaSeleccionada((prevCategorias:Categoria[]) => {
+        const existeCategoria = prevCategorias.some((cat) => cat.id === categoriaId);
+        let nuevasCategorias;
 
-      if (existeCategoria) {
-        return prevCategorias.filter((cat) => cat.id !== categoriaId);
-      } else {
-        const categoriaSeleccionada = categorias.find((cat) => cat.id === categoriaId);
-
-        if (categoriaSeleccionada !== undefined) {
-          return [
-            ...prevCategorias,
-            {
-              ...categoriaSeleccionada,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-          ];
+        if (existeCategoria) {
+            // Si ya está seleccionada, la eliminamos
+            nuevasCategorias = prevCategorias.filter((cat) => cat.id !== categoriaId);
+        } else {
+            // Si no está seleccionada, la agregamos
+            const categoria = categorias.find((cat) => cat.id === categoriaId);
+            nuevasCategorias = categoria ? [...prevCategorias, categoria] : prevCategorias;
         }
 
-        // Si no se encuentra la categoría, se retorna el estado anterior sin cambios
-        return prevCategorias;
-      }
-    }); */
-  };
+        // Actualizamos los platos según las categorías seleccionadas
+        if (nuevasCategorias.length > 0) {
+            setListPlatos(
+                platos.filter((plato) =>
+                    nuevasCategorias.some((categoria) => categoria.id === plato.categoria_id)
+                )
+            );
+        } else {
+            // Si no hay categorías seleccionadas, mostramos todos los platos
+            setListPlatos(platos);
+        }
+
+        return nuevasCategorias; // Actualizamos el estado de las categorías seleccionadas
+    });
+};
 
 
 
@@ -62,9 +60,10 @@ export default function Index({ categorias, platos }: { categorias: { id: number
       <ConfiguracionLayout >
         <div>Platos</div>
         <Formulario categorias={categorias} />
+        
         <section>
           {categorias && categorias.map((categoria) => (<Badge key={categoria.id} variant="outline" className={`mr-2 cursor-pointer ${categoriaSeleccionada.some((cat: Categoria) => cat.id === categoria.id) ? "bg-gray-500 text-white" : ""
-            }`} onClick={handleClickCategoria(categoria.id)}>{categoria.nombre}</Badge>))}
+            }`} onClick={()=>handleClickCategoria(categoria.id)}>{categoria.nombre}</Badge>))}
 
         </section>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

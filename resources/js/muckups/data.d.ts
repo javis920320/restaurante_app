@@ -7,7 +7,7 @@ const ListaPlatos: Plato[] = [
     categoria_id: 1,
     created_at: '2023-10-01',
     updated_at: '2023-10-01',
-    imagen: 'https://via.placeholder.com/150',
+    imagen: 'https://via.placeholder.com/https://media.istockphoto.com/id/1952949637/photo/spicy-salmon-bowl-with-rice-carrots-cucumber-and-avocado.jpg?s=1024x1024&w=is&k=20&c=ocxzCAR4G76kIcXFbxpcjX1fq0PqhTQs_JlacWHGuS0=',
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const ListaPlatos: Plato[] = [
     created_at: '2023-10-01',
     updated_at: '2023-10-01',
     descripcion: 'Descripción del plato 2',
-    imagen: 'https://via.placeholder.com/150',
+    imagen: 'https://www.infobae.com/resizer/v2/R4VENSPXO5DZBJ7M5CNWTKEAJQ.jpg?auth=e17bf2694a3eaf395d58a160b09cac133ff395e55f3e48295ed3c66173c5af23&smart=true&width=992&height=558&quality=85',
   },
   {
     id: 3,
