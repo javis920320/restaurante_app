@@ -41,3 +41,21 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Categoria{
+    id: number;
+    nombre: string;
+   // descripcion: string;
+    created_at: string;
+    updated_at: string; 
+}
+ export interface Plato{    
+    id: number;
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    categoria_id: number;
+    created_at: string;
+    updated_at: string; 
+    imagen: string; 
+ }
