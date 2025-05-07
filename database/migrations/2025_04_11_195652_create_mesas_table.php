@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre')->unique(); // Nombre de la mesa    
             $table->integer('capacidad'); // Capacidad de la mesa
-            $table->enum('estado', ['disponible', 'ocupada']); // Estado de la mesa
+            $table->enum('estado', ['disponible', 'ocupada','reservada']); // Estado de la mesa
             $table->timestamps();
         });
     }

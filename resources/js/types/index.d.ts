@@ -59,3 +59,32 @@ export interface Categoria{
     updated_at: string; 
     imagen: string; 
  }
+
+ export interface Mesa{
+
+    id:number;
+    nombre:string;
+    capacidad:integer;
+    estado:string;  
+
+
+ }
+ type PedidoItem={
+    plato_id:number;
+    cantidad:number;
+    precio:number;
+}
+
+
+ export interface Pedido{
+     
+     user_id:number;    
+     mesa_id:number;
+     items:PedidoItem[];
+     total:number;   
+     estado:string; 
+     agregarPedido:(plato:Pedido)=>void;
+     eliminarPedido:(id:number)=>void;  
+     
+     //precio:number;
+ }

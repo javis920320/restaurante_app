@@ -8,6 +8,7 @@ class Mesa extends Model
 {
     protected $fillable = [
         'nombre',
+        'capacidad',
         'estado',
     ];
     //relaciones con los modelos

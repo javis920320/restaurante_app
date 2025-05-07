@@ -3,11 +3,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import ConfiguracionLayout from '@/layouts/configuracion/layout';
 import { Categoria, type Plato } from '@/types';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import axios from "axios"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
 import Formulario from './Formulario';
 import { Badge } from '@/components/ui/badge';
 
