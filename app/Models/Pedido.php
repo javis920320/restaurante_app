@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pedido extends Model
 {
+    protected $fillable = ['user_id', 'cliente_id', 'mesa_id', 'estado'];
     
     //relaciones con los modelos
     public function cliente()
@@ -20,4 +21,8 @@ class Pedido extends Model
     {
         return $this->belongsTo(Mesa::class);
     }
+    public function item()
+    {
+        return $this->hasMany(ItemPedido::class, 'pedido_id');
+    }   
 }

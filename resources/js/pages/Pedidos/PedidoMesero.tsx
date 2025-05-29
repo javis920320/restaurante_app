@@ -1,14 +1,52 @@
 import { usePedido } from '@/context/PedidoContext'
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { RemoveFormatting, Trash } from 'lucide-react'
+import { Car, RemoveFormatting, Trash } from 'lucide-react'
 import React from 'react'
+import axios from "axios"
+
+import { Card } from '@/components/ui/card';
+import NumberInput from '@/components/mycomponents/number-input';
 
 const PedidoMesero = () => {
   //obtener el usuario de la sesion
-    const { auth } = usePage<SharedData>().props;
+  const { auth } = usePage<SharedData>().props;
+  //obtener el parametro de la url
+  const mesa = window.location.pathname.split('/').pop();
 
-  const { items,eliminarPedido,user_id } = usePedido()
+  const { items, eliminarPedido, user_id, agregarPedido } = usePedido()
+  //metodo para modificar la cantidad de platos
+ const modificarCantidad = (platoId: number, cantidad: number) => { 
+    const item = items.find(item => item.plato_id === platoId);
+    if (item) {
+      agregarPedido({ ...item, cantidad });
+    }
+  }
+
+  const handleEnviarPedido = (e: React.FormEvent) => {
+    e.preventDefault()
+    const data = {
+      user_id: user_id,
+      items: items,
+      mesa_id: mesa,
+      estado: 'en concina',
+    }
+
+    axios.post(route('pedido.store'), data)
+      .then((response) => {
+        console.log(response.data)
+
+      })
+      .catch((error) => {
+        console.error(error)
+
+      })
+
+
+    // Aquí puedes enviar el pedido al servidor o realizar cualquier otra acción necesaria
+
+  }
+
 
   return (
     <div className="w-full p-4 bg-white shadow-md rounded-lg">
@@ -16,49 +54,69 @@ const PedidoMesero = () => {
         Pedido del Mesero
       </h2>
 
+
       <section className="mb-2">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg font-semibold text-gray-700">Mesero: {auth.user.name}</h3>
-            
-        <p className="text-center text-sm text-gray-500">Platos Seleccionados</p>
+
+          <p className="text-center text-sm text-gray-500">Platos Seleccionados</p>
+
         </div>
       </section>
 
       {Array.isArray(items) && items.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left text-gray-700">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-              <tr>
-                <th className="px-4 py-2">Plato ID</th>
-                <th className="px-4 py-2">Cantidad</th>
-                <th className="px-4 py-2">Precio</th>
-                <th className="px-4 py-2">Sub Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.plato_id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2 text-center">{item.plato_id}</td>
-                  <td className="px-4 py-2 text-center">{item.cantidad}</td>
-                  <td className="px-4 py-2 text-center">${item.precio.toFixed(2)}</td>
-                  <td className="px-4 py-2 text-center font-semibold">
-                    ${(item.precio * item.cantidad).toFixed(2)}
-                  </td>
-                  <td><button  className='text-red-300' onClick={()=>eliminarPedido(item.plato_id)}><Trash></Trash></button></td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="bg-gray-100 font-semibold text-gray-700">
-                <td colSpan={3} className="px-4 py-2 text-right">Total:</td>
-                <td className="px-4 py-2 text-center">${items.reduce((total, item) => total + item.precio * item.cantidad, 0).toFixed(2)}</td>
-              </tr> 
-            </tfoot>
-          </table>
-        </div>
+        items.map((item) => (
+          <Card key={item.plato_id} className="w-full h-24 rounded-lg  relative mb-2">
+            <div className="flex  items-center justify-around">
+              <div className="flex items-center ">
+                {/* <img
+                src={item.plato.imagen}
+                alt={item.plato.nombre}
+                className="w-16 h-16 object-cover rounded-lg mr-4"
+              /> */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">{item.plato.nombre}</h3>
+                  <p className="text-sm text-gray-500">{item.plato.descripcion}</p>
+                </div>
+              </div>
+              <div className='flex items-center justify-between w-auto'>  
+                <NumberInput 
+                  cantidad={item.cantidad} 
+                  platoId={item.plato_id} 
+                  modificarCantidad={modificarCantidad} 
+                />
+                <button
+                  onClick={() => eliminarPedido(item.plato_id)}
+                  className="text-red-500 hover:text-red-700 focus:outline-none"
+                >
+                  <Trash size={24} />
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-lg font-semibold text-gray-700">
+                Precio: ${item.precio.toFixed(2)}
+              </p>
+              <p className="text-lg font-semibold text-gray-700">
+                Total: ${(item.precio * item.cantidad).toFixed(2)}
+              </p>
+            </div>
+          </Card>
+        ))
       ) : (
         <p className="text-center text-gray-500 mt-4">No hay platos seleccionados.</p>
       )}
+      <form onClick={handleEnviarPedido}>
+        <div className="flex justify-center mt-4">
+
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+          >
+            Enviar Pedido
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

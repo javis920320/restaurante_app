@@ -1,8 +1,11 @@
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { usePedido } from '@/context/PedidoContext';
+import { useCategorys } from '@/hooks/use-categorys';
 import { Plato } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
+import { ShoppingCart } from 'lucide-react';
 import React from 'react';
 
 interface PlatosDisponiblesProps {
@@ -13,6 +16,8 @@ const PlatosDisponibles = ({ plato }: PlatosDisponiblesProps) => {
     // Obtén la mesa desde el contexto de la página actual
     const { mesa } = usePage().props;
     const { agregarPedido } = usePedido();
+    
+
 
     // Manejo del formulario
     const { data, setData } = useForm({
@@ -26,49 +31,44 @@ const PlatosDisponibles = ({ plato }: PlatosDisponiblesProps) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (data.cantidad > 0) {
+       
             agregarPedido({
                 plato_id: data.plato_id,
+                plato: plato,   
                 cantidad: data.cantidad,
-                
+
                 precio: data.precio,
             });
-            console.log('Pedido agregado:', data);
-        } else {
-            console.error('La cantidad debe ser mayor a 0');
-        }
+            
+  
     };
 
     return (
-        <Card className="w-full h-64 rounded-lg">
-            <form onSubmit={handleSubmit}>
-                <img
-                    src={plato.imagen}
-                    alt={plato.nombre}
-                    className="w-full h-32 object-cover rounded-t-lg"
-                />
-                <h2 className="text-center">{plato.nombre}</h2>
-                <section className="flex flex-col items-center">
-                    <p>{plato.descripcion}</p>
-                    <p>${plato.precio.toFixed(2)}</p>
-                </section>
-                <section className="flex flex-row items-center">
-                    <Input
-                        type="number"
-                        placeholder="Cantidad"
-                        className="w-1/2"
-                        value={data.cantidad}
-                        onChange={(e) => setData('cantidad', parseInt(e.target.value))}
+        <form onSubmit={handleSubmit}>
+            <Card className="w-full h-64 rounded-lg  relative">
+                
+                <CardTitle >
+                    <img
+                        src={plato.imagen}
+                        alt={plato.nombre}
+                        className="w-full h-20 object-cover rounded-t-lg"
                     />
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                    >
-                        Agregar
-                    </button>
-                </section>
-            </form>
-        </Card>
+                </CardTitle>
+
+                <CardContent className="">
+                    <h2 className="text-start text-blue-950 font-bold">{plato.nombre}</h2>
+                    <section className="flex flex-col items-start">
+                        <small className='text-gray-500'>{plato.descripcion}</small>
+                        
+                    </section>
+                </CardContent>
+
+                <CardFooter className='flex flex-row justify-between items-center'> 
+                    <Button type='submit' className='cursor-pointer' > <ShoppingCart></ShoppingCart>+</Button>
+                    <small className='   font-semibold  text-green-200 opacity-55 bg-green-600 rounded-lg p-2'>${plato.precio.toFixed(2)}</small>
+                </CardFooter>
+            </Card>
+        </form>
     );
 };
 

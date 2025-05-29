@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade'); // Relación con la tabla clientes    
+           // $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade'); // Relación con la tabla clientes    
+           $table->foreignId('cliente_id')->nullable()->constrained('clientes')->onDelete('cascade');
             $table->foreignId("user_id")->constrained("users")->onDelete("cascade"); // Relación con la tabla users
             $table->foreignId("mesa_id")->constrained("mesas")->onDelete("cascade"); // Relación con la tabla mesas 
             $table->enum('estado', ['pendiente', 'en concina', 'servido', 'pagado']); // Estado del pedido

@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('platos', function (Blueprint $table) {
-            $table->string('descripcion')->nullable()->after('nombre');
-            $table->string('imagen')->nullable()->after('descripcion');
+            if (!Schema::hasColumn('platos', 'descripcion')) {
+                $table->string('descripcion')->nullable()->after('nombre');
+            }
+            if (!Schema::hasColumn('platos', 'imagen')) {
+                $table->string('imagen')->nullable()->after('descripcion');
+            }
              // Agregar la columna 'imagen' después de 'descripcion'
            
         });
@@ -25,6 +29,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('platos', function (Blueprint $table) {
+            $table->dropColumn('descripcion');
+        $table->dropColumn('imagen');
             //
         });
     }

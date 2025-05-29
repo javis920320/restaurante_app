@@ -72,6 +72,7 @@ export interface Categoria{
  type PedidoItem={
     plato_id:number;
     cantidad:number;
+    plato:Plato;
     precio:number;
 }
 

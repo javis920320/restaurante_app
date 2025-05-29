@@ -30,6 +30,9 @@ Route::resource("/configuracion/platos",PlatoController::class);
 Route::resource("/configuracion/mesas",MesaController::class);  
 Route::resource("/registro/pedido",PedidoController::class);
 Route::get("/pedido/{mesa}",[PedidoController::class,"create"])->name("pedido.create");
+//ruta para ver los pedidos que se encuentran en cosina
+Route::get("/cocina/pedidos", [PedidoController::class,"cocina"])->name("pedido.cocina");    
+
 //Route::resource("/configuracion/usuarios",);
 
 require __DIR__.'/settings.php';
