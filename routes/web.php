@@ -17,7 +17,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        $mesas=Mesa::all();   
+        $mesas = Mesa::with('pedido')->get();   
         
         return Inertia::render('dashboard',[
             'mesas'=>$mesas,    

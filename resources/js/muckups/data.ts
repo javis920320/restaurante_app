@@ -118,7 +118,8 @@ export const ListaMesas:Mesa[]=[
     estado: 'pendiente',
     mesa_id: 1,
     platos: [
-      { id: 1, nombre: 'Plato 1', cantidad: 2 },
+      { id: 1, nombre: 'Plato 1', cantidad: 2 ,precio: 10.99 ,    imagen: 'https://www.recetasnestle.com.co/sites/default/files/styles/recipe_detail_desktop_new/public/srh_recipes/7151caff1878492a358313035f73b0a6.webp?itok=JvbUf3tj',
+},
       { id: 2, nombre: 'Plato 2', cantidad: 1 },
       { id: 3, nombre: 'Plato 3', cantidad: 1 },
 
@@ -190,7 +191,7 @@ export const ListaMesas:Mesa[]=[
     estado: 'cancelado',
     mesa_id: 2,
     platos: [
-      { id: 2, nombre: 'Plato 2', cantidad: 1 },
+      { id: 2, nombre: 'Plato 2', cantidad: 1 ,precio: 12.99},  
     ],
   },
 

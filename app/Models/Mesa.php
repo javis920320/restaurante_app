@@ -16,6 +16,6 @@ class Mesa extends Model
     //relaciones con los modelos
     public function pedido()
     {
-        return $this->hasMany(Pedido::class);
+        return $this->hasMany(Pedido::class, 'mesa_id', 'id');  
     }   
 }

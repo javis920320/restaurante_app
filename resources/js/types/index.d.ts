@@ -78,7 +78,7 @@ export interface Categoria{
 
 
  export interface Pedido{
-     
+     id:number
      user_id:number;    
      mesa_id:number;
      items:PedidoItem[];

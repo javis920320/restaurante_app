@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mesa;
+use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,7 +17,7 @@ class MesaController extends Controller
         $mesas = Mesa::all();
         return Inertia::render('Mesas/mesas', [
             'mesas' => $mesas,
-        ]); 
+        ]);
     }
 
     public function store(Request $request)
@@ -36,5 +37,17 @@ class MesaController extends Controller
             'mesa' => $mesa,
         ]);
 
+    }
+    public function show(Mesa $mesa)
+    {
+     $pedidos=Pedido::where('mesa_id', $mesa->id)->get();
+     
+
+        // Mostrar los detalles de una mesa específica 
+
+        return Inertia::render('Mesas/Show', [
+            'mesa' => $mesa,
+            'pedidos' => $pedidos,  
+        ]);
     }
 }

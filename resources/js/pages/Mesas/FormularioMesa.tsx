@@ -2,42 +2,21 @@ import { Input } from '@/components/ui/input'
 import { useForm } from '@inertiajs/react'
 import React from 'react'
 import axios from 'axios'
-const FormularioMesa = () => {
-
-     const { data, setData, post, processing, errors,setError } = useForm({
-        nombre: '',
-        capacidad: 0,
-        estado: 'disponible',   
-     })
-
-    const handleSubmit = async(e: React.FormEvent) => {
-            e.preventDefault()
-            try {
-                const respuesta=await  axios.post(route("mesas.store"), data);
-                if (respuesta.status === 200) {
-                    setData({ nombre: '', capacidad: 0, estado: 'disponible' }) // Reinicia los datos del formulario
-                } else {
-                    respuesta.data.errors.forEach((error: any) => {
-                        setError(error.field, error.message); // Establece el error en el campo correspondiente 
-                    })
-                }
-                
-            } catch (error: any) {
-                if (error.response && error.response.data.errors) {
-                    const backendErrors = error.response.data.errors;
-                    Object.keys(backendErrors).forEach((key: any) => {
-                        setError(key, backendErrors[key][0]); // Establece el error en el campo correspondiente
-                    });
-                }   
-                
-            }
+const FormularioMesa = ({data,setData,processing, errors,handleSubmit}:any) => {
+const ubicaciones = [
+    'Interior',
+    'Exterior',
+    'Barra',
+    'Terraza',  
+    'VIP',
+    'Zona de fumadores']
 
 
-          
-    }
+
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg shadow-md mb-4">   
+    <form onSubmit={handleSubmit} className="bg-white p-2 rounded-lg shadow-md mb-4 flex flex-col">    
+    <p className='text-gray-500'>Configura las mesas de tu restaurante</p> 
         <Input
             type="text"
             placeholder="Nombre de la mesa"
@@ -53,6 +32,20 @@ const FormularioMesa = () => {
             onChange={(e) => setData('capacidad', parseInt(e.target.value))} 
             className="mb-4"    
         />
+        <select
+            value={data.ubicacion}
+            onChange={(e) => setData('ubicacion', e.target.value)} 
+            className="mb-4"    
+            >
+            <option value="">Seleccione una ubicación</option>  
+              {ubicaciones.map((ubicacion: string) => ( 
+                <option key={ubicacion} value={ubicacion}>
+                    {ubicacion}
+                </option>
+                ))}  
+            </select>
+
+
         <select
             value={data.estado}
             onChange={(e) => setData('estado', e.target.value)} 

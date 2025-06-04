@@ -4,6 +4,8 @@ import { Mesa, type BreadcrumbItem } from '@/types';
 import { Button } from '@headlessui/react';
 import DrawedMesa from "../pages/Mesas/DrawedMesa";
 import { Head, Link } from '@inertiajs/react';
+import { Car } from 'lucide-react';
+import CardMesa from './Mesas/CardMesa';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,11 +45,12 @@ export default function Dashboard({mesas}: { mesas: Mesa[] }) {
                 <h1>Estado de las Mesas </h1>
                 
 
-                <div className='grid gap-2  grid-cols-1 md:grid-cols-4 sm:grid-cols-1 relative content-center  justify-center '>
+                <div className='grid gap-2  grid-cols-1 md:grid-cols-4 sm:grid-cols-1 relative content-center  justify-center  w-full'>
                     
                     
                     {Array.isArray(mesas) && mesas.map((mesa) => (
-                       <DrawedMesa key={mesa.id} mesa={mesa}/>
+                       <CardMesa key={mesa.id} mesa={mesa}  />  
+
                     ))}
 
                    

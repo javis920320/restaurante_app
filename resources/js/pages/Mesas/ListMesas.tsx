@@ -1,28 +1,29 @@
 import React from 'react'
-import { ListaMesas } from '../../muckups/data'
+//import { ListaMesas } from '../../muckups/data'
 import CardMesa from './CardMesa'
 
-const ListMesas = () => {
+const ListMesas = ({ListaMesas}:any) => {
 const filterDisponibilidad =[
-    "Disponible",
-    "Ocupado",
-    "Reservado",
+    "disponible",
+    "ocupada",
+    "reservado",
 ]
 
+
     return (
-        <div className=' flex flex-col gap-4'>
+        <div className=' flex flex-col gap-4 bg-gray-100 p-4 rounded-lg shadow-md'> 
             <h1 className='text-2xl font-bold'>Mesas</h1>
             {
                 filterDisponibilidad.map((disponibilidad) => (
                     <div key={disponibilidad} className='flex items-center gap-2'>
-                        <div className={`w-4 h-4 rounded-full ${disponibilidad === "Disponible" ? "bg-green-500" : disponibilidad === "Ocupado" ? "bg-red-500" : "bg-yellow-500"}`}></div>
+                        <div className={`w-4 h-4 rounded-full ${disponibilidad === "disponible" ? "bg-green-500" : disponibilidad === "ocupada" ? "bg-red-500" : "bg-yellow-500"}`}></div>
                         <span>{disponibilidad}</span>
                     </div>
                 ))  
             }
 
             
-            <div className='grid grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 gap-5'>   
                 {Array.isArray(ListaMesas) && ListaMesas.map((mesa) => (
                     <CardMesa key={mesa.id} mesa={mesa} />
                 ))}
