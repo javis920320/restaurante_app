@@ -15,7 +15,7 @@ class MesaController extends Controller
     {
         // Obtener todas las mesas de la base de datos
         $mesas = Mesa::all();
-        return Inertia::render('Mesas/mesas', [
+        return Inertia::render('Mesas/Mesas', [
             'mesas' => $mesas,
         ]);
     }
@@ -24,8 +24,9 @@ class MesaController extends Controller
     {
         // Validar los datos de entrada
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'required|string|max:255|unique:mesas,nombre', // Cambiado a unique para nombre
             "capacidad" => 'required|integer|min:1',
+            'ubicacion' => 'required|in:Interior,Exterior,Patio,Balcón,Jardín,Barra,Terraza,VIP,Zona de fumadores', // Cambiado a enum para ubicacion   
             'estado' => 'required|in:disponible,ocupada', // Cambiado a enum para estado
 
         ]);
@@ -34,7 +35,7 @@ class MesaController extends Controller
         $mesa = Mesa::create($request->all());
         return response()->json([
             'message' => 'Mesa creada exitosamente.',
-            'mesa' => $mesa,
+            'nuevaMesa' => $mesa,
         ]);
 
     }

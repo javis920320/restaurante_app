@@ -4,16 +4,25 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::table('mesas', function (Blueprint $table) {
-            $table->enum('ubicacion', ['interior', 'exterior', 'terraza', 'patio', 'balcón','jardín', 'sala privada'])
-                ->default('interior')
+            $table->enum('ubicacion', [
+                'Interior',
+                'Exterior',
+                'Patio',
+                'Balcón',
+                'Jardín',
+                'Barra',
+                'Terraza',
+                'VIP',
+                'Zona de fumadores'
+            ])
+                ->default('Interior')
                 ->after('estado')
                 ->comment('Ubicación de la mesa: interior o exterior');
 
