@@ -11,7 +11,7 @@ const filterDisponibilidad =[
 
 
     return (
-        <div className=' flex flex-col gap-4 bg-gray-100  dark:bg-stone-900 p-4 rounded-lg shadow-md w-full'> 
+        <div className=' flex flex-col gap-4  p-4 rounded-lg shadow-md '> 
             <h1 className='text-2xl font-bold'>Mesas</h1>
             {
                 filterDisponibilidad.map((disponibilidad) => (
@@ -23,7 +23,7 @@ const filterDisponibilidad =[
             }
 
             
-            <div className='grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 gap-5'>   
+            <div className='grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 md:grid-cols-1 gap-5'>   
                 {Array.isArray(ListaMesas) && ListaMesas.map((mesa) => (
                     <CardMesa key={mesa.id} mesa={mesa} />
                 ))}

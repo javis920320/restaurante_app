@@ -48,15 +48,12 @@ const filteredPlatos = ListFilterPlates();
             <Head title="Crear Pedido" />
             <h1 className='text-2xl font-bold'>{mesa.nombre}</h1>
             <p className='text-gray-500'>Crear Pedido</p>
-            <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-1 gap-5'>    
-            
+
+            <div className=' relative grid grid-cols-1 lg:grid-cols-2 md:grid-cols-1 gap-5'>        
             <section className=''>
-                
-              
               {categorias&& categorias.map((categoria: Categoria) => (
                 <Badge key={categoria.id} className={
                     filterCategoria.some((cat:any) => cat.id === categoria.id)
-                    
                         ? 'cursor-pointer'
                         : 'bg-gray-200 text-gray-800 cursor-pointer'   
                 }
@@ -67,21 +64,16 @@ const filteredPlatos = ListFilterPlates();
               )) }
 
                 
-                <div className='grid grid-cols-1 xl:grid-cols-5  lg:grid-cols-4 md:grid-cols-1 gap-5 '>
-                  
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4'>
                     {filteredPlatos.length === 0 && <p className='text-red-500'>No hay platos disponibles</p>}
                     {Array.isArray(filteredPlatos) && filteredPlatos.map((plato: any) => (
                         <PlatosDisponibles key={plato.id} plato={plato} />
                     ))}
-
                 </div>
-
-
             </section>
-          <Card>
-
+          {/* <Card > */}
                 <PedidoMesero />
-            </Card>
+            {/* </Card> */}
             </div>
         </AppLayout>
     )

@@ -195,4 +195,21 @@ export const ListaMesas:Mesa[]=[
     ],
   },
 
+
+ ]
+
+ export const Ubicaciones_mesas=[
+  "Entrada",
+  "Interior",
+  "Terraza",
+  "Barra",
+  "Esquina",
+  "Jardín", 
+  "Zona VIP",
+  "Zona Familiar",
+  "Zona de fumadores",
+  "Zona de juegos",
+  "Zona de eventos",
+  "Zona de espera",
+
  ]

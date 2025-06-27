@@ -49,16 +49,16 @@ const PlatosDisponibles = ({ plato }: PlatosDisponiblesProps) => {
                 
                 <CardTitle >
                     <img
-                        src={plato.imagen}
+                        src={plato.imagen? plato.imagen : 'https://img.freepik.com/free-vector/404-error-with-landscape-concept-illustration_114360-7898.jpg'}
                         alt={plato.nombre}
                         className="w-full h-20 object-cover rounded-t-lg"
                     />
                 </CardTitle>
 
                 <CardContent className="">
-                    <h2 className="text-start text-blue-950 font-bold">{plato.nombre}</h2>
-                    <section className="flex flex-col items-start">
-                        <small className='text-gray-500'>{plato.descripcion}</small>
+                    <h2 className="text-start text-blue-950 dark:text-gray-300 font-bold">{plato.nombre}</h2>
+                    <section className="flex flex-col  justify-start items-start   ">
+                        <small className=' m-2 text-gray-400'>{plato.descripcion}</small>
                         
                     </section>
                 </CardContent>

@@ -3,7 +3,7 @@ import React from 'react'
 const ItemPedido = ({ pedido }: any) => {
     return (
         <div>
-            <div className="flex flex-col items-center justify-between p-4 bg-white shadow-md rounded-lg mb-4">
+            <div className="flex flex-col items-center justify-between p-4  shadow-md rounded-lg mb-4">
                 <div className='flex flex-col justify-between items-start w-full'>
                     <div className="flex justify-between w-full">
                         <h2 className="text-sm text-gray-500">Codigo:#{pedido.id}</h2>

@@ -1,8 +1,14 @@
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from '@inertiajs/react';
-import axios from "axios"
 
-const FormularioMesa = ({ onMesaCreada }: any) => {
+import axios from "axios"
+import { useState } from 'react';
+
+const FormularioMesa = ({ onMesaCreada, mesa }: any) => {
+    //definimos un estado si la peticion  con axios es exitosa o no
+    const [isSuccess, setIsSuccess] = useState(false);
     const ubicaciones = [
         'Interior',
         'Exterior',
@@ -16,19 +22,63 @@ const FormularioMesa = ({ onMesaCreada }: any) => {
 
 
     const { data, setData, post, processing, errors, setError } = useForm({
-        nombre: '',
-        capacidad: 0,
-        ubicacion: '',
-        estado: 'disponible',
+        nombre: mesa ? mesa.nombre : '',
+        capacidad: mesa ? mesa.capacidad : 0,
+        ubicacion: mesa ? mesa.ubicacion : '',
+        estado: mesa ? mesa.estado : 'disponible',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            
+            if (!data.nombre || !data.capacidad || !data.ubicacion || !data.estado) {
+                setError({
+                    nombre: data.nombre ? '' : 'El nombre es obligatorio',
+                    capacidad: data.capacidad > 0 ? '' : 'La capacidad debe ser mayor a 0',
+                    ubicacion: data.ubicacion ? '' : 'La ubicación es obligatoria',
+                    estado: data.estado ? '' : 'El estado es obligatorio',
+                });
+                return;
+            }
+
+            //SI la mesa ya existe, actualizamos sus datos
+            if (mesa) {
+               
+
+                const response = await axios.put(route('mesas.update', mesa.id), data);
+                if (response.status == 200) {
+                    const { mesaActualizada } = response.data;
+                    setTimeout(() => {
+                        setIsSuccess(false);
+                    }, 3000); // Resetea el estado de éxito después de 3 segundos
+                    setIsSuccess(true);
+                    onMesaCreada({ mesaActualizada });
+                    setData({
+                        nombre: '',
+                        capacidad: 0,
+                        ubicacion: '',
+                        estado: 'disponible',
+                    });
+                    setError({
+                        nombre: '',
+                        capacidad: '',
+                        ubicacion: '',
+                        estado: '',
+                    });
+                    
+                }
+                return;
+            }
 
             const response = await axios.post(route('mesas.store'), data)
+
             if (response.status == 200) {
                 const { nuevaMesa } = response.data;
+                  setTimeout(() => {
+                        setIsSuccess(false);
+                    }, 3000);
+                setIsSuccess(true);
                 onMesaCreada({ nuevaMesa });
                 setData({
                     nombre: '',
@@ -45,7 +95,7 @@ const FormularioMesa = ({ onMesaCreada }: any) => {
                 console.log(nuevaMesa);
             }
 
-        } catch (error) {
+        } catch (error: any) {
 
             if (error.response && error.response.data && error.response.data.errors) {
                 const errorData = error.response.data.errors;
@@ -65,8 +115,8 @@ const FormularioMesa = ({ onMesaCreada }: any) => {
 
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-zinc-900 p-2 rounded-lg shadow-md mb-4 flex flex-col h-[350px]">
-
+        <form onSubmit={handleSubmit} className="p-2 rounded-lg shadow-md mb-4 flex flex-col h-[350px]">
+            
             <p className='text-gray-500'>Configura las mesas de tu restaurante</p>
             <Input
                 type="text"
@@ -74,47 +124,51 @@ const FormularioMesa = ({ onMesaCreada }: any) => {
                 value={data.nombre}
                 onChange={(e) => setData('nombre', e.target.value)}
                 className="mb-4"
+                disabled={mesa ? true : false}
             />
-            <select
-                value={data.ubicacion}
-                onChange={(e) => setData('ubicacion', e.target.value)}
-                className="mb-4 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-                <option value="">Seleccione una ubicación</option>
-                {ubicaciones.map((ubicacion: string) => (
-                    <option key={ubicacion} value={ubicacion}>
-                        {ubicacion}
-                    </option>
-                ))}
-            </select>
 
+            <Select value={data.ubicacion} onValueChange={(value) => setData('ubicacion', value)} defaultValue={data.ubicacion} >
+                <SelectTrigger className='w-full mt-1' >
+                    <span className='text-gray-500'>{data.ubicacion ? data.ubicacion : "Seleccionar Ubicación"}</span>
+                </SelectTrigger>
+                <SelectContent className='w-full'>
+                    {ubicaciones.map((ubicacion: string) => (
+                        <SelectItem key={ubicacion} value={ubicacion}>{ubicacion}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+
+            <Label>Capacidad</Label>
             <Input
                 type="number"
                 placeholder="Capacidad de la mesa"
-
+                    min={1}
                 value={data.capacidad}
                 onChange={(e) => setData('capacidad', parseInt(e.target.value))}
-                className="mb-4"
+                className="my-4"
             />
+            <Select value={data.estado} onValueChange={(value) => setData('estado', value)} defaultValue={data.estado}>
+                <SelectTrigger className='w-full mt-1'>
+                    <span className='text-gray-500'>{data.estado ? data.estado : "Seleccionar estado"}</span>
+                </SelectTrigger>
+                <SelectContent className='w-full'>
+                    <SelectItem value="disponible">Disponible</SelectItem>
+                    <SelectItem value="ocupada">Ocupada</SelectItem>
+                    <SelectItem value="reservada">Reservada</SelectItem>
+                    <SelectItem value="en_mantenimiento">En Mantenimiento</SelectItem>
+                </SelectContent>
+            </Select>
 
 
 
-            <select
-                value={data.estado}
-                onChange={(e) => setData('estado', e.target.value)}
-                className="mb-4 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-                <option value="disponible">Disponible</option>
-                <option value="ocupada">Ocupada</option>
-                <option value="reservada">Reservada</option>
-            </select>
             <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className=" my-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 disabled={processing}
             >
                 {processing ? 'Guardando...' : 'Guardar Mesa'}
             </button>
+            {isSuccess && <p className="text-green-500">Mesa guardada exitosamente</p>}
             {errors.nombre && <p className="text-red-500">{errors.nombre}</p>}
             {errors.capacidad && <p className="text-red-500">{errors.capacidad}</p>}
             {errors.estado && <p className="text-red-500">{errors.estado}</p>}

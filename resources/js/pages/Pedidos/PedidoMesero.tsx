@@ -49,7 +49,7 @@ const PedidoMesero = () => {
 
 
   return (
-    <div className="w-full p-4 bg-white shadow-md rounded-lg">
+    <div className="w-full p-4 bg-white shadow-md rounded-lg ">
       <h2 className="text-xl font-semibold text-center text-gray-700 mb-4">
         Pedido del Mesero
       </h2>
