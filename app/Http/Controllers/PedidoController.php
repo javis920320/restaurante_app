@@ -136,5 +136,30 @@ class PedidoController extends Controller
             ], 422);
         }
     }
+
+    /**
+     * Mostrar estado del pedido (público)
+     */
+    public function showStatus(Pedido $pedido)
+    {
+        $pedido->load(['mesa', 'detalles.producto']);
+
+        return Inertia::render('Pedidos/Status', [
+            'codigo' => (string)$pedido->id,
+            'pedidoInicial' => $pedido,
+        ]);
+    }
+
+    /**
+     * Obtener pedido (API pública)
+     */
+    public function showPublic(Pedido $pedido)
+    {
+        $pedido->load(['mesa', 'detalles.producto']);
+
+        return response()->json([
+            'pedido' => $pedido,
+        ]);
+    }
 }
 
