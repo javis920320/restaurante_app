@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('qr_token')->unique()->after('nombre');
             $table->foreignId('restaurante_id')->nullable()->after('id')->constrained('restaurantes')->onDelete('cascade');
             $table->boolean('activa')->default(true)->after('estado');
-            $table->softDeletes();
             
             // Índices
             $table->index('qr_token');
@@ -35,7 +34,6 @@ return new class extends Migration
             $table->dropIndex(['restaurante_id']);
             $table->dropIndex(['activa']);
             $table->dropColumn(['qr_token', 'restaurante_id', 'activa']);
-            $table->dropSoftDeletes();
         });
     }
 };
