@@ -31,8 +31,11 @@ export const usePedido = (codigo: string): UsePedidoResult => {
                 const data = await pedidoService.obtenerPedidoPorCodigo(codigo);
                 setPedido(data);
                 setError(null);
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Error al obtener el pedido');
+            } catch (err: unknown) {
+                const errorMessage = err && typeof err === 'object' && 'response' in err
+                    ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al obtener el pedido'
+                    : 'Error al obtener el pedido';
+                setError(errorMessage);
                 console.error('Error fetching pedido:', err);
             } finally {
                 setLoading(false);
