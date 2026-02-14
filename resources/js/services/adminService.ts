@@ -28,7 +28,7 @@ const adminService = {
      */
     obtenerPedidos: async (filtros?: FiltrosPedidos): Promise<PaginatedPedidos> => {
         const params = new URLSearchParams();
-        
+
         if (filtros?.estado) {
             params.append('estado', filtros.estado);
         }

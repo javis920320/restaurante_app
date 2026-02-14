@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import { Producto } from '../services/menuService';
+import { Producto } from '@/services/menuService';
+import React, { createContext, useCallback, useContext, useReducer } from 'react';
 
 export interface CarritoItem {
     producto: Producto;
@@ -35,26 +35,20 @@ const CarritoContext = createContext<CarritoContextType | undefined>(undefined);
 
 // Función auxiliar para calcular el total
 const calcularTotal = (items: CarritoItem[]): number => {
-    return items.reduce((sum, item) => sum + (item.producto.precio * item.cantidad), 0);
+    return items.reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0);
 };
 
 // Reducer para manejar el estado del carrito
 const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoState => {
     switch (action.type) {
         case 'AGREGAR_PRODUCTO': {
-            const existingItemIndex = state.items.findIndex(
-                item => item.producto.id === action.payload.producto.id
-            );
+            const existingItemIndex = state.items.findIndex((item) => item.producto.id === action.payload.producto.id);
 
             let newItems: CarritoItem[];
-            
+
             if (existingItemIndex >= 0) {
                 // Si el producto ya existe, aumentar cantidad
-                newItems = state.items.map((item, index) =>
-                    index === existingItemIndex
-                        ? { ...item, cantidad: item.cantidad + 1 }
-                        : item
-                );
+                newItems = state.items.map((item, index) => (index === existingItemIndex ? { ...item, cantidad: item.cantidad + 1 } : item));
             } else {
                 // Si no existe, agregar nuevo
                 newItems = [
@@ -74,10 +68,8 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
         }
 
         case 'AUMENTAR_CANTIDAD': {
-            const newItems = state.items.map(item =>
-                item.producto.id === action.payload.productoId
-                    ? { ...item, cantidad: item.cantidad + 1 }
-                    : item
+            const newItems = state.items.map((item) =>
+                item.producto.id === action.payload.productoId ? { ...item, cantidad: item.cantidad + 1 } : item,
             );
 
             return {
@@ -88,12 +80,8 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
 
         case 'DISMINUIR_CANTIDAD': {
             const newItems = state.items
-                .map(item =>
-                    item.producto.id === action.payload.productoId
-                        ? { ...item, cantidad: item.cantidad - 1 }
-                        : item
-                )
-                .filter(item => item.cantidad > 0);
+                .map((item) => (item.producto.id === action.payload.productoId ? { ...item, cantidad: item.cantidad - 1 } : item))
+                .filter((item) => item.cantidad > 0);
 
             return {
                 items: newItems,
@@ -102,9 +90,7 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
         }
 
         case 'ELIMINAR_PRODUCTO': {
-            const newItems = state.items.filter(
-                item => item.producto.id !== action.payload.productoId
-            );
+            const newItems = state.items.filter((item) => item.producto.id !== action.payload.productoId);
 
             return {
                 items: newItems,
@@ -113,10 +99,8 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
         }
 
         case 'ACTUALIZAR_NOTAS': {
-            const newItems = state.items.map(item =>
-                item.producto.id === action.payload.productoId
-                    ? { ...item, notas: action.payload.notas }
-                    : item
+            const newItems = state.items.map((item) =>
+                item.producto.id === action.payload.productoId ? { ...item, notas: action.payload.notas } : item,
             );
 
             return {

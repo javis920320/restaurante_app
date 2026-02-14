@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import adminService, { FiltrosPedidos } from '../services/adminService';
-import { Pedido } from '../services/pedidoService';
+import adminService, { FiltrosPedidos } from '@/services/adminService';
+import { Pedido } from '@/services/pedidoService';
+import { useEffect, useState } from 'react';
 
 interface UseAdminPedidosResult {
     pedidos: Pedido[];
@@ -30,7 +30,7 @@ export const useAdminPedidos = (filtros?: FiltrosPedidos): UseAdminPedidosResult
     const [cambiandoEstado, setCambiandoEstado] = useState<boolean>(false);
 
     const refetch = () => {
-        setRefreshKey(prev => prev + 1);
+        setRefreshKey((prev) => prev + 1);
     };
 
     useEffect(() => {
@@ -45,8 +45,8 @@ export const useAdminPedidos = (filtros?: FiltrosPedidos): UseAdminPedidosResult
                 setLastPage(data.last_page);
                 setTotal(data.total);
                 setError(null);
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Error al obtener los pedidos');
+            } catch (err) {
+                setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al obtener los pedidos');
                 console.error('Error fetching pedidos:', err);
             } finally {
                 setLoading(false);
@@ -67,18 +67,18 @@ export const useAdminPedidos = (filtros?: FiltrosPedidos): UseAdminPedidosResult
                 clearInterval(intervalId);
             }
         };
-    }, [filtros?.estado, filtros?.mesa_id, filtros?.page, refreshKey]);
+    }, [filtros?.estado, filtros?.mesa_id, filtros?.page, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const cambiarEstado = async (pedidoId: number, estado: string) => {
         try {
             setCambiandoEstado(true);
             await adminService.cambiarEstadoPedido(
-                pedidoId, 
-                estado as 'pendiente' | 'confirmado' | 'en_preparacion' | 'listo' | 'entregado' | 'pagado' | 'cancelado'
+                pedidoId,
+                estado as 'pendiente' | 'confirmado' | 'en_preparacion' | 'listo' | 'entregado' | 'pagado' | 'cancelado',
             );
             refetch();
-        } catch (err: any) {
-            throw new Error(err.response?.data?.message || 'Error al cambiar el estado');
+        } catch (err) {
+            throw new Error((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al cambiar el estado');
         } finally {
             setCambiandoEstado(false);
         }
@@ -89,8 +89,8 @@ export const useAdminPedidos = (filtros?: FiltrosPedidos): UseAdminPedidosResult
             setCambiandoEstado(true);
             await adminService.cerrarMesa(pedidoId);
             refetch();
-        } catch (err: any) {
-            throw new Error(err.response?.data?.message || 'Error al cerrar la mesa');
+        } catch (err) {
+            throw new Error((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al cerrar la mesa');
         } finally {
             setCambiandoEstado(false);
         }

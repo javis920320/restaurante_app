@@ -1,11 +1,10 @@
 import Heading from '@/components/heading';
-import { Props } from 'node_modules/@headlessui/react/dist/types';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 
-import { PropsWithChildren } from 'react';
 import { Separator } from '@/components/ui/separator';
+import { PropsWithChildren } from 'react';
 
 export default function ConfiguracionLayout({ children }: PropsWithChildren) {
     if (typeof window === 'undefined') {
@@ -38,40 +37,33 @@ export default function ConfiguracionLayout({ children }: PropsWithChildren) {
 
     const currentPath = window.location.pathname;
     return (
-        <div className= "px-4 py-6">
-
-        <Heading title="Configuración Basica " description = "Configuración Basica en Categorias, Mesas, Platos, Usuarios"/>
+        <div className="px-4 py-6">
+            <Heading title="Configuración Basica " description="Configuración Basica en Categorias, Mesas, Platos, Usuarios" />
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav className="flex flex-col space-y-1 space-x-0">
-                    {
-                        sidebarNavItems.map((item, index) => (
+                        {sidebarNavItems.map((item, index) => (
                             <Button
-                                key= {`${item.href}-${index}`}
-                                size = "sm"
-                                variant = "ghost"
+                                key={`${item.href}-${index}`}
+                                size="sm"
+                                variant="ghost"
                                 asChild
-                                className = {
-                                    cn('w-full justify-start', {
-                                        'bg-muted': currentPath === item.href,})
-                                    }>
-                                <Link href={ item.href } prefetch>
-                                { item.title }
+                                className={cn('w-full justify-start', {
+                                    'bg-muted': currentPath === item.href,
+                                })}
+                            >
+                                <Link href={item.href} prefetch>
+                                    {item.title}
                                 </Link>
-                        </Button>
-                    ))}
-
+                            </Button>
+                        ))}
                     </nav>
-
                 </aside>
-                <Separator className="my-6 md:hidden" />   
+                <Separator className="my-6 md:hidden" />
                 <div className="flex-1 md:max-w-2xl">
                     <section className="max-w-xl space-y-12">{children}</section>
-
                 </div>
-
             </div>
         </div>
-    );  
-
+    );
 }

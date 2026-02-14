@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { usePedido } from '@/hooks/usePedido';
+import { Pedido } from '@/services/pedidoService';
 import { Head, router } from '@inertiajs/react';
-import { usePedido } from '../../hooks/usePedido';
-import { Pedido } from '../../services/pedidoService';
-import { CheckCircle, Clock, ChefHat, Package, CreditCard, Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
+import { CheckCircle, ChefHat, Clock, CreditCard, Loader2, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface PedidoStatusProps {
     codigo: string;
@@ -110,15 +110,15 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
                 });
             }
         }
-    }, [pedido?.estado]);
+    }, [pedido?.estado]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (loading && !pedido) {
         return (
             <>
                 <Head title="Cargando pedido..." />
-                <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="flex min-h-screen items-center justify-center bg-gray-50">
                     <div className="text-center">
-                        <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+                        <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-blue-600" />
                         <p className="text-gray-600">Cargando tu pedido...</p>
                     </div>
                 </div>
@@ -130,12 +130,10 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
         return (
             <>
                 <Head title="Error" />
-                <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-                    <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-                        <p className="text-red-600 mb-4">{error}</p>
-                        <Button onClick={() => router.visit('/')}>
-                            Volver al inicio
-                        </Button>
+                <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+                    <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-lg">
+                        <p className="mb-4 text-red-600">{error}</p>
+                        <Button onClick={() => router.visit('/')}>Volver al inicio</Button>
                     </div>
                 </div>
             </>
@@ -152,32 +150,26 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
     return (
         <>
             <Head title={`Pedido - ${estadoConfig.label}`} />
-            
-            <div className="min-h-screen bg-gray-50 py-8 px-4">
-                <div className="max-w-2xl mx-auto">
+
+            <div className="min-h-screen bg-gray-50 px-4 py-8">
+                <div className="mx-auto max-w-2xl">
                     {/* Estado actual destacado */}
-                    <div className={`${estadoConfig.bgColor} ${estadoConfig.borderColor} border-2 rounded-xl p-6 mb-6 shadow-lg`}>
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className={`${estadoConfig.color} p-3 rounded-full bg-white`}>
+                    <div className={`${estadoConfig.bgColor} ${estadoConfig.borderColor} mb-6 rounded-xl border-2 p-6 shadow-lg`}>
+                        <div className="mb-4 flex items-center gap-4">
+                            <div className={`${estadoConfig.color} rounded-full bg-white p-3`}>
                                 <IconComponent className="h-8 w-8" />
                             </div>
                             <div className="flex-1">
-                                <h1 className={`text-2xl font-bold ${estadoConfig.color}`}>
-                                    {estadoConfig.label}
-                                </h1>
-                                <p className="text-sm text-gray-600 mt-1">
-                                    {estadoConfig.description}
-                                </p>
+                                <h1 className={`text-2xl font-bold ${estadoConfig.color}`}>{estadoConfig.label}</h1>
+                                <p className="mt-1 text-sm text-gray-600">{estadoConfig.description}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Información del pedido */}
-                    <div className="bg-white rounded-lg shadow p-6 mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Información del Pedido
-                        </h2>
-                        
+                    <div className="mb-6 rounded-lg bg-white p-6 shadow">
+                        <h2 className="mb-4 text-lg font-semibold text-gray-900">Información del Pedido</h2>
+
                         <div className="space-y-3 text-sm">
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Mesa:</span>
@@ -198,89 +190,74 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
 
                     {/* Detalles del pedido */}
                     {pedido.detalles && pedido.detalles.length > 0 && (
-                        <div className="bg-white rounded-lg shadow p-6 mb-6">
-                            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                                Productos
-                            </h2>
-                            
+                        <div className="mb-6 rounded-lg bg-white p-6 shadow">
+                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Productos</h2>
+
                             <div className="space-y-3">
                                 {pedido.detalles.map((detalle) => (
-                                    <div key={detalle.id} className="flex justify-between items-start border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                                    <div
+                                        key={detalle.id}
+                                        className="flex items-start justify-between border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                                    >
                                         <div className="flex-1">
-                                            <p className="font-medium text-gray-900">
-                                                {detalle.producto.nombre}
-                                            </p>
+                                            <p className="font-medium text-gray-900">{detalle.producto.nombre}</p>
                                             <p className="text-sm text-gray-600">
                                                 {detalle.cantidad} x {formatPrice(detalle.precio_unitario)}
                                             </p>
-                                            {detalle.notas && (
-                                                <p className="text-xs text-gray-500 italic mt-1">
-                                                    {detalle.notas}
-                                                </p>
-                                            )}
+                                            {detalle.notas && <p className="mt-1 text-xs text-gray-500 italic">{detalle.notas}</p>}
                                         </div>
-                                        <span className="font-semibold text-gray-900">
-                                            {formatPrice(detalle.subtotal)}
-                                        </span>
+                                        <span className="font-semibold text-gray-900">{formatPrice(detalle.subtotal)}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="border-t-2 border-gray-200 mt-4 pt-4">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold text-gray-900">
-                                        Total:
-                                    </span>
-                                    <span className="text-2xl font-bold text-green-600">
-                                        {formatPrice(pedido.total)}
-                                    </span>
+                            <div className="mt-4 border-t-2 border-gray-200 pt-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold text-gray-900">Total:</span>
+                                    <span className="text-2xl font-bold text-green-600">{formatPrice(pedido.total)}</span>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {/* Timeline de estados */}
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Seguimiento
-                        </h2>
-                        
+                    <div className="rounded-lg bg-white p-6 shadow">
+                        <h2 className="mb-4 text-lg font-semibold text-gray-900">Seguimiento</h2>
+
                         <div className="relative">
-                            {Object.entries(estadosConfig).slice(0, 6).map(([key, config], index, array) => {
-                                const isActive = pedido.estado === key;
-                                const estadoIndex = Object.keys(estadosConfig).indexOf(pedido.estado);
-                                const currentIndex = Object.keys(estadosConfig).indexOf(key);
-                                const isCompleted = currentIndex <= estadoIndex;
-                                
-                                return (
-                                    <div key={key} className="flex gap-4 pb-6 last:pb-0">
-                                        <div className="relative flex flex-col items-center">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                                isCompleted ? config.bgColor + ' ' + config.color : 'bg-gray-100 text-gray-400'
-                                            } border-2 ${isActive ? config.borderColor : 'border-gray-200'}`}>
-                                                {isCompleted && <CheckCircle className="h-5 w-5" />}
+                            {Object.entries(estadosConfig)
+                                .slice(0, 6)
+                                .map(([key, config], index, array) => {
+                                    const isActive = pedido.estado === key;
+                                    const estadoIndex = Object.keys(estadosConfig).indexOf(pedido.estado);
+                                    const currentIndex = Object.keys(estadosConfig).indexOf(key);
+                                    const isCompleted = currentIndex <= estadoIndex;
+
+                                    return (
+                                        <div key={key} className="flex gap-4 pb-6 last:pb-0">
+                                            <div className="relative flex flex-col items-center">
+                                                <div
+                                                    className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                                                        isCompleted ? config.bgColor + ' ' + config.color : 'bg-gray-100 text-gray-400'
+                                                    } border-2 ${isActive ? config.borderColor : 'border-gray-200'}`}
+                                                >
+                                                    {isCompleted && <CheckCircle className="h-5 w-5" />}
+                                                </div>
+                                                {index < array.length - 1 && (
+                                                    <div className={`absolute top-8 h-full w-0.5 ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`} />
+                                                )}
                                             </div>
-                                            {index < array.length - 1 && (
-                                                <div className={`w-0.5 h-full absolute top-8 ${
-                                                    isCompleted ? 'bg-green-500' : 'bg-gray-200'
-                                                }`} />
-                                            )}
+                                            <div className="flex-1 pt-1">
+                                                <p className={`font-medium ${isActive ? config.color : 'text-gray-900'}`}>{config.label}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 pt-1">
-                                            <p className={`font-medium ${isActive ? config.color : 'text-gray-900'}`}>
-                                                {config.label}
-                                            </p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
                         </div>
                     </div>
 
                     {/* Actualización automática */}
-                    <p className="text-center text-sm text-gray-500 mt-6">
-                        Esta página se actualiza automáticamente cada 10 segundos
-                    </p>
+                    <p className="mt-6 text-center text-sm text-gray-500">Esta página se actualiza automáticamente cada 10 segundos</p>
                 </div>
             </div>
         </>

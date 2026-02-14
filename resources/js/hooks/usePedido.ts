@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import pedidoService, { Pedido } from '../services/pedidoService';
+import pedidoService, { Pedido } from '@/services/pedidoService';
+import { useEffect, useState } from 'react';
 
 interface UsePedidoResult {
     pedido: Pedido | null;
@@ -19,7 +19,7 @@ export const usePedido = (codigo: string): UsePedidoResult => {
     const [refreshKey, setRefreshKey] = useState<number>(0);
 
     const refetch = () => {
-        setRefreshKey(prev => prev + 1);
+        setRefreshKey((prev) => prev + 1);
     };
 
     useEffect(() => {
@@ -31,11 +31,11 @@ export const usePedido = (codigo: string): UsePedidoResult => {
                 const data = await pedidoService.obtenerPedidoPorCodigo(codigo);
                 setPedido(data);
                 setError(null);
-            } catch (err: unknown) {
-                const errorMessage = err && typeof err === 'object' && 'response' in err
-                    ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al obtener el pedido'
-                    : 'Error al obtener el pedido';
-                setError(errorMessage);
+            } catch (err) {
+                setError(
+                    (err as { response?: { data?: { message?: string } } }).response?.data
+                        ?.message || 'Error al obtener el pedido',
+                );
                 console.error('Error fetching pedido:', err);
             } finally {
                 setLoading(false);

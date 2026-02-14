@@ -1,4 +1,4 @@
-import api from './api';
+import { MenuData } from '@/services/menuService';
 
 export interface Producto {
     id: number;

@@ -1,13 +1,6 @@
-import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 interface EstadoSelectorProps {
     estadoActual: string;
@@ -38,8 +31,8 @@ export default function EstadoSelector({ estadoActual, pedidoId, onCambiarEstado
 
         try {
             await onCambiarEstado(pedidoId, nuevoEstado);
-        } catch (err: any) {
-            setError(err.message || 'Error al cambiar el estado');
+        } catch (err) {
+            setError((err as Error).message || 'Error al cambiar el estado');
             console.error('Error cambiando estado:', err);
         } finally {
             setLoading(false);
@@ -48,11 +41,7 @@ export default function EstadoSelector({ estadoActual, pedidoId, onCambiarEstado
 
     return (
         <div className="space-y-2">
-            <Select
-                value={estadoActual}
-                onValueChange={handleChange}
-                disabled={disabled || loading}
-            >
+            <Select value={estadoActual} onValueChange={handleChange} disabled={disabled || loading}>
                 <SelectTrigger className="w-full">
                     {loading ? (
                         <div className="flex items-center gap-2">
@@ -71,10 +60,8 @@ export default function EstadoSelector({ estadoActual, pedidoId, onCambiarEstado
                     ))}
                 </SelectContent>
             </Select>
-            
-            {error && (
-                <p className="text-sm text-red-600">{error}</p>
-            )}
+
+            {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
     );
 }
