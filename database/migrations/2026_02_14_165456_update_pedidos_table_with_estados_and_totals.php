@@ -52,7 +52,7 @@ return new class extends Migration
         });
         
         Schema::table('pedidos', function (Blueprint $table) {
-            $table->enum('estado', ['pendiente', 'en concina', 'servido', 'pagado'])
+            $table->enum('estado', ['pendiente', 'en_cocina', 'servido', 'pagado'])
                 ->after('mesa_id');
         });
     }
