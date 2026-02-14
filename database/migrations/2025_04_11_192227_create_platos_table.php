@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal("precio",8,2);
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade'); // Relación con la tabla categorias      
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
