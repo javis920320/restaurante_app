@@ -1,5 +1,3 @@
-import { MenuData } from '@/services/menuService';
-
 export interface Producto {
     id: number;
     nombre: string;

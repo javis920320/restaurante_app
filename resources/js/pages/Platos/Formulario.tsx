@@ -75,42 +75,6 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
                 </SelectTrigger>
             </Select>
 
-<<<<<<< HEAD
-  return (
-    <form onSubmit={handleSubmit}>
-    <InputError message={errors.nombre} />
-    <div className=' grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-      <Input
-        className='col-span-2'
-        placeholder='Nombre del plato'
-        value={data.nombre}
-        onChange={(e) => setData('nombre', e.target.value)}
-      ></Input>
-      <Input type='number'
-        placeholder='Precio del plato'
-        value={data.precio}
-        onChange={(e) => setData('precio', parseFloat(e.target.value))}
-      ></Input>
-    </div>
-    <Select onValueChange={(value) => setData("categoria_id", parseInt(value))} >
-      <SelectTrigger className="w-full mt-2" >
-        <SelectValue placeholder="Selecciona una categoria" />
-        <SelectContent>
-          {categorias.map((categoria) => (
-            <SelectItem key={categoria.id} value={categoria.id.toString()}>{categoria.nombre}</SelectItem>
-          ))}
-        </SelectContent>
-      </SelectTrigger>
-    </Select>
-
-    <div className=' my-2'>
-      <textarea className=" p-2 rounded-2xl w-full border-1 " placeholder="Descripción del plato" value={data.descripcion} onChange={(e) => setData('descripcion', e.target.value)}></textarea>
-    </div>
-    <Button type="submit" disabled={processing} className="bg-blue-500 text-white rounded-md px-4 py-2 mt-4"> Nuevo Plato</Button>
-  </form>
-  )
-}
-=======
             <div className="my-2">
                 <textarea
                     className="w-full rounded-2xl border-1 p-2"
@@ -119,11 +83,14 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
                     onChange={(e) => setData('descripcion', e.target.value)}
                 ></textarea>
             </div>
-            <Button type="submit" disabled={processing} className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white">
-                {' '}
+            <Button
+                type="submit"
+                disabled={processing}
+                className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white"
+            >
                 Nuevo Plato
             </Button>
         </form>
     );
 }
->>>>>>> b2db0f0 (Fix linting issues and update imports to use path aliases)
+
