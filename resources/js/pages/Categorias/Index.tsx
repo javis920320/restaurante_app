@@ -16,7 +16,6 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
     const [listCategorias, setCategorias] = useState<Categoria[]>(categorias); // Estado para las categorías
     const categoriaExist = listCategorias.length > 0 ? true : false; // Verifica si hay categorías
     const {
-        post,
         setData,
         data,
         errors,
@@ -81,7 +80,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                                 {listCategorias.map((categoria) => (
                                     <li key={categoria.id} className="flex justify-between rounded-md border p-2">
                                         <span>{categoria.nombre}</span>
-                                        <button className="text-red-500 hover:text-red-700" onClick={(e) => eliminarCategoria(categoria.id)}>
+                                        <button className="text-red-500 hover:text-red-700" onClick={() => eliminarCategoria(categoria.id)}>
                                             Eliminar{' '}
                                         </button>
                                     </li>
