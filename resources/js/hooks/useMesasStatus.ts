@@ -28,8 +28,12 @@ export function useMesasStatus(options: UseMesasStatusOptions = {}) {
             const response = await axios.get('/api/admin/mesas/status');
             setMesas(response.data);
             setError(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al cargar estado de mesas');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Error al cargar estado de mesas');
+            } else {
+                setError('Error al cargar estado de mesas');
+            }
         } finally {
             setLoading(false);
         }
