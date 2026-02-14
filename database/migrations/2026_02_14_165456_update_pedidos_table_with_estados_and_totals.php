@@ -41,10 +41,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pedidos', function (Blueprint $table) {
-            $table->dropIndex(['estado']);
+            // Drop indexes if they exist
+            if (Schema::hasColumn('pedidos', 'estado')) {
+                $table->dropIndex(['estado']);
+            }
             $table->dropIndex(['mesa_id', 'estado']);
             $table->dropColumn(['subtotal', 'total', 'notas']);
-            $table->dropSoftDeletes();
         });
         
         Schema::table('pedidos', function (Blueprint $table) {

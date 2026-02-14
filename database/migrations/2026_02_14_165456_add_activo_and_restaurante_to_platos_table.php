@@ -36,7 +36,6 @@ return new class extends Migration
             $table->dropIndex(['activo']);
             $table->dropIndex(['restaurante_id']);
             $table->dropColumn(['restaurante_id', 'activo']);
-            $table->dropSoftDeletes();
         });
     }
 };
