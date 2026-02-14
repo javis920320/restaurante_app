@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('capacidad'); // Capacidad de la mesa
             $table->enum('estado', ['disponible', 'ocupada']); // Estado de la mesa
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
