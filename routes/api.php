@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuQRController;
 use App\Http\Controllers\PedidoController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,12 @@ Route::get('/pedidos/{pedido}', [PedidoController::class, 'showPublic'])->name('
 
 // Rutas protegidas con autenticación
 Route::middleware('auth:sanctum')->group(function () {
+    // Dashboard metrics and data
+    Route::get('/admin/dashboard/metrics', [DashboardController::class, 'metrics'])->name('api.dashboard.metrics');
+    Route::get('/admin/dashboard/reportes', [DashboardController::class, 'reportes'])->name('api.dashboard.reportes');
+    Route::get('/admin/dashboard/pedidos-kanban', [DashboardController::class, 'pedidosKanban'])->name('api.dashboard.pedidos-kanban');
+    Route::get('/admin/mesas/status', [DashboardController::class, 'mesasStatus'])->name('api.mesas.status');
+    
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');
     Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('api.pedidos.show');

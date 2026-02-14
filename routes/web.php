@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuQRController;
 use App\Http\Controllers\MesaController;
 use App\Http\Controllers\PedidoController;
@@ -20,9 +21,8 @@ Route::get('/pedido/{pedido}', [PedidoController::class, 'showStatus'])->name('p
 
 // Rutas protegidas con autenticación
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    // Dashboard administrativo
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
