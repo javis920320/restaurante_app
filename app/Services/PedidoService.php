@@ -120,6 +120,24 @@ class PedidoService
             throw new Exception('Estado inválido: ' . $nuevoEstado);
         }
 
+        // Validate state transitions
+        $transicionesPermitidas = [
+            'pendiente' => ['confirmado', 'cancelado'],
+            'confirmado' => ['en_preparacion', 'cancelado'],
+            'en_preparacion' => ['listo', 'cancelado'],
+            'listo' => ['entregado'],
+            'entregado' => ['pagado'],
+            'pagado' => [], // Terminal state
+            'cancelado' => [], // Terminal state
+        ];
+
+        $estadoActual = $pedido->estado;
+        
+        // Check if transition is allowed
+        if (!in_array($nuevoEstado, $transicionesPermitidas[$estadoActual] ?? [])) {
+            throw new Exception("No se puede cambiar de estado '{$estadoActual}' a '{$nuevoEstado}'");
+        }
+
         return DB::transaction(function () use ($pedido, $nuevoEstado, $userId) {
             $estadoAnterior = $pedido->estado;
 
