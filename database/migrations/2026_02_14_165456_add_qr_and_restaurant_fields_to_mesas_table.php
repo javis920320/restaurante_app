@@ -30,6 +30,7 @@ return new class extends Migration
     {
         Schema::table('mesas', function (Blueprint $table) {
             $table->dropForeign(['restaurante_id']);
+            $table->dropUnique(['qr_token']);
             $table->dropIndex(['qr_token']);
             $table->dropIndex(['restaurante_id']);
             $table->dropIndex(['activa']);
