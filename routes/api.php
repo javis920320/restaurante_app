@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // Rutas públicas para el sistema de pedidos por QR
 Route::post('/pedidos', [PedidoController::class, 'store'])->name('api.pedidos.store');
+Route::get('/pedidos/{pedido}', [PedidoController::class, 'showPublic'])->name('api.pedidos.show-public');
 
 // Rutas protegidas con autenticación
 Route::middleware('auth:sanctum')->group(function () {

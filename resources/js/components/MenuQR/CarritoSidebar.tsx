@@ -49,14 +49,8 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
             // Limpiar carrito
             limpiarCarrito();
 
-            // Redirigir a la página de estado del pedido
-            // Nota: Asumimos que el pedido tiene un campo 'codigo' para tracking
-            if (response.pedido.codigo) {
-                router.visit(`/pedido/${response.pedido.codigo}`);
-            } else {
-                // Si no hay código, redirigir con el ID
-                router.visit(`/pedido/tracking/${response.pedido.id}`);
-            }
+            // Redirigir a la página de estado del pedido usando el ID
+            router.visit(`/pedido/${response.pedido.id}`);
         } catch (err: any) {
             console.error('Error al crear pedido:', err);
             const errorMessage = err.response?.data?.message || 'Error al crear el pedido. Por favor, intenta de nuevo.';

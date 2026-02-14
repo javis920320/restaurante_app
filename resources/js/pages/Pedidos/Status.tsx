@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { usePedido } from '../../hooks/usePedido';
+import { Pedido } from '../../services/pedidoService';
 import { CheckCircle, Clock, ChefHat, Package, CreditCard, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface PedidoStatusProps {
     codigo: string;
+    pedidoInicial?: Pedido;
 }
 
 const estadosConfig = {
@@ -68,8 +70,16 @@ const estadosConfig = {
     },
 };
 
-export default function Status({ codigo }: PedidoStatusProps) {
-    const { pedido, loading, error } = usePedido(codigo);
+export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
+    const { pedido: pedidoActualizado, loading, error } = usePedido(codigo);
+    const [pedido, setPedido] = useState<Pedido | null>(pedidoInicial || null);
+
+    // Update pedido when we get new data from polling
+    useEffect(() => {
+        if (pedidoActualizado) {
+            setPedido(pedidoActualizado);
+        }
+    }, [pedidoActualizado]);
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('es-CO', {

@@ -63,10 +63,10 @@ const pedidoService = {
 
     /**
      * Obtiene el estado de un pedido por su código
-     * Nota: Este endpoint aún no existe en el backend, se debe implementar
+     * Nota: Usamos el ID del pedido como código
      */
     obtenerPedidoPorCodigo: async (codigo: string): Promise<Pedido> => {
-        const response = await api.get<{ pedido: Pedido }>(`/pedidos/codigo/${codigo}`);
+        const response = await api.get<{ pedido: Pedido }>(`/pedidos/${codigo}`);
         return response.data.pedido;
     },
 

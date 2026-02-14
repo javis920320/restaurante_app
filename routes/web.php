@@ -15,6 +15,9 @@ Route::get('/', function () {
 // Ruta pública del menú QR
 Route::get('/menu/{token}', [MenuQRController::class, 'show'])->name('menu.qr');
 
+// Ruta pública para ver el estado del pedido
+Route::get('/pedido/{pedido}', [PedidoController::class, 'showStatus'])->name('pedido.status');
+
 // Rutas protegidas con autenticación
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
