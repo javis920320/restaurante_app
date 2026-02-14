@@ -7,7 +7,7 @@ import React from 'react'
 import axios from "axios"
 
 export default function  Formulario  ({ categorias }: { categorias: { id: number; nombre: string }[] })  {
-      const { data, setData, errors, setError, post, processing } = useForm({
+      const { data, setData, errors, setError, processing } = useForm({
         nombre: '',
         precio: 0,
         descripcion: '',
@@ -17,29 +17,25 @@ export default function  Formulario  ({ categorias }: { categorias: { id: number
       const handleSubmit = async (e: React.FormEvent) => {
           e.preventDefault();
           try {
-            const respuesta = await axios.post(route("platos.store"), { nombre: data.nombre, precio: data.precio, descripcion: data.descripcion, categoria_id: data.categoria_id, imagen: data.imagen })
-      
+            const respuesta = await axios.post(route("platos.store"), { nombre: data.nombre, precio: data.precio, descripcion: data.descripcion, categoria_id: data.categoria_id, imagen: data.imagen });
+
             if (respuesta.status === 200) {
               setData({ nombre: '', precio: 0, descripcion: '', categoria_id: 0, imagen: null });
-              
-      
             } else {
-      
               // Maneja el error aquí
             }
-          } catch (error: any) {
-            if (error.response && error.response.data.errors) {
-              const backendErrors = error.response.data.errors;
-              Object.keys(backendErrors).forEach((key: any) => {
-                setError(key, backendErrors[key][0]); // Establece el error en el campo correspondiente
-              });
-      
+          } catch (error: unknown) {
+            if (error && typeof error === 'object' && 'response' in error) {
+              const errorResponse = error as { response?: { data?: { errors?: Record<string, string[]> } } };
+              const backendErrors = errorResponse.response?.data?.errors;
+              if (backendErrors) {
+                Object.keys(backendErrors).forEach((key: string) => {
+                  setError(key, backendErrors[key][0]); // Establece el error en el campo correspondiente
+                });
+              }
             }
-      
           }
-      
         }
-
 
 
   return (
@@ -51,17 +47,14 @@ export default function  Formulario  ({ categorias }: { categorias: { id: number
         placeholder='Nombre del plato'
         value={data.nombre}
         onChange={(e) => setData('nombre', e.target.value)}
-
       ></Input>
       <Input type='number'
         placeholder='Precio del plato'
         value={data.precio}
         onChange={(e) => setData('precio', parseFloat(e.target.value))}
-
       ></Input>
     </div>
     <Select onValueChange={(value) => setData("categoria_id", parseInt(value))} >
-
       <SelectTrigger className="w-full mt-2" >
         <SelectValue placeholder="Selecciona una categoria" />
         <SelectContent>
@@ -79,4 +72,3 @@ export default function  Formulario  ({ categorias }: { categorias: { id: number
   </form>
   )
 }
-
