@@ -41,11 +41,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pedidos', function (Blueprint $table) {
-            // Drop indexes if they exist
+            // Drop indexes that depend on estado column
             if (Schema::hasColumn('pedidos', 'estado')) {
                 $table->dropIndex(['estado']);
+                $table->dropIndex(['mesa_id', 'estado']);
             }
-            $table->dropIndex(['mesa_id', 'estado']);
             $table->dropColumn(['subtotal', 'total', 'notas']);
         });
         
