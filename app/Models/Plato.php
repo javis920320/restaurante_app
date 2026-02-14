@@ -3,24 +3,57 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Plato extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'nombre',
-        'precio', 
+        'precio',
         'descripcion',
         'categoria_id',
+        'restaurante_id',
         'imagen',
-        'estado',
-    ];  
-    //relaciones con los modelos
-    public function categoria()
+        'activo',
+    ];
+
+    protected $casts = [
+        'precio' => 'decimal:2',
+        'activo' => 'boolean',
+    ];
+
+    /**
+     * Relación con categoría
+     */
+    public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class);
     }
-    public function pedido()
+
+    /**
+     * Relación con restaurante
+     */
+    public function restaurante(): BelongsTo
     {
-        return $this->belongsToMany(Pedido::class)->withPivot('cantidad','precio','total');
-    }   
+        return $this->belongsTo(Restaurante::class);
+    }
+
+    /**
+     * Scope para productos activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
+
+    /**
+     * Scope para productos por categoría
+     */
+    public function scopePorCategoria($query, $categoriaId)
+    {
+        return $query->where('categoria_id', $categoriaId);
+    }
 }
