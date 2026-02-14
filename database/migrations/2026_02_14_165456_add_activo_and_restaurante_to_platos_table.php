@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::table('platos', function (Blueprint $table) {
             $table->foreignId('restaurante_id')->nullable()->after('categoria_id')->constrained('restaurantes')->onDelete('cascade');
             $table->boolean('activo')->default(true)->after('precio');
-            $table->softDeletes();
+            
+            // Solo agregar softDeletes si no existe la columna deleted_at
+            if (!Schema::hasColumn('platos', 'deleted_at')) {
+                $table->softDeletes();
+            }
             
             // Índices
             $table->index('activo');

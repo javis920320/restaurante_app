@@ -23,7 +23,11 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 2)->default(0)->after('estado');
             $table->decimal('total', 10, 2)->default(0)->after('subtotal');
             $table->text('notas')->nullable()->after('total');
-            $table->softDeletes();
+            
+            // Solo agregar softDeletes si no existe la columna deleted_at
+            if (!Schema::hasColumn('pedidos', 'deleted_at')) {
+                $table->softDeletes();
+            }
             
             // Índices
             $table->index('estado');

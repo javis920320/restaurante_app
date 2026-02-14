@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId("mesa_id")->constrained("mesas")->onDelete("cascade"); // Relación con la tabla mesas 
             $table->enum('estado', ['pendiente', 'en concina', 'servido', 'pagado']); // Estado del pedido
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
