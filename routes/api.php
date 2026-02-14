@@ -1,0 +1,28 @@
+<?php
+
+use App\Http\Controllers\MenuQRController;
+use App\Http\Controllers\PedidoController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+
+// Rutas públicas para el sistema de pedidos por QR
+Route::post('/pedidos', [PedidoController::class, 'store'])->name('api.pedidos.store');
+
+// Rutas protegidas con autenticación
+Route::middleware('auth:sanctum')->group(function () {
+    // Gestión de pedidos
+    Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');
+    Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('api.pedidos.show');
+    Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('api.pedidos.cambiar-estado');
+    Route::post('/pedidos/{pedido}/cerrar-mesa', [PedidoController::class, 'cerrarMesa'])->name('api.pedidos.cerrar-mesa');
+});
