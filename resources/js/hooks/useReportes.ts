@@ -37,8 +37,12 @@ export function useReportes(options: UseReportesOptions = {}) {
             const response = await axios.get('/api/admin/dashboard/reportes');
             setReportes(response.data);
             setError(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al cargar reportes');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Error al cargar reportes');
+            } else {
+                setError('Error al cargar reportes');
+            }
         } finally {
             setLoading(false);
         }

@@ -28,8 +28,12 @@ export function useDashboardMetrics(options: UseDashboardMetricsOptions = {}) {
             const response = await axios.get('/api/admin/dashboard/metrics');
             setMetrics(response.data);
             setError(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al cargar métricas');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Error al cargar métricas');
+            } else {
+                setError('Error al cargar métricas');
+            }
         } finally {
             setLoading(false);
         }
