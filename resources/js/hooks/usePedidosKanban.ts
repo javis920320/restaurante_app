@@ -51,8 +51,12 @@ export function usePedidosKanban(options: UsePedidosKanbanOptions = {}) {
             const response = await axios.get('/api/admin/dashboard/pedidos-kanban');
             setPedidos(response.data);
             setError(null);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al cargar pedidos');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Error al cargar pedidos');
+            } else {
+                setError('Error al cargar pedidos');
+            }
         } finally {
             setLoading(false);
         }
@@ -65,8 +69,12 @@ export function usePedidosKanban(options: UsePedidosKanbanOptions = {}) {
             });
             // Refresh data after state change
             await fetchPedidosKanban();
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al cambiar estado');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err.response?.data?.message || 'Error al cambiar estado');
+            } else {
+                setError('Error al cambiar estado');
+            }
             throw err;
         }
     };
