@@ -19,6 +19,11 @@ export default function ConfiguracionLayout({ children }: PropsWithChildren) {
             icon: null,
         },
         {
+            title: 'Restaurantes',
+            href: '/configuracion/restaurantes',
+            icon: null,
+        },
+        {
             title: 'Mesas',
             href: '/configuracion/mesas',
             icon: null,

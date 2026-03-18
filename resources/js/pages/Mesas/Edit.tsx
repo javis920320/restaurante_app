@@ -107,7 +107,21 @@ export default function Edit({ mesa, restaurantes }: EditProps) {
                             </div>
 
                             {/* Restaurante */}
-                            {restaurantes.length > 0 && (
+                            {restaurantes.length === 0 ? (
+                                <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3 text-sm">
+                                    <p className="text-yellow-800 font-medium">No hay restaurantes disponibles.</p>
+                                    <p className="mt-1 text-yellow-700">
+                                        Debes{' '}
+                                        <Link
+                                            href={route('restaurantes.index')}
+                                            className="underline font-semibold hover:text-yellow-900"
+                                        >
+                                            crear un restaurante
+                                        </Link>{' '}
+                                        antes de poder editar esta mesa.
+                                    </p>
+                                </div>
+                            ) : (
                                 <div className="space-y-2">
                                     <Label htmlFor="restaurante_id">Restaurante</Label>
                                     <Select
@@ -164,7 +178,7 @@ export default function Edit({ mesa, restaurantes }: EditProps) {
 
                             {/* Submit */}
                             <div className="flex gap-3 pt-4">
-                                <Button type="submit" disabled={processing} className="flex-1">
+                                <Button type="submit" disabled={processing || restaurantes.length === 0} className="flex-1">
                                     <Save className="mr-2 h-4 w-4" />
                                     {processing ? 'Guardando...' : 'Guardar Cambios'}
                                 </Button>
