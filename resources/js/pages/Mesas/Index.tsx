@@ -37,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Mesas', href: '/configuracion/mesas' },
 ];
 
-export default function Index({ mesas, restaurantes = [] }: MesasIndexProps) {
+export default function Index({ mesas }: MesasIndexProps) {
     const [confirmDelete, setConfirmDelete] = React.useState<number | null>(null);
 
     const mesasData = mesas.data || [];
