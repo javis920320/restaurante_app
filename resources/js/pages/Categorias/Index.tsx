@@ -21,7 +21,6 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
         data,
         errors,
         setError,
-        delete: destroy,
     } = useForm({
         nombre: '',
     });
