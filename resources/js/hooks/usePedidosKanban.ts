@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
+import api from '@/services/api';
 
 interface ProductoResumen {
     nombre: string;
@@ -48,11 +49,11 @@ export function usePedidosKanban(options: UsePedidosKanbanOptions = {}) {
 
     const fetchPedidosKanban = async () => {
         try {
-            const response = await axios.get('/api/admin/dashboard/pedidos-kanban');
+            const response = await api.get('/admin/dashboard/pedidos-kanban');
             setPedidos(response.data);
             setError(null);
         } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(err.response?.data?.message || 'Error al cargar pedidos');
             } else {
                 setError('Error al cargar pedidos');
@@ -64,13 +65,13 @@ export function usePedidosKanban(options: UsePedidosKanbanOptions = {}) {
 
     const cambiarEstado = async (pedidoId: number, nuevoEstado: string) => {
         try {
-            await axios.patch(`/api/pedidos/${pedidoId}/estado`, {
+            await api.patch(`/pedidos/${pedidoId}/estado`, {
                 estado: nuevoEstado,
             });
             // Refresh data after state change
             await fetchPedidosKanban();
         } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(err.response?.data?.message || 'Error al cambiar estado');
             } else {
                 setError('Error al cambiar estado');

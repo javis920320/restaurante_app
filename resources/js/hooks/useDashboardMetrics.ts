@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
+import api from '@/services/api';
 
 interface DashboardMetrics {
     pedidos_pendientes: number;
@@ -25,11 +26,11 @@ export function useDashboardMetrics(options: UseDashboardMetricsOptions = {}) {
 
     const fetchMetrics = async () => {
         try {
-            const response = await axios.get('/api/admin/dashboard/metrics');
+            const response = await api.get('/admin/dashboard/metrics');
             setMetrics(response.data);
             setError(null);
         } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(err.response?.data?.message || 'Error al cargar métricas');
             } else {
                 setError('Error al cargar métricas');
