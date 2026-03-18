@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
+import api from '@/services/api';
 
 interface VentaPorHora {
     hora: number;
@@ -34,11 +35,11 @@ export function useReportes(options: UseReportesOptions = {}) {
 
     const fetchReportes = async () => {
         try {
-            const response = await axios.get('/api/admin/dashboard/reportes');
+            const response = await api.get('/admin/dashboard/reportes');
             setReportes(response.data);
             setError(null);
         } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(err.response?.data?.message || 'Error al cargar reportes');
             } else {
                 setError('Error al cargar reportes');

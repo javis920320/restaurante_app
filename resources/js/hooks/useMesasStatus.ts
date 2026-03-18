@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
+import api from '@/services/api';
 
 interface MesaStatus {
     id: number;
@@ -25,11 +26,11 @@ export function useMesasStatus(options: UseMesasStatusOptions = {}) {
 
     const fetchMesasStatus = async () => {
         try {
-            const response = await axios.get('/api/admin/mesas/status');
+            const response = await api.get('/admin/mesas/status');
             setMesas(response.data);
             setError(null);
         } catch (err: unknown) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 setError(err.response?.data?.message || 'Error al cargar estado de mesas');
             } else {
                 setError('Error al cargar estado de mesas');

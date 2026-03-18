@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '@/services/api';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface ProductoCocina {
@@ -46,7 +46,7 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
     useEffect(() => {
         const fetchPedidos = async () => {
             try {
-                const response = await axios.get<PedidoCocina[]>('/api/admin/cocina/pedidos');
+                const response = await api.get<PedidoCocina[]>('/admin/cocina/pedidos');
                 setPedidos(response.data);
                 setError(null);
             } catch (err) {
@@ -71,7 +71,7 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
 
     const marcarEnPreparacion = useCallback(async (pedidoId: number) => {
         try {
-            await axios.patch(`/api/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
+            await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
             setActionError(null);
             refetch();
         } catch (err) {
@@ -82,7 +82,7 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
 
     const marcarListo = useCallback(async (pedidoId: number) => {
         try {
-            await axios.patch(`/api/pedidos/${pedidoId}/estado`, { estado: 'listo' });
+            await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'listo' });
             setActionError(null);
             refetch();
         } catch (err) {
