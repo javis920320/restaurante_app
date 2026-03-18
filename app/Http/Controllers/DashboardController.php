@@ -31,6 +31,35 @@ class DashboardController extends Controller
     }
 
     /**
+     * Display the kitchen display system (KDS) page
+     */
+    public function cocina()
+    {
+        return Inertia::render('Cocina/Index');
+    }
+
+    /**
+     * Display the reports page
+     */
+    public function reportesPage()
+    {
+        return Inertia::render('Reportes/Index');
+    }
+
+    /**
+     * Get orders for the kitchen display system (KDS)
+     * Returns pending, confirmed and in_preparation orders
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cocinaKDS()
+    {
+        $pedidos = $this->dashboardService->getPedidosParaCocina();
+
+        return response()->json($pedidos);
+    }
+
+    /**
      * Get real-time metrics for the dashboard
      * 
      * @return \Illuminate\Http\JsonResponse
@@ -55,13 +84,17 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get quick reports
-     * 
+     * Get quick reports with optional date range filtering
+     *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function reportes()
+    public function reportes(Request $request)
     {
-        $reportes = $this->dashboardService->getReportes();
+        $fechaInicio = $request->get('fecha_inicio');
+        $fechaFin = $request->get('fecha_fin');
+
+        $reportes = $this->dashboardService->getReportes($fechaInicio, $fechaFin);
 
         return response()->json($reportes);
     }

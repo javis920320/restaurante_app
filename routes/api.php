@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/dashboard/reportes', [DashboardController::class, 'reportes'])->name('api.dashboard.reportes');
     Route::get('/admin/dashboard/pedidos-kanban', [DashboardController::class, 'pedidosKanban'])->name('api.dashboard.pedidos-kanban');
     Route::get('/admin/mesas/status', [DashboardController::class, 'mesasStatus'])->name('api.mesas.status');
+    Route::get('/admin/cocina/pedidos', [DashboardController::class, 'cocinaKDS'])->name('api.cocina.pedidos');
     
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');

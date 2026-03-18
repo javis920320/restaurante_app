@@ -1,3 +1,4 @@
+import { toast } from '@/components/ui/toaster';
 import { Pedido } from '@/services/pedidoService';
 import { Clock, FileText, MapPin } from 'lucide-react';
 import EstadoBadge from './EstadoBadge';
@@ -30,16 +31,26 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
     // Determine if estado can be changed (no pagado ni cancelado)
     const puedeEditarEstado = !['pagado', 'cancelado'].includes(pedido.estado);
 
+    const handleCambiarEstado = async (pedidoId: number, nuevoEstado: string) => {
+        try {
+            await onCambiarEstado(pedidoId, nuevoEstado);
+            const etiqueta = nuevoEstado.replace(/_/g, ' ');
+            toast.success(`Pedido #${pedidoId} → ${etiqueta}`);
+        } catch {
+            toast.error(`Error al cambiar estado del pedido #${pedidoId}`);
+        }
+    };
+
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
             {/* Header */}
             <div className="mb-3 flex items-start justify-between">
                 <div className="flex-1">
                     <div className="mb-1 flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-gray-500" />
-                        <span className="font-semibold text-gray-900">{pedido.mesa?.nombre || `Mesa #${pedido.mesa_id}`}</span>
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">{pedido.mesa?.nombre || `Mesa #${pedido.mesa_id}`}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <Clock className="h-3 w-3" />
                         <span>{formatDate(pedido.created_at)}</span>
                     </div>
@@ -55,20 +66,20 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
                 <div className="mb-3 space-y-1">
                     {pedido.detalles.slice(0, 3).map((detalle) => (
                         <div key={detalle.id} className="flex justify-between text-sm">
-                            <span className="text-gray-700">
+                            <span className="text-gray-700 dark:text-gray-300">
                                 {detalle.cantidad}x {detalle.producto.nombre}
                             </span>
-                            <span className="text-gray-600">{formatPrice(detalle.subtotal)}</span>
+                            <span className="text-gray-600 dark:text-gray-400">{formatPrice(detalle.subtotal)}</span>
                         </div>
                     ))}
-                    {pedido.detalles.length > 3 && <p className="text-xs text-gray-500 italic">+{pedido.detalles.length - 3} producto(s) más</p>}
+                    {pedido.detalles.length > 3 && <p className="text-xs italic text-gray-500">+{pedido.detalles.length - 3} producto(s) más</p>}
                 </div>
             )}
 
             {/* Notas */}
             {pedido.notas && (
                 <div className="mb-3 text-sm">
-                    <div className="flex items-start gap-2 text-gray-600">
+                    <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400">
                         <FileText className="mt-0.5 h-3 w-3" />
                         <span className="italic">{pedido.notas}</span>
                     </div>
@@ -76,14 +87,14 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
             )}
 
             {/* Footer con total y selector de estado */}
-            <div className="space-y-3 border-t border-gray-200 pt-3">
+            <div className="space-y-3 border-t border-gray-200 pt-3 dark:border-gray-700">
                 <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">Total:</span>
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total:</span>
                     <span className="text-lg font-bold text-green-600">{formatPrice(pedido.total)}</span>
                 </div>
 
                 {showEstadoSelector && puedeEditarEstado && (
-                    <EstadoSelector estadoActual={pedido.estado} pedidoId={pedido.id} onCambiarEstado={onCambiarEstado} />
+                    <EstadoSelector estadoActual={pedido.estado} pedidoId={pedido.id} onCambiarEstado={handleCambiarEstado} />
                 )}
             </div>
         </div>

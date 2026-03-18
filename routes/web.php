@@ -24,6 +24,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard administrativo
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Panel de Cocina (KDS)
+    Route::get('/cocina', [DashboardController::class, 'cocina'])->name('cocina.index');
+
+    // Reportes y Analítica
+    Route::get('/reportes', [DashboardController::class, 'reportesPage'])->name('reportes.index');
+
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
     Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('pedidos.show');
