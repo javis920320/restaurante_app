@@ -183,15 +183,19 @@ class DashboardService
         $fin = $fechaFin ? \Carbon\Carbon::parse($fechaFin)->endOfDay() : today()->endOfDay();
 
         // Sales by hour in the date range
+        $hourExpr = DB::getDriverName() === 'sqlite'
+            ? "CAST(strftime('%H', created_at) AS INTEGER)"
+            : 'HOUR(created_at)';
+
         $ventasPorHora = Pedido::whereBetween('created_at', [$inicio, $fin])
             ->whereIn('estado', ['pagado'])
             ->select(
-                DB::raw('HOUR(created_at) as hora'),
+                DB::raw($hourExpr . ' as hora'),
                 DB::raw('COUNT(*) as total_pedidos'),
                 DB::raw('SUM(total) as total_ventas')
             )
-            ->groupBy('hora')
-            ->orderBy('hora', 'asc')
+            ->groupBy(DB::raw($hourExpr))
+            ->orderBy(DB::raw($hourExpr), 'asc')
             ->get()
             ->map(function ($item) {
                 return [
