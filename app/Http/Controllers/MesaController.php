@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MesaRequest;
 use App\Models\Mesa;
+use App\Models\Restaurante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -23,8 +24,11 @@ class MesaController extends Controller
             ->orderBy('nombre')
             ->paginate(20);
 
+        $restaurantes = Restaurante::where('activo', true)->get(['id', 'nombre']);
+
         return Inertia::render('Mesas/Index', [
             'mesas' => $mesas,
+            'restaurantes' => $restaurantes,
         ]);
     }
 
@@ -35,7 +39,11 @@ class MesaController extends Controller
     {
         $this->authorize('create', Mesa::class);
 
-        return Inertia::render('Mesas/Create');
+        $restaurantes = Restaurante::where('activo', true)->get(['id', 'nombre']);
+
+        return Inertia::render('Mesas/Create', [
+            'restaurantes' => $restaurantes,
+        ]);
     }
 
     /**
@@ -74,8 +82,11 @@ class MesaController extends Controller
     {
         $this->authorize('update', $mesa);
 
+        $restaurantes = Restaurante::where('activo', true)->get(['id', 'nombre']);
+
         return Inertia::render('Mesas/Edit', [
             'mesa' => $mesa,
+            'restaurantes' => $restaurantes,
         ]);
     }
 

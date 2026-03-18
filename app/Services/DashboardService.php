@@ -11,6 +11,41 @@ use Illuminate\Support\Facades\Cache;
 class DashboardService
 {
     /**
+     * Get orders for the kitchen display system
+     * Returns pending, confirmed and in-preparation orders grouped with product details
+     *
+     * @return array
+     */
+    public function getPedidosParaCocina(): array
+    {
+        $estados = ['pendiente', 'confirmado', 'en_preparacion'];
+
+        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+            ->whereIn('estado', $estados)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(function ($pedido) {
+                return [
+                    'id' => $pedido->id,
+                    'mesa_nombre' => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
+                    'estado' => $pedido->estado,
+                    'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
+                    'notas' => $pedido->notas,
+                    'created_at' => $pedido->created_at->toISOString(),
+                    'productos' => $pedido->detalles->map(function ($detalle) {
+                        return [
+                            'nombre' => $detalle->producto->nombre,
+                            'cantidad' => $detalle->cantidad,
+                            'notas' => $detalle->notas ?? null,
+                        ];
+                    })->toArray(),
+                ];
+            });
+
+        return $pedidos->toArray();
+    }
+
+    /**
      * Get main dashboard metrics
      * 
      * @return array
@@ -136,14 +171,19 @@ class DashboardService
     }
 
     /**
-     * Get quick reports
-     * 
+     * Get quick reports with optional date range filter
+     *
+     * @param string|null $fechaInicio
+     * @param string|null $fechaFin
      * @return array
      */
-    public function getReportes(): array
+    public function getReportes(?string $fechaInicio = null, ?string $fechaFin = null): array
     {
-        // Sales by hour (today)
-        $ventasPorHora = Pedido::whereDate('created_at', today())
+        $inicio = $fechaInicio ? \Carbon\Carbon::parse($fechaInicio)->startOfDay() : today()->startOfDay();
+        $fin = $fechaFin ? \Carbon\Carbon::parse($fechaFin)->endOfDay() : today()->endOfDay();
+
+        // Sales by hour in the date range
+        $ventasPorHora = Pedido::whereBetween('created_at', [$inicio, $fin])
             ->whereIn('estado', ['pagado'])
             ->select(
                 DB::raw('HOUR(created_at) as hora'),
@@ -161,9 +201,9 @@ class DashboardService
                 ];
             });
 
-        // Top products sold today
-        $productosMasVendidos = PedidoDetalle::whereHas('pedido', function ($query) {
-                $query->whereDate('created_at', today())
+        // Top products sold in date range
+        $productosMasVendidos = PedidoDetalle::whereHas('pedido', function ($query) use ($inicio, $fin) {
+                $query->whereBetween('created_at', [$inicio, $fin])
                     ->whereIn('estado', ['pagado']);
             })
             ->with('producto')
@@ -184,15 +224,15 @@ class DashboardService
                 ];
             });
 
-        // Total orders today
-        $totalPedidosDia = Pedido::whereDate('created_at', today())->count();
+        // Total orders in date range
+        $totalPedidosDia = Pedido::whereBetween('created_at', [$inicio, $fin])->count();
 
-        // Average preparation time (from created to listo/entregado)
-        $tiempoPromedioPreparacion = Pedido::whereDate('created_at', today())
+        // Average preparation time
+        // Note: assumes updated_at reflects when the order reached its final state
+        $tiempoPromedioPreparacion = Pedido::whereBetween('created_at', [$inicio, $fin])
             ->whereIn('estado', ['listo', 'entregado', 'pagado'])
             ->get()
             ->map(function ($pedido) {
-                // Simple calculation: assume updated_at is when it reached current state
                 return $pedido->created_at->diffInMinutes($pedido->updated_at);
             })
             ->avg() ?? 0;

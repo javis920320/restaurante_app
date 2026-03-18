@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Table2 } from 'lucide-react';
+import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, Settings, Table2, UtensilsCrossed } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,9 +14,37 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Configuración principal',
-        href: '/configuracion/platos',
+        title: 'Pedidos',
+        href: '/pedidos',
+        icon: ClipboardList,
+    },
+    {
+        title: 'Cocina (KDS)',
+        href: '/cocina',
+        icon: ChefHat,
+    },
+    {
+        title: 'Reportes',
+        href: '/reportes',
+        icon: BarChart3,
+    },
+];
+
+const configNavItems: NavItem[] = [
+    {
+        title: 'Mesas',
+        href: '/configuracion/mesas',
         icon: Table2,
+    },
+    {
+        title: 'Platos',
+        href: '/configuracion/platos',
+        icon: UtensilsCrossed,
+    },
+    {
+        title: 'Categorías',
+        href: '/categorias',
+        icon: Settings,
     },
 ];
 
@@ -49,7 +77,8 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={mainNavItems} label="Operaciones" />
+                <NavMain items={configNavItems} label="Configuración" />
             </SidebarContent>
 
             <SidebarFooter>
