@@ -45,17 +45,36 @@ export interface User {
 export interface Categoria {
     id: number;
     nombre: string;
-    // descripcion: string;
+    activo: boolean;
+    orden: number;
+    platos_count?: number;
     created_at: string;
     updated_at: string;
 }
+
+export interface Opcion {
+    id: number;
+    plato_id: number;
+    nombre: string;
+    precio_extra: number;
+    orden: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Plato {
     id: number;
     nombre: string;
     descripcion: string;
     precio: number;
     categoria_id: number;
+    restaurante_id: number;
+    activo: boolean;
+    disponible: boolean;
+    orden: number;
     created_at: string;
     updated_at: string;
     imagen: string;
+    opciones?: Opcion[];
+    categoria?: Categoria;
 }

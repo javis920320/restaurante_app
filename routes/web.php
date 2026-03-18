@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuQRController;
 use App\Http\Controllers\MesaController;
+use App\Http\Controllers\OpcionController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PlatoController;
 use App\Http\Controllers\RestauranteController;
@@ -37,11 +38,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestión de categorías
     Route::resource('categorias', CategoriaController::class);
+    Route::post('/categorias/{categoria}/toggle-activo', [CategoriaController::class, 'toggleActivo'])
+        ->name('categorias.toggle-activo');
 
     // Gestión de productos/platos
     Route::resource('/configuracion/platos', PlatoController::class);
     Route::post('/configuracion/platos/{plato}/toggle-activo', [PlatoController::class, 'toggleActivo'])
         ->name('platos.toggle-activo');
+    Route::post('/configuracion/platos/{plato}/toggle-disponible', [PlatoController::class, 'toggleDisponible'])
+        ->name('platos.toggle-disponible');
+
+    // Gestión de opciones de platos
+    Route::post('/configuracion/platos/{plato}/opciones', [OpcionController::class, 'store'])
+        ->name('platos.opciones.store');
+    Route::patch('/configuracion/platos/{plato}/opciones/{opcion}', [OpcionController::class, 'update'])
+        ->name('platos.opciones.update');
+    Route::delete('/configuracion/platos/{plato}/opciones/{opcion}', [OpcionController::class, 'destroy'])
+        ->name('platos.opciones.destroy');
 
     // Gestión de restaurantes
     Route::resource('configuracion/restaurantes', RestauranteController::class)
