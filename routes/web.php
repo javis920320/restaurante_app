@@ -6,6 +6,7 @@ use App\Http\Controllers\MenuQRController;
 use App\Http\Controllers\MesaController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PlatoController;
+use App\Http\Controllers\RestauranteController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,6 +42,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/configuracion/platos', PlatoController::class);
     Route::post('/configuracion/platos/{plato}/toggle-activo', [PlatoController::class, 'toggleActivo'])
         ->name('platos.toggle-activo');
+
+    // Gestión de restaurantes
+    Route::resource('configuracion/restaurantes', RestauranteController::class)
+        ->only(['index', 'store', 'update', 'destroy'])
+        ->names('restaurantes');
 
     // Gestión de mesas
     Route::resource('/configuracion/mesas', MesaController::class);
