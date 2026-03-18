@@ -45,6 +45,8 @@ export interface User {
 export interface Categoria {
     id: number;
     nombre: string;
+    activo: boolean;
+    platos_count?: number;
     // descripcion: string;
     created_at: string;
     updated_at: string;
