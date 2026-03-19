@@ -10,6 +10,7 @@ class Categoria extends Model
     
     use HasFactory;
     protected $fillable = [
+        'menu_id',
         'nombre',
         'activo',
         'orden',
