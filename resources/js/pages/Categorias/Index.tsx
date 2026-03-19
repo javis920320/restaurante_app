@@ -48,19 +48,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
         }
     };
 
-    const eliminarCategoria = (id: number) => {
-        setDeleteError(null);
-        destroy(route('categorias.destroy', id), {
-            preserveScroll: true,
-            onSuccess: () => {
-                setCategorias((prev) => prev.filter((categoria) => categoria.id !== id));
-            },
-            onError: (errors) => {
-                console.log(errors);
-            },
-        });
-    };
-
+  
     const handleEliminar = async (id: number) => {
         setDeleteError(null);
         try {
