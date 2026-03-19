@@ -18,7 +18,7 @@ const itemKey = (productoId: number, opcionId?: number) =>
     opcionId ? `${productoId}-${opcionId}` : `${productoId}`;
 
 const itemPrecio = (item: CarritoItem): number =>
-    item.producto.precio + (item.opcion?.precio_extra ?? 0);
+    Number(item.producto.precio) + Number(item.opcion?.precio_extra ?? 0);
 
 type CarritoAction =
     | { type: 'AGREGAR_PRODUCTO'; payload: { producto: Producto; notas?: string; opcion?: Opcion } }

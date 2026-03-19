@@ -26,6 +26,7 @@ interface MenuQRShowProps {
             precio: number;
             imagen?: string;
             activo: boolean;
+            disponible: boolean;
             categoria_id: number;
         }>;
     }>;

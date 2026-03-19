@@ -27,6 +27,7 @@ interface Plato {
     descripcion?: string;
     imagen?: string;
     categoria_id: number;
+    restaurante_id?: number;
     categoria?: Categoria;
 }
 
@@ -63,14 +64,16 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
         return Array.from(map.values());
     }, [platos]);
 
-    // Filtrar platos por categoría y búsqueda
+    // Filtrar platos por categoría, búsqueda y restaurante de la mesa seleccionada
     const platosFiltrados = useMemo(() => {
+        const mesaObj = mesas.find((m) => m.id.toString() === mesaSeleccionada);
         return platos.filter((p) => {
             const coincideCategoria = categoriaActiva === 'todas' || (p.categoria && p.categoria.id.toString() === categoriaActiva);
             const coincideBusqueda = !busqueda || p.nombre.toLowerCase().includes(busqueda.toLowerCase());
-            return coincideCategoria && coincideBusqueda;
+            const coincideRestaurante = !mesaObj || !p.restaurante_id || p.restaurante_id === mesaObj.restaurante_id;
+            return coincideCategoria && coincideBusqueda && coincideRestaurante;
         });
-    }, [platos, categoriaActiva, busqueda]);
+    }, [platos, categoriaActiva, busqueda, mesaSeleccionada, mesas]);
 
     const totalCarrito = carrito.reduce((sum, item) => sum + item.subtotal, 0);
 
@@ -89,9 +92,9 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                 {
                     producto_id: plato.id,
                     nombre: plato.nombre,
-                    precio: plato.precio,
+                    precio: Number(plato.precio),
                     cantidad: 1,
-                    subtotal: plato.precio,
+                    subtotal: Number(plato.precio),
                 },
             ];
         });

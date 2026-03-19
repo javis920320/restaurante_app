@@ -17,7 +17,7 @@ export default function CarritoItem({ item }: CarritoItemProps) {
         }).format(price);
     };
 
-    const precioUnitario = item.producto.precio + (item.opcion?.precio_extra ?? 0);
+    const precioUnitario = Number(item.producto.precio) + Number(item.opcion?.precio_extra ?? 0);
     const subtotal = precioUnitario * item.cantidad;
     const opcionId = item.opcion?.id;
 
