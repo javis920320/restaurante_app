@@ -228,7 +228,7 @@ class PedidoService
 
         // Validate state transitions
         $transicionesPermitidas = [
-            'pendiente' => ['confirmado', 'cancelado'],
+            'pendiente' => ['confirmado', 'en_preparacion', 'cancelado'],
             'confirmado' => ['en_preparacion', 'cancelado'],
             'en_preparacion' => ['listo', 'cancelado'],
             'listo' => ['entregado'],
