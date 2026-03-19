@@ -6,13 +6,19 @@ import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import React from 'react';
 
-export default function Formulario({ categorias }: { categorias: { id: number; nombre: string }[] }) {
-    const { data, setData, errors, setError, processing } = useForm({
+interface FormularioProps {
+    categorias: { id: number; nombre: string }[];
+    onCreated?: () => void;
+}
+
+export default function Formulario({ categorias, onCreated }: FormularioProps) {
+    const { data, setData, errors, setError, processing, reset } = useForm({
         nombre: '',
         precio: 0,
         descripcion: '',
         categoria_id: 0,
-        imagen: null,
+        imagen: '',
+        disponible: true,
     });
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,13 +28,13 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
                 precio: data.precio,
                 descripcion: data.descripcion,
                 categoria_id: data.categoria_id,
-                imagen: data.imagen,
+                imagen: data.imagen.trim() || null,
+                disponible: data.disponible,
             });
 
-            if (respuesta.status === 200) {
-                setData({ nombre: '', precio: 0, descripcion: '', categoria_id: 0, imagen: null });
-            } else {
-                // Maneja el error aquí
+            if (respuesta.status === 200 || respuesta.status === 201) {
+                reset();
+                onCreated?.();
             }
         } catch (error: unknown) {
             if (error && typeof error === 'object' && 'response' in error) {
@@ -38,7 +44,7 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
                 const backendErrors = errorResponse.response?.data?.errors;
                 if (backendErrors) {
                     Object.keys(backendErrors).forEach((key: string) => {
-                        setError(key, backendErrors[key][0]); // Establece el error en el campo correspondiente
+                        setError(key, backendErrors[key][0]);
                     });
                 }
             }
@@ -46,7 +52,8 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="rounded-md border p-4">
+            <h2 className="mb-3 text-lg font-semibold">Nuevo Plato</h2>
             <InputError message={errors.nombre} />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Input
@@ -54,13 +61,14 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
                     placeholder="Nombre del plato"
                     value={data.nombre}
                     onChange={(e) => setData('nombre', e.target.value)}
-                ></Input>
+                />
                 <Input
                     type="number"
                     placeholder="Precio del plato"
                     value={data.precio}
+                    min={0}
                     onChange={(e) => setData('precio', parseFloat(e.target.value))}
-                ></Input>
+                />
             </div>
             <Select onValueChange={(value) => setData('categoria_id', parseInt(value))}>
                 <SelectTrigger className="mt-2 w-full">
@@ -77,18 +85,36 @@ export default function Formulario({ categorias }: { categorias: { id: number; n
 
             <div className="my-2">
                 <textarea
-                    className="w-full rounded-2xl border-1 p-2"
+                    className="w-full rounded-2xl border p-2"
                     placeholder="Descripción del plato"
                     value={data.descripcion}
                     onChange={(e) => setData('descripcion', e.target.value)}
-                ></textarea>
+                />
             </div>
-            <Button
-                type="submit"
-                disabled={processing}
-                className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white"
-            >
-                Nuevo Plato
+
+            <div className="mb-2">
+                <Input
+                    placeholder="URL de imagen (opcional)"
+                    value={data.imagen}
+                    onChange={(e) => setData('imagen', e.target.value)}
+                />
+            </div>
+
+            <div className="mb-2 flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    id="disponible"
+                    checked={data.disponible}
+                    onChange={(e) => setData('disponible', e.target.checked)}
+                    className="h-4 w-4"
+                />
+                <label htmlFor="disponible" className="text-sm text-gray-700">
+                    Disponible al crear
+                </label>
+            </div>
+
+            <Button type="submit" disabled={processing} className="mt-2 rounded-md bg-blue-500 px-4 py-2 text-white">
+                Guardar Plato
             </Button>
         </form>
     );

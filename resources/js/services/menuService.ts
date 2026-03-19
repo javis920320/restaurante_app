@@ -1,3 +1,11 @@
+export interface Opcion {
+    id: number;
+    plato_id: number;
+    nombre: string;
+    precio_extra: number;
+    orden: number;
+}
+
 export interface Producto {
     id: number;
     nombre: string;
@@ -5,7 +13,9 @@ export interface Producto {
     precio: number;
     imagen?: string;
     activo: boolean;
+    disponible: boolean;
     categoria_id: number;
+    opciones?: Opcion[];
 }
 
 export interface Categoria {

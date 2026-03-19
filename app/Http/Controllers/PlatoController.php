@@ -20,7 +20,7 @@ class PlatoController extends Controller
 
         $categorias = Categoria::all();
 
-        $query = Plato::with(['categoria', 'restaurante']);
+        $query = Plato::with(['categoria', 'restaurante', 'opciones']);
 
         // Filtros opcionales
         if ($request->filled('categoria_id')) {
@@ -31,12 +31,16 @@ class PlatoController extends Controller
             $query->where('activo', $request->boolean('activo'));
         }
 
-        $platos = $query->orderBy('nombre')->paginate(20);
+        if ($request->filled('disponible')) {
+            $query->where('disponible', $request->boolean('disponible'));
+        }
+
+        $platos = $query->orderBy('orden')->orderBy('nombre')->paginate(20);
 
         return Inertia::render('Platos/Index', [
             'categorias' => $categorias,
             'platos' => $platos,
-            'filters' => $request->only(['categoria_id', 'activo']),
+            'filters' => $request->only(['categoria_id', 'activo', 'disponible']),
         ]);
     }
 
@@ -74,7 +78,7 @@ class PlatoController extends Controller
     {
         $this->authorize('view', $plato);
 
-        $plato->load(['categoria', 'restaurante']);
+        $plato->load(['categoria', 'restaurante', 'opciones']);
 
         return Inertia::render('Platos/Show', [
             'plato' => $plato,
@@ -135,6 +139,21 @@ class PlatoController extends Controller
 
         return response()->json([
             'message' => 'Estado actualizado exitosamente.',
+            'plato' => $plato,
+        ]);
+    }
+
+    /**
+     * Toggle product availability (disponible/agotado).
+     */
+    public function toggleDisponible(Plato $plato)
+    {
+        $this->authorize('update', $plato);
+
+        $plato->update(['disponible' => !$plato->disponible]);
+
+        return response()->json([
+            'message' => 'Disponibilidad actualizada exitosamente.',
             'plato' => $plato,
         ]);
     }

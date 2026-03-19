@@ -93,7 +93,7 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
                 ) : (
                     <div className="space-y-1">
                         {state.items.map((item) => (
-                            <CarritoItem key={item.producto.id} item={item} />
+                            <CarritoItem key={`${item.producto.id}-${item.opcion?.id ?? 'base'}`} item={item} />
                         ))}
                     </div>
                 )}

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plato extends Model
 {
@@ -18,11 +19,14 @@ class Plato extends Model
         'restaurante_id',
         'imagen',
         'activo',
+        'disponible',
+        'orden',
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
         'activo' => 'boolean',
+        'disponible' => 'boolean',
     ];
 
     /**
@@ -42,11 +46,27 @@ class Plato extends Model
     }
 
     /**
+     * Relación con opciones/variantes
+     */
+    public function opciones(): HasMany
+    {
+        return $this->hasMany(Opcion::class)->orderBy('orden');
+    }
+
+    /**
      * Scope para productos activos
      */
     public function scopeActivos($query)
     {
         return $query->where('activo', true);
+    }
+
+    /**
+     * Scope para productos disponibles
+     */
+    public function scopeDisponibles($query)
+    {
+        return $query->where('disponible', true);
     }
 
     /**

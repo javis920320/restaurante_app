@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useCarrito } from '@/context/CarritoContext';
-import { Producto } from '@/services/menuService';
+import { Opcion, Producto } from '@/services/menuService';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -11,9 +11,13 @@ interface ProductCardProps {
 export default function ProductCard({ producto }: ProductCardProps) {
     const { agregarProducto } = useCarrito();
     const [agregado, setAgregado] = useState(false);
+    const [opcionSeleccionada, setOpcionSeleccionada] = useState<Opcion | null>(null);
+
+    const tieneOpciones = producto.opciones && producto.opciones.length > 0;
+    const precioFinal = producto.precio + (opcionSeleccionada?.precio_extra ?? 0);
 
     const handleAgregar = () => {
-        agregarProducto(producto);
+        agregarProducto(producto, opcionSeleccionada ?? undefined);
         setAgregado(true);
 
         // Reset after animation
@@ -46,8 +50,33 @@ export default function ProductCard({ producto }: ProductCardProps) {
 
                     {producto.descripcion && <p className="mb-2 line-clamp-2 text-sm text-gray-600">{producto.descripcion}</p>}
 
+                    {/* Opciones/Variantes */}
+                    {tieneOpciones && (
+                        <div className="mb-2">
+                            <p className="mb-1 text-xs font-medium text-gray-500">Opciones:</p>
+                            <div className="flex flex-wrap gap-1">
+                                {producto.opciones!.map((opcion) => (
+                                    <button
+                                        key={opcion.id}
+                                        onClick={() => setOpcionSeleccionada(opcionSeleccionada?.id === opcion.id ? null : opcion)}
+                                        className={`rounded-full border px-2 py-0.5 text-xs transition-colors ${
+                                            opcionSeleccionada?.id === opcion.id
+                                                ? 'border-green-500 bg-green-50 text-green-700'
+                                                : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        {opcion.nombre}
+                                        {opcion.precio_extra > 0 && (
+                                            <span className="ml-1 text-green-600">+{formatPrice(opcion.precio_extra)}</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="mt-auto flex items-center justify-between">
-                        <span className="text-lg font-bold text-green-600">{formatPrice(producto.precio)}</span>
+                        <span className="text-lg font-bold text-green-600">{formatPrice(precioFinal)}</span>
 
                         <Button onClick={handleAgregar} size="sm" className={agregado ? 'bg-green-600 hover:bg-green-700' : ''}>
                             {agregado ? (

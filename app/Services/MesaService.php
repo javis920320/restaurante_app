@@ -82,8 +82,10 @@ class MesaService
         $platos = $mesa->restaurante
             ->platos()
             ->activos()
-            ->with('categoria')
+            ->disponibles()
+            ->with('categoria', 'opciones')
             ->orderBy('categoria_id')
+            ->orderBy('orden')
             ->orderBy('nombre')
             ->get();
 

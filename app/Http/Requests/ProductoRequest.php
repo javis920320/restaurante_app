@@ -30,6 +30,8 @@ class ProductoRequest extends FormRequest
             'restaurante_id' => 'required|integer|exists:restaurantes,id',
             'imagen' => 'nullable|string|max:500',
             'activo' => 'nullable|boolean',
+            'disponible' => 'nullable|boolean',
+            'orden' => 'nullable|integer|min:0',
         ];
     }
 

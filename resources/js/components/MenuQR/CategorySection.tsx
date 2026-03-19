@@ -10,10 +10,10 @@ interface CategorySectionProps {
 }
 
 export default function CategorySection({ categoria }: CategorySectionProps) {
-    // Filtrar solo productos activos
-    const productosActivos = categoria.productos.filter((p) => p.activo);
+    // Solo mostrar productos activos y disponibles
+    const productosVisibles = categoria.productos.filter((p) => p.activo && p.disponible);
 
-    if (productosActivos.length === 0) {
+    if (productosVisibles.length === 0) {
         return null;
     }
 
@@ -22,7 +22,7 @@ export default function CategorySection({ categoria }: CategorySectionProps) {
             <h2 className="border-b-2 border-gray-200 pb-2 text-xl font-bold text-gray-900">{categoria.nombre}</h2>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {productosActivos.map((producto) => (
+                {productosVisibles.map((producto) => (
                     <ProductCard key={producto.id} producto={producto} />
                 ))}
             </div>
