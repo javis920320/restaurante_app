@@ -127,6 +127,10 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
             setError('Debes agregar al menos un producto.');
             return;
         }
+        if (totalCarrito <= 0) {
+            setError('El total del pedido debe ser mayor a cero.');
+            return;
+        }
 
         setEnviando(true);
         setError(null);
