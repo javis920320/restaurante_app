@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\HistorialEstadoPedido;
 use App\Models\Pedido;
 use App\Models\PedidoDetalle;
 use App\Models\Mesa;
@@ -50,45 +51,18 @@ class PedidoService
                 'subtotal' => 0,
                 'total' => 0,
                 'notas' => $notas,
+                'canal' => 'qr',
             ]);
 
-            $subtotal = 0;
-
-            // Agregar items al pedido
-            foreach ($items as $item) {
-                // Obtener producto y verificar que existe y está activo
-                $producto = Plato::activos()
-                    ->where('id', $item['producto_id'])
-                    ->where('restaurante_id', $mesa->restaurante_id)
-                    ->firstOrFail();
-
-                $cantidad = (int) $item['cantidad'];
-                $precioUnitario = $producto->precio;
-                $subtotalItem = $precioUnitario * $cantidad;
-
-                // Crear detalle del pedido
-                PedidoDetalle::create([
-                    'pedido_id' => $pedido->id,
-                    'producto_id' => $producto->id,
-                    'cantidad' => $cantidad,
-                    'precio_unitario' => $precioUnitario,
-                    'subtotal' => $subtotalItem,
-                    'notas' => $item['notas'] ?? null,
-                ]);
-
-                $subtotal += $subtotalItem;
-            }
-
-            // Actualizar totales del pedido
-            $pedido->update([
-                'subtotal' => $subtotal,
-                'total' => $subtotal, // En el futuro se pueden agregar impuestos, descuentos, etc.
-            ]);
+            $this->agregarItemsAlPedido($pedido, $items, $mesa->restaurante_id);
 
             // Ocupar la mesa si no está ocupada
             if ($mesa->estado === 'disponible') {
                 $this->mesaService->ocuparMesa($mesa);
             }
+
+            // Registrar en historial
+            $this->registrarHistorial($pedido, null, 'pendiente', null, 'qr');
 
             // Disparar evento
             event(new PedidoCreado($pedido));
@@ -101,6 +75,131 @@ class PedidoService
 
             return $pedido->load('detalles.producto', 'mesa');
         });
+    }
+
+    /**
+     * Crear un pedido asistido por mesero
+     *
+     * @param int $mesaId
+     * @param array $items [['producto_id' => int, 'cantidad' => int, 'notas' => string], ...]
+     * @param int $userId
+     * @param int|null $clienteId
+     * @param string|null $notas
+     * @return Pedido
+     * @throws Exception
+     */
+    public function crearPedidoMesero(
+        int $mesaId,
+        array $items,
+        int $userId,
+        ?int $clienteId = null,
+        ?string $notas = null
+    ): Pedido {
+        $mesa = Mesa::activas()->findOrFail($mesaId);
+
+        if (!$mesa->restaurante || !$mesa->restaurante->activo) {
+            throw new Exception('El restaurante no está disponible actualmente.');
+        }
+
+        return DB::transaction(function () use ($mesa, $items, $userId, $clienteId, $notas) {
+            $pedido = Pedido::create([
+                'mesa_id' => $mesa->id,
+                'cliente_id' => $clienteId,
+                'user_id' => $userId,
+                'estado' => 'pendiente',
+                'subtotal' => 0,
+                'total' => 0,
+                'notas' => $notas,
+                'canal' => 'mesero',
+            ]);
+
+            $this->agregarItemsAlPedido($pedido, $items, $mesa->restaurante_id);
+
+            // Ocupar la mesa si no está ocupada
+            if ($mesa->estado === 'disponible') {
+                $this->mesaService->ocuparMesa($mesa);
+            }
+
+            // Registrar en historial
+            $this->registrarHistorial($pedido, null, 'pendiente', $userId, 'mesero');
+
+            // Disparar evento
+            event(new PedidoCreado($pedido));
+
+            Log::info('Pedido creado por mesero', [
+                'pedido_id' => $pedido->id,
+                'mesa_id' => $mesa->id,
+                'user_id' => $userId,
+                'total' => $pedido->total,
+            ]);
+
+            return $pedido->load('detalles.producto', 'mesa');
+        });
+    }
+
+    /**
+     * Agrega items a un pedido y recalcula totales
+     *
+     * @param Pedido $pedido
+     * @param array $items
+     * @param int $restauranteId
+     * @throws Exception
+     */
+    protected function agregarItemsAlPedido(Pedido $pedido, array $items, int $restauranteId): void
+    {
+        $subtotal = 0;
+
+        foreach ($items as $item) {
+            $producto = Plato::activos()
+                ->where('id', $item['producto_id'])
+                ->where('restaurante_id', $restauranteId)
+                ->firstOrFail();
+
+            $cantidad = (int) $item['cantidad'];
+            $precioUnitario = $producto->precio;
+            $subtotalItem = $precioUnitario * $cantidad;
+
+            PedidoDetalle::create([
+                'pedido_id' => $pedido->id,
+                'producto_id' => $producto->id,
+                'cantidad' => $cantidad,
+                'precio_unitario' => $precioUnitario,
+                'subtotal' => $subtotalItem,
+                'notas' => $item['notas'] ?? null,
+            ]);
+
+            $subtotal += $subtotalItem;
+        }
+
+        $pedido->update([
+            'subtotal' => $subtotal,
+            'total' => $subtotal,
+        ]);
+    }
+
+    /**
+     * Registrar un cambio de estado en el historial
+     *
+     * @param Pedido $pedido
+     * @param string|null $estadoAnterior
+     * @param string $estadoNuevo
+     * @param int|null $userId
+     * @param string|null $canal
+     */
+    protected function registrarHistorial(
+        Pedido $pedido,
+        ?string $estadoAnterior,
+        string $estadoNuevo,
+        ?int $userId,
+        ?string $canal = null
+    ): void {
+        HistorialEstadoPedido::create([
+            'pedido_id' => $pedido->id,
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo' => $estadoNuevo,
+            'user_id' => $userId,
+            'canal' => $canal,
+        ]);
     }
 
     /**
@@ -145,6 +244,9 @@ class PedidoService
                 'estado' => $nuevoEstado,
                 'user_id' => $userId ?? $pedido->user_id,
             ]);
+
+            // Registrar en historial de estados
+            $this->registrarHistorial($pedido, $estadoAnterior, $nuevoEstado, $userId);
 
             // Disparar evento
             event(new PedidoEstadoActualizado($pedido, $estadoAnterior, $nuevoEstado));

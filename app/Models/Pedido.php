@@ -19,6 +19,7 @@ class Pedido extends Model
         'subtotal',
         'total',
         'notas',
+        'canal',
     ];
 
     protected $casts = [
@@ -56,6 +57,14 @@ class Pedido extends Model
     public function detalles(): HasMany
     {
         return $this->hasMany(PedidoDetalle::class);
+    }
+
+    /**
+     * Relación con el historial de estados
+     */
+    public function historial(): HasMany
+    {
+        return $this->hasMany(HistorialEstadoPedido::class)->orderBy('created_at', 'asc');
     }
 
     /**

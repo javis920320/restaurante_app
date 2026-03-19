@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');
+    Route::post('/pedidos/mesero', [PedidoController::class, 'storeMesero'])->name('api.pedidos.store-mesero');
     Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('api.pedidos.show');
     Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('api.pedidos.cambiar-estado');
     Route::post('/pedidos/{pedido}/cerrar-mesa', [PedidoController::class, 'cerrarMesa'])->name('api.pedidos.cerrar-mesa');

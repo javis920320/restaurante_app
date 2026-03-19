@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CrearPedidoQRRequest;
+use App\Http\Requests\CrearPedidoMeseroRequest;
 use App\Http\Requests\CambiarEstadoPedidoRequest;
+use App\Models\Mesa;
 use App\Models\Pedido;
+use App\Models\Plato;
 use App\Services\PedidoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +51,23 @@ class PedidoController extends Controller
     }
 
     /**
+     * Show create order form for waiters.
+     */
+    public function create(Request $request)
+    {
+        $this->authorize('create', Pedido::class);
+
+        $mesas = Mesa::activas()->with('restaurante')->get();
+        $platos = Plato::activos()->disponibles()->with('categoria')->orderBy('categoria_id')->orderBy('orden')->orderBy('nombre')->get();
+
+        return Inertia::render('Pedidos/Crear', [
+            'mesas' => $mesas,
+            'platos' => $platos,
+            'mesa_id' => $request->query('mesa_id'),
+        ]);
+    }
+
+    /**
      * Store a newly created resource in storage (desde QR).
      */
     public function store(CrearPedidoQRRequest $request)
@@ -79,11 +99,37 @@ class PedidoController extends Controller
     {
         $this->authorize('view', $pedido);
 
-        $pedido->load(['mesa', 'detalles.producto', 'cliente', 'user']);
+        $pedido->load(['mesa', 'detalles.producto', 'cliente', 'user', 'historial.user']);
 
         return Inertia::render('Pedidos/Show', [
             'pedido' => $pedido,
         ]);
+    }
+
+    /**
+     * Store a newly created order from waiter (authenticated).
+     */
+    public function storeMesero(CrearPedidoMeseroRequest $request)
+    {
+        try {
+            $pedido = $this->pedidoService->crearPedidoMesero(
+                mesaId: $request->mesa_id,
+                items: $request->items,
+                userId: Auth::id(),
+                clienteId: $request->cliente_id,
+                notas: $request->notas
+            );
+
+            return response()->json([
+                'message' => 'Pedido creado exitosamente.',
+                'pedido' => $pedido,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear el pedido.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     /**
