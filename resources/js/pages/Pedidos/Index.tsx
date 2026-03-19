@@ -28,15 +28,20 @@ export default function Index({ filters }: PageProps) {
         await cambiarEstado(pedidoId, nuevoEstado);
     };
 
+    // Aplicar filtro de búsqueda por nombre de mesa
+    const pedidosFiltrados = busqueda
+        ? pedidos.filter((p) => p.mesa?.nombre?.toLowerCase().includes(busqueda.toLowerCase()))
+        : pedidos;
+
     // Agrupar pedidos por estado
     const pedidosPorEstado = {
-        pendiente: pedidos.filter((p) => p.estado === 'pendiente'),
-        confirmado: pedidos.filter((p) => p.estado === 'confirmado'),
-        en_preparacion: pedidos.filter((p) => p.estado === 'en_preparacion'),
-        listo: pedidos.filter((p) => p.estado === 'listo'),
-        entregado: pedidos.filter((p) => p.estado === 'entregado'),
-        pagado: pedidos.filter((p) => p.estado === 'pagado'),
-        cancelado: pedidos.filter((p) => p.estado === 'cancelado'),
+        pendiente: pedidosFiltrados.filter((p) => p.estado === 'pendiente'),
+        confirmado: pedidosFiltrados.filter((p) => p.estado === 'confirmado'),
+        en_preparacion: pedidosFiltrados.filter((p) => p.estado === 'en_preparacion'),
+        listo: pedidosFiltrados.filter((p) => p.estado === 'listo'),
+        entregado: pedidosFiltrados.filter((p) => p.estado === 'entregado'),
+        pagado: pedidosFiltrados.filter((p) => p.estado === 'pagado'),
+        cancelado: pedidosFiltrados.filter((p) => p.estado === 'cancelado'),
     };
 
     return (
@@ -103,7 +108,7 @@ export default function Index({ filters }: PageProps) {
                     </div>
 
                     <div className="mt-4 flex items-center gap-2 text-sm">
-                        <span className="text-gray-600">{pedidos.length} pedido(s)</span>
+                        <span className="text-gray-600">{pedidosFiltrados.length} pedido(s)</span>
                         {filtroEstado !== 'all' && (
                             <>
                                 <span className="text-gray-400">•</span>
@@ -134,7 +139,7 @@ export default function Index({ filters }: PageProps) {
                 )}
 
                 {/* Pedidos agrupados por estado */}
-                {!loading && pedidos.length > 0 && (
+                {!loading && pedidosFiltrados.length > 0 && (
                     <div className="space-y-8">
                         {filtroEstado === 'all' ? (
                             // Vista agrupada por estado
@@ -169,7 +174,7 @@ export default function Index({ filters }: PageProps) {
                         ) : (
                             // Vista de lista simple con filtro
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {pedidos.map((pedido) => (
+                                {pedidosFiltrados.map((pedido) => (
                                     <PedidoCard key={pedido.id} pedido={pedido} onCambiarEstado={handleCambiarEstado} />
                                 ))}
                             </div>
@@ -178,17 +183,27 @@ export default function Index({ filters }: PageProps) {
                 )}
 
                 {/* Empty state */}
-                {!loading && pedidos.length === 0 && (
+                {!loading && pedidosFiltrados.length === 0 && (
                     <div className="rounded-lg border border-gray-200 bg-white py-12 text-center">
                         <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                             <Search className="h-8 w-8 text-gray-400" />
                         </div>
                         <h3 className="mb-2 text-lg font-medium text-gray-900">No hay pedidos</h3>
                         <p className="mb-4 text-gray-600">
-                            {filtroEstado !== 'all' ? 'No se encontraron pedidos con este estado' : 'Aún no hay pedidos registrados'}
+                            {busqueda
+                                ? 'No se encontraron pedidos para esa mesa'
+                                : filtroEstado !== 'all'
+                                  ? 'No se encontraron pedidos con este estado'
+                                  : 'Aún no hay pedidos registrados'}
                         </p>
-                        {filtroEstado !== 'all' && (
-                            <Button onClick={() => setFiltroEstado('all')} variant="outline">
+                        {(filtroEstado !== 'all' || busqueda) && (
+                            <Button
+                                onClick={() => {
+                                    setFiltroEstado('all');
+                                    setBusqueda('');
+                                }}
+                                variant="outline"
+                            >
                                 Ver todos los pedidos
                             </Button>
                         )}

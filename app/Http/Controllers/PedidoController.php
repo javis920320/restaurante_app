@@ -44,6 +44,12 @@ class PedidoController extends Controller
 
         $pedidos = $query->paginate(20);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'pedidos' => $pedidos,
+            ]);
+        }
+
         return Inertia::render('Pedidos/Index', [
             'pedidos' => $pedidos,
             'filters' => $request->only(['estado', 'mesa_id']),
