@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -14,28 +13,48 @@ class RolesAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles as specified in requirements
-        $admin = Role::firstOrCreate(['name' => 'admin']);  
-        $cocina = Role::firstOrCreate(['name' => 'cocina']);
-        $mesero = Role::firstOrCreate(['name' => 'mesero']);
-        $caja = Role::firstOrCreate(['name' => 'caja']);
-        $cliente = Role::firstOrCreate(['name' => 'cliente']);
-        
-        // Legacy role for backward compatibility
-        $cocinero = Role::firstOrCreate(['name' => 'cocinero']);
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $permissions = ['crear pedido', 'ver pedidos', 'cobrar', 'asignar mesa', 'cambiar estado pedido', 'cerrar mesa'];
+        // Define all permissions
+        $allPermissions = [
+            // Orders
+            'crear pedido',
+            'ver pedidos',
+            'cambiar estado pedido',
+            // Tables
+            'asignar mesa',
+            'cerrar mesa',
+            // Billing
+            'cobrar',
+            // Reports
+            'acceder reportes',
+            // User management
+            'gestionar usuarios',
+            'gestionar roles',
+        ];
 
-       foreach ($permissions as $permission) {
-            $perm = Permission::firstOrCreate(['name' => $permission]);
-            $admin->givePermissionTo($perm);
+        foreach ($allPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
         }
-        
-        // Assign specific permissions to roles
-        $cocina->givePermissionTo(['ver pedidos', 'cambiar estado pedido']);
-        $cocinero->givePermissionTo(['ver pedidos', 'cambiar estado pedido']); // Legacy role
-        $mesero->givePermissionTo(['crear pedido', 'ver pedidos', 'cambiar estado pedido']);
-        $caja->givePermissionTo(['ver pedidos', 'cobrar', 'cerrar mesa']);
-        $cliente->givePermissionTo(['ver pedidos']);
+
+        // Create roles
+        $admin   = Role::firstOrCreate(['name' => 'admin']);
+        $mesero  = Role::firstOrCreate(['name' => 'mesero']);
+        $cocina  = Role::firstOrCreate(['name' => 'cocina']);
+        $caja    = Role::firstOrCreate(['name' => 'caja']);
+        $cliente = Role::firstOrCreate(['name' => 'cliente']);
+
+        // Legacy role for backward compatibility
+        Role::firstOrCreate(['name' => 'cocinero']);
+
+        // Admin gets all permissions
+        $admin->syncPermissions($allPermissions);
+
+        // Assign permissions per role
+        $mesero->syncPermissions(['crear pedido', 'ver pedidos', 'cambiar estado pedido', 'asignar mesa']);
+        $cocina->syncPermissions(['ver pedidos', 'cambiar estado pedido']);
+        $caja->syncPermissions(['ver pedidos', 'cobrar', 'cerrar mesa', 'acceder reportes']);
+        $cliente->syncPermissions(['ver pedidos']);
     }
 }

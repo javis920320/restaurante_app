@@ -2,9 +2,10 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { usePermissions } from '@/hooks/use-permissions';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, MenuSquare, Settings, Table2, UtensilsCrossed } from 'lucide-react';
+import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, MenuSquare, Settings, Shield, Table2, UserCog, UtensilsCrossed } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -53,6 +54,19 @@ const configNavItems: NavItem[] = [
     },
 ];
 
+const adminNavItems: NavItem[] = [
+    {
+        title: 'Usuarios',
+        href: '/usuarios',
+        icon: UserCog,
+    },
+    {
+        title: 'Roles y Permisos',
+        href: '/roles',
+        icon: Shield,
+    },
+];
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -67,6 +81,8 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { can } = usePermissions();
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -84,6 +100,9 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} label="Operaciones" />
                 <NavMain items={configNavItems} label="Configuración" />
+                {(can('gestionar usuarios') || can('gestionar roles')) && (
+                    <NavMain items={adminNavItems} label="Administración" />
+                )}
             </SidebarContent>
 
             <SidebarFooter>

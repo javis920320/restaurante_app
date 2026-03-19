@@ -10,6 +10,8 @@ use App\Http\Controllers\OpcionController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\PlatoController;
 use App\Http\Controllers\RestauranteController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -80,6 +82,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/configuracion/mesas', MesaController::class);
     Route::get('/configuracion/mesas/{mesa}/qr', [MesaController::class, 'generarQR'])
         ->name('mesas.generar-qr');
+
+    // Gestión de usuarios
+    Route::resource('usuarios', UserController::class)->except(['show', 'create', 'edit']);
+    Route::post('/usuarios/{usuario}/toggle-activo', [UserController::class, 'toggleActivo'])
+        ->name('usuarios.toggle-activo');
+
+    // Gestión de roles y permisos
+    Route::resource('roles', RoleController::class)->except(['show', 'create', 'edit']);
 });
 
 require __DIR__.'/settings.php';
