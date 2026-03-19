@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, Settings, Table2, UtensilsCrossed } from 'lucide-react';
+import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, MenuSquare, Settings, Table2, UtensilsCrossed } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -45,6 +45,11 @@ const configNavItems: NavItem[] = [
         title: 'Categorías',
         href: '/categorias',
         icon: Settings,
+    },
+    {
+        title: 'Menús',
+        href: '/configuracion/menus',
+        icon: MenuSquare,
     },
 ];
 

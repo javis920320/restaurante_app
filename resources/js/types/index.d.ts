@@ -44,10 +44,36 @@ export interface User {
 
 export interface Categoria {
     id: number;
+    menu_id?: number | null;
     nombre: string;
     activo: boolean;
     orden: number;
     platos_count?: number;
+    platos?: Plato[];
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Menu {
+    id: number;
+    restaurante_id: number;
+    nombre: string;
+    slug: string;
+    estado: 'borrador' | 'publicado';
+    categorias_count?: number;
+    categorias?: Categoria[];
+    restaurante?: Restaurante;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Restaurante {
+    id: number;
+    nombre: string;
+    direccion?: string;
+    telefono?: string;
+    email?: string;
+    activo: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -72,6 +98,7 @@ export interface Plato {
     activo: boolean;
     disponible: boolean;
     orden: number;
+    stock?: number | null;
     created_at: string;
     updated_at: string;
     imagen: string;

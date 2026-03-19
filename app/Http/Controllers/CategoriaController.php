@@ -25,11 +25,13 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255|unique:categorias,nombre',
             'orden' => 'nullable|integer|min:0',
+            'menu_id' => 'nullable|exists:menus,id',
         ]);
 
         $categoria = Categoria::create([
             'nombre' => $request->nombre,
             'orden' => $request->input('orden', 0),
+            'menu_id' => $request->input('menu_id'),
         ]);
 
         return response()->json([

@@ -27,11 +27,12 @@ class ProductoRequest extends FormRequest
             'descripcion' => 'nullable|string|max:1000',
             'precio' => 'required|numeric|min:0|max:999999.99',
             'categoria_id' => 'required|integer|exists:categorias,id',
-            'restaurante_id' => 'required|integer|exists:restaurantes,id',
+            'restaurante_id' => 'nullable|integer|exists:restaurantes,id',
             'imagen' => 'nullable|string|max:500',
             'activo' => 'nullable|boolean',
             'disponible' => 'nullable|boolean',
             'orden' => 'nullable|integer|min:0',
+            'stock' => 'nullable|integer|min:0',
         ];
     }
 
