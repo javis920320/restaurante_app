@@ -67,6 +67,14 @@ class PlatoController extends Controller
 
         $plato = Plato::create($request->validated());
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto creado exitosamente.',
+                'plato' => $plato->load('categoria'),
+            ], 201);
+        }
+
         return redirect()->route('platos.index')
             ->with('success', 'Producto creado exitosamente.');
     }
@@ -123,6 +131,13 @@ class PlatoController extends Controller
         $this->authorize('delete', $plato);
 
         $plato->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto eliminado exitosamente.',
+            ]);
+        }
 
         return redirect()->route('platos.index')
             ->with('success', 'Producto eliminado exitosamente.');

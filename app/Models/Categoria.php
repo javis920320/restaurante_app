@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Categoria extends Model
 {
     
     use HasFactory;
     protected $fillable = [
+        'menu_id',
         'nombre',
         'activo',
         'orden',
@@ -23,6 +25,11 @@ class Categoria extends Model
     public function platos()
     {
         return $this->hasMany(Plato::class);
+    }
+
+    public function menu(): BelongsTo
+    {
+        return $this->belongsTo(Menu::class);
     }
 
     /**

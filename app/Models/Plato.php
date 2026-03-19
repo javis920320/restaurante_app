@@ -21,6 +21,7 @@ class Plato extends Model
         'activo',
         'disponible',
         'orden',
+        'stock',
     ];
 
     protected $casts = [

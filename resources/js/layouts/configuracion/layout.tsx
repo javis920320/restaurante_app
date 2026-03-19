@@ -34,6 +34,11 @@ export default function ConfiguracionLayout({ children }: PropsWithChildren) {
             icon: null,
         },
         {
+            title: 'Menús',
+            href: '/configuracion/menus',
+            icon: null,
+        },
+        {
             title: 'Usuarios',
             href: '/usuarios',
             icon: null,

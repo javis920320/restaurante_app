@@ -31,6 +31,14 @@ class Restaurante extends Model
     }
 
     /**
+     * Relación con menús
+     */
+    public function menus(): HasMany
+    {
+        return $this->hasMany(Menu::class);
+    }
+
+    /**
      * Relación con productos/platos
      */
     public function platos(): HasMany
