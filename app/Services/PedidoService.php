@@ -152,8 +152,15 @@ class PedidoService
         foreach ($items as $item) {
             $producto = Plato::activos()
                 ->where('id', $item['producto_id'])
-                ->where('restaurante_id', $restauranteId)
-                ->firstOrFail();
+                ->where(function ($q) use ($restauranteId) {
+                    $q->where('restaurante_id', $restauranteId)
+                        ->orWhereNull('restaurante_id');
+                })
+                ->first();
+
+            if (!$producto) {
+                throw new Exception("El producto seleccionado (ID: {$item['producto_id']}) no está disponible en este restaurante.");
+            }
 
             $cantidad = (int) $item['cantidad'];
             $precioUnitario = $producto->precio;

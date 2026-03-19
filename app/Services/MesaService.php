@@ -89,6 +89,16 @@ class MesaService
             ->orderBy('nombre')
             ->get();
 
-        return $platos->groupBy('categoria.nombre')->toArray();
+        return $platos->groupBy('categoria_id')
+            ->map(function ($categoryPlatos) {
+                $firstPlato = $categoryPlatos->first();
+                return [
+                    'id' => $firstPlato->categoria_id,
+                    'nombre' => $firstPlato->categoria ? $firstPlato->categoria->nombre : 'Sin categoría',
+                    'productos' => $categoryPlatos->values()->toArray(),
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 }
