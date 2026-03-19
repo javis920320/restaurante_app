@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('/pedidos/crear', [PedidoController::class, 'create'])->name('pedidos.create');
     Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('pedidos.show');
 
     // Gestión de categorías

@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminPedidos } from '@/hooks/useAdminPedidos';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-import { RefreshCw, Search } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { Plus, RefreshCw, Search } from 'lucide-react';
 import React from 'react';
 
 interface PageProps {
@@ -51,10 +51,18 @@ export default function Index({ filters }: PageProps) {
                         <p className="mt-1 text-gray-600">Gestiona los pedidos del restaurante en tiempo real</p>
                     </div>
 
-                    <Button onClick={refetch} variant="outline" size="sm">
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Actualizar
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button asChild size="sm">
+                            <Link href="/pedidos/crear">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Nuevo Pedido
+                            </Link>
+                        </Button>
+                        <Button onClick={refetch} variant="outline" size="sm">
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Actualizar
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Filtros */}
