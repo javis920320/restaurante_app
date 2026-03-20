@@ -25,5 +25,8 @@ class DatabaseSeeder extends Seeder
 
         // Assign admin role to test user
         $user->assignRole('admin');
+
+        // Create or update the app owner account with admin access
+        $this->call(AdminUserSeeder::class);
     }
 }
