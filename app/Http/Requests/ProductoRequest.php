@@ -33,6 +33,7 @@ class ProductoRequest extends FormRequest
             'disponible' => 'nullable|boolean',
             'orden' => 'nullable|integer|min:0',
             'stock' => 'nullable|integer|min:0',
+            'production_area' => 'nullable|string|in:kitchen,bar,none',
         ];
     }
 

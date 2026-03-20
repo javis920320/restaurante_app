@@ -2,9 +2,12 @@ import api from '@/services/api';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface ProductoCocina {
+    id: number;
     nombre: string;
     cantidad: number;
     notas?: string;
+    production_area: 'kitchen' | 'bar' | 'none';
+    estado: 'pendiente' | 'en_preparacion' | 'listo' | 'entregado';
 }
 
 export interface PedidoCocina {

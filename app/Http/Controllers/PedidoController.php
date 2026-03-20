@@ -8,6 +8,7 @@ use App\Http\Requests\CrearPedidoMeseroRequest;
 use App\Http\Requests\CambiarEstadoPedidoRequest;
 use App\Models\Mesa;
 use App\Models\Pedido;
+use App\Models\PedidoDetalle;
 use App\Models\Plato;
 use App\Services\PedidoService;
 use Illuminate\Http\Request;
@@ -184,6 +185,35 @@ class PedidoController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al cerrar la mesa.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Update the status of an individual order item.
+     */
+    public function cambiarEstadoDetalle(Request $request, Pedido $pedido, PedidoDetalle $detalle)
+    {
+        $this->authorize('cambiarEstado', $pedido);
+
+        $request->validate([
+            'estado' => ['required', 'string', 'in:' . implode(',', PedidoDetalle::ESTADOS)],
+        ]);
+
+        try {
+            $detalleActualizado = $this->pedidoService->cambiarEstadoDetalle(
+                detalle: $detalle,
+                nuevoEstado: $request->estado
+            );
+
+            return response()->json([
+                'message' => 'Estado del ítem actualizado exitosamente.',
+                'detalle' => $detalleActualizado,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al cambiar el estado del ítem.',
                 'error' => $e->getMessage(),
             ], 422);
         }

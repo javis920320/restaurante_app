@@ -1,20 +1,20 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCocinaKDS, type PedidoCocina } from '@/hooks/useCocinaKDS';
+import { useBarKDS, type PedidoBar } from '@/hooks/useBarKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, ChefHat, Clock, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, GlassWater, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Cocina', href: '/cocina' },
+    { title: 'Bar', href: '/bar' },
 ];
 
 export default function Index() {
-    const { pedidos, loading, error, actionError, marcarListo, marcarEnPreparacion, refetch } = useCocinaKDS({
+    const { pedidos, loading, error, actionError, marcarListo, marcarEnPreparacion, refetch } = useBarKDS({
         pollingInterval: 10,
     });
 
@@ -23,17 +23,17 @@ export default function Index() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Panel de Cocina" />
+            <Head title="Panel de Bar" />
 
             <div className="min-h-screen space-y-6 bg-gray-950 p-6 text-white">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="rounded-xl bg-orange-600 p-3">
-                            <ChefHat className="h-7 w-7 text-white" />
+                        <div className="rounded-xl bg-purple-700 p-3">
+                            <GlassWater className="h-7 w-7 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Panel de Cocina</h1>
+                            <h1 className="text-3xl font-bold text-white">Panel de Bar</h1>
                             <p className="text-gray-400">
                                 {pedidos.length} pedido(s) activo(s) • Actualización automática cada 10s
                             </p>
@@ -86,11 +86,11 @@ export default function Index() {
                                 </div>
                             ) : (
                                 pendientes.map((pedido) => (
-                                    <PedidoKDSCard
+                                    <PedidoBarCard
                                         key={pedido.id}
                                         pedido={pedido}
-                                        onAccion={() => marcarEnPreparacion(pedido.id)}
-                                        accionLabel="▶ Iniciar Preparación"
+                                        onItemAccion={(detalleId) => marcarEnPreparacion(pedido.id, detalleId)}
+                                        accionLabel="▶ Iniciar"
                                         accionColor="bg-blue-600 hover:bg-blue-700"
                                     />
                                 ))
@@ -99,25 +99,25 @@ export default function Index() {
 
                         {/* En Preparación */}
                         <div className="space-y-4">
-                            <div className="flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2">
-                                <ChefHat className="h-5 w-5 text-blue-400" />
-                                <h2 className="text-lg font-bold text-blue-300">
+                            <div className="flex items-center gap-2 rounded-lg bg-purple-900 px-4 py-2">
+                                <GlassWater className="h-5 w-5 text-purple-400" />
+                                <h2 className="text-lg font-bold text-purple-300">
                                     En Preparación ({enPreparacion.length})
                                 </h2>
                             </div>
 
                             {enPreparacion.length === 0 ? (
                                 <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
-                                    <ChefHat className="mx-auto h-12 w-12 text-gray-600" />
+                                    <GlassWater className="mx-auto h-12 w-12 text-gray-600" />
                                     <p className="mt-3 text-gray-500">Sin pedidos en preparación</p>
                                 </div>
                             ) : (
                                 enPreparacion.map((pedido) => (
-                                    <PedidoKDSCard
+                                    <PedidoBarCard
                                         key={pedido.id}
                                         pedido={pedido}
-                                        onAccion={() => marcarListo(pedido.id)}
-                                        accionLabel="✓ Marcar como Listo"
+                                        onItemAccion={(detalleId) => marcarListo(pedido.id, detalleId)}
+                                        accionLabel="✓ Listo"
                                         accionColor="bg-green-600 hover:bg-green-700"
                                     />
                                 ))
@@ -129,41 +129,31 @@ export default function Index() {
                 {/* Empty state */}
                 {!loading && pedidos.length === 0 && (
                     <div className="rounded-xl border border-gray-700 bg-gray-900 py-20 text-center">
-                        <ChefHat className="mx-auto h-20 w-20 text-gray-700" />
+                        <GlassWater className="mx-auto h-20 w-20 text-gray-700" />
                         <h3 className="mt-4 text-2xl font-bold text-gray-400">¡Todo al día!</h3>
-                        <p className="mt-2 text-gray-500">No hay pedidos activos en este momento</p>
+                        <p className="mt-2 text-gray-500">No hay pedidos activos en el bar</p>
                     </div>
                 )}
 
                 {/* Footer */}
                 <div className="text-center text-sm text-gray-600">
-                    Panel de Cocina • Restaurante App • Actualización automática cada 10 segundos
+                    Panel de Bar • Restaurante App • Actualización automática cada 10 segundos
                 </div>
             </div>
         </AppLayout>
     );
 }
 
-interface PedidoKDSCardProps {
-    pedido: PedidoCocina;
-    onAccion: () => void;
+interface PedidoBarCardProps {
+    pedido: PedidoBar;
+    onItemAccion: (detalleId: number) => Promise<void>;
     accionLabel: string;
     accionColor: string;
 }
 
-function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDSCardProps) {
-    const [isUpdating, setIsUpdating] = useState(false);
-    const isDelayed = pedido.tiempo_transcurrido > 20;
-    const isCritical = pedido.tiempo_transcurrido > 35;
-
-    const handleAccion = async () => {
-        setIsUpdating(true);
-        try {
-            await onAccion();
-        } finally {
-            setIsUpdating(false);
-        }
-    };
+function PedidoBarCard({ pedido, onItemAccion, accionLabel, accionColor }: PedidoBarCardProps) {
+    const isDelayed = pedido.tiempo_transcurrido > 10;
+    const isCritical = pedido.tiempo_transcurrido > 20;
 
     return (
         <div
@@ -203,58 +193,86 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDS
                 </div>
             </div>
 
-            {/* Products */}
+            {/* Bar items with per-item actions */}
             <div className="mb-4 space-y-2">
-                {pedido.productos.map((producto, idx) => (
-                    <div
-                        key={idx}
-                        className="flex items-start justify-between rounded-lg bg-gray-800 px-3 py-2"
-                    >
-                        <div>
-                            <span className="font-medium text-white">{producto.nombre}</span>
-                            {producto.notas && (
-                                <p className="mt-1 text-xs text-yellow-400 italic">📝 {producto.notas}</p>
-                            )}
-                            <span
-                                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                    producto.estado === 'listo'
-                                        ? 'bg-green-700 text-green-100'
-                                        : producto.estado === 'en_preparacion'
-                                          ? 'bg-blue-700 text-blue-100'
-                                          : 'bg-gray-600 text-gray-200'
-                                }`}
-                            >
-                                {producto.estado === 'listo'
-                                    ? '✓ Listo'
-                                    : producto.estado === 'en_preparacion'
-                                      ? '⏳ Preparando'
-                                      : '⏱ Pendiente'}
-                            </span>
-                        </div>
-                        <span className="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-sm font-bold text-white">
-                            x{producto.cantidad}
-                        </span>
-                    </div>
+                {pedido.productos.map((producto) => (
+                    <BarItemRow
+                        key={producto.id}
+                        producto={producto}
+                        onAccion={() => onItemAccion(producto.id)}
+                        accionLabel={accionLabel}
+                        accionColor={accionColor}
+                    />
                 ))}
             </div>
 
             {/* Order notes */}
             {pedido.notas && (
-                <div className="mb-4 rounded-lg border border-yellow-800 bg-yellow-950/50 px-3 py-2">
+                <div className="rounded-lg border border-yellow-800 bg-yellow-950/50 px-3 py-2">
                     <p className="text-sm text-yellow-300">
                         <span className="font-bold">📋 Nota:</span> {pedido.notas}
                     </p>
                 </div>
             )}
+        </div>
+    );
+}
 
-            {/* Action button */}
-            <button
-                onClick={handleAccion}
-                disabled={isUpdating}
-                className={`w-full rounded-lg py-3 text-base font-bold text-white transition-all ${accionColor} disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-                {isUpdating ? '⏳ Actualizando...' : accionLabel}
-            </button>
+interface BarItemRowProps {
+    producto: PedidoBar['productos'][0];
+    onAccion: () => Promise<void>;
+    accionLabel: string;
+    accionColor: string;
+}
+
+function BarItemRow({ producto, onAccion, accionLabel, accionColor }: BarItemRowProps) {
+    const [isUpdating, setIsUpdating] = useState(false);
+    const isDone = producto.estado === 'listo' || producto.estado === 'entregado';
+
+    const handleAccion = async () => {
+        setIsUpdating(true);
+        try {
+            await onAccion();
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    return (
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-gray-800 px-3 py-2">
+            <div className="flex-1">
+                <span className="font-medium text-white">{producto.nombre}</span>
+                {producto.notas && (
+                    <p className="mt-1 text-xs text-yellow-400 italic">📝 {producto.notas}</p>
+                )}
+                <span
+                    className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        producto.estado === 'listo'
+                            ? 'bg-green-700 text-green-100'
+                            : producto.estado === 'en_preparacion'
+                              ? 'bg-blue-700 text-blue-100'
+                              : 'bg-gray-600 text-gray-200'
+                    }`}
+                >
+                    {producto.estado === 'listo'
+                        ? '✓ Listo'
+                        : producto.estado === 'en_preparacion'
+                          ? '⏳ Preparando'
+                          : '⏱ Pendiente'}
+                </span>
+            </div>
+            <span className="rounded-full bg-gray-700 px-2 py-0.5 text-sm font-bold text-white">
+                x{producto.cantidad}
+            </span>
+            {!isDone && (
+                <button
+                    onClick={handleAccion}
+                    disabled={isUpdating}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-bold text-white transition-all ${accionColor} disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                    {isUpdating ? '⏳' : accionLabel}
+                </button>
+            )}
         </div>
     );
 }

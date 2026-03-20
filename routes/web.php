@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Panel de Cocina (KDS)
     Route::get('/cocina', [DashboardController::class, 'cocina'])->name('cocina.index');
 
+    // Panel de Bar
+    Route::get('/bar', [DashboardController::class, 'bar'])->name('bar.index');
+
     // Reportes y Analítica
     Route::get('/reportes', [DashboardController::class, 'reportesPage'])->name('reportes.index');
 

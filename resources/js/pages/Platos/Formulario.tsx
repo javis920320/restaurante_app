@@ -11,6 +11,12 @@ interface FormularioProps {
     onCreated?: () => void;
 }
 
+const PRODUCTION_AREA_OPTIONS = [
+    { value: 'none', label: 'Sin área (entrega directa)' },
+    { value: 'kitchen', label: '🍳 Cocina' },
+    { value: 'bar', label: '🍹 Bar' },
+];
+
 export default function Formulario({ categorias, onCreated }: FormularioProps) {
     const { data, setData, errors, setError, processing, reset } = useForm({
         nombre: '',
@@ -19,6 +25,7 @@ export default function Formulario({ categorias, onCreated }: FormularioProps) {
         categoria_id: 0,
         imagen: '',
         disponible: true,
+        production_area: 'none' as 'none' | 'kitchen' | 'bar',
     });
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,6 +37,7 @@ export default function Formulario({ categorias, onCreated }: FormularioProps) {
                 categoria_id: data.categoria_id,
                 imagen: data.imagen.trim() || null,
                 disponible: data.disponible,
+                production_area: data.production_area,
             });
 
             if (respuesta.status === 200 || respuesta.status === 201) {
@@ -82,6 +90,25 @@ export default function Formulario({ categorias, onCreated }: FormularioProps) {
                     </SelectContent>
                 </SelectTrigger>
             </Select>
+
+            <div className="mt-2">
+                <Select
+                    defaultValue="none"
+                    onValueChange={(value) => setData('production_area', value as 'none' | 'kitchen' | 'bar')}
+                >
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Área de producción" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {PRODUCTION_AREA_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <InputError message={errors.production_area} />
+            </div>
 
             <div className="my-2">
                 <textarea

@@ -11,6 +11,8 @@ class Plato extends Model
 {
     use SoftDeletes;
 
+    const PRODUCTION_AREAS = ['kitchen', 'bar', 'none'];
+
     protected $fillable = [
         'nombre',
         'precio',
@@ -22,12 +24,17 @@ class Plato extends Model
         'disponible',
         'orden',
         'stock',
+        'production_area',
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
         'activo' => 'boolean',
         'disponible' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'production_area' => 'none',
     ];
 
     /**

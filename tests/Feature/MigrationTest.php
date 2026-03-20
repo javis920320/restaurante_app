@@ -131,3 +131,110 @@ test('pedido model can use soft deletes', function () {
     expect(\App\Models\Pedido::count())->toBe(0);
     expect(\App\Models\Pedido::withTrashed()->count())->toBe(1);
 });
+
+test('platos table has production_area column', function () {
+    expect(Schema::hasColumn('platos', 'production_area'))->toBeTrue();
+});
+
+test('pedido_detalles table has production_area column', function () {
+    expect(Schema::hasColumn('pedido_detalles', 'production_area'))->toBeTrue();
+});
+
+test('pedido_detalles table has estado column', function () {
+    expect(Schema::hasColumn('pedido_detalles', 'estado'))->toBeTrue();
+});
+
+test('plato production_area defaults to none', function () {
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Test PA']);
+    $plato = \App\Models\Plato::create([
+        'nombre' => 'Plato Sin Área',
+        'precio' => 10.00,
+        'categoria_id' => $categoria->id,
+        'activo' => true,
+    ]);
+
+    expect($plato->production_area)->toBe('none');
+});
+
+test('plato can be assigned to kitchen production area', function () {
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Test Kitchen']);
+    $plato = \App\Models\Plato::create([
+        'nombre' => 'Hamburguesa',
+        'precio' => 15.00,
+        'categoria_id' => $categoria->id,
+        'activo' => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    expect($plato->production_area)->toBe('kitchen');
+});
+
+test('plato can be assigned to bar production area', function () {
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Test Bar']);
+    $plato = \App\Models\Plato::create([
+        'nombre' => 'Mojito',
+        'precio' => 8.00,
+        'categoria_id' => $categoria->id,
+        'activo' => true,
+        'production_area' => 'bar',
+    ]);
+
+    expect($plato->production_area)->toBe('bar');
+});
+
+test('pedido_detalle production_area is copied from product when order is created', function () {
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Bebidas']);
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Test Restaurante', 'activo' => true]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa 1',
+        'capacidad' => 4,
+        'estado' => 'disponible',
+        'activa' => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+
+    $platoBar = \App\Models\Plato::create([
+        'nombre' => 'Cerveza',
+        'precio' => 5.00,
+        'categoria_id' => $categoria->id,
+        'restaurante_id' => $restaurante->id,
+        'activo' => true,
+        'disponible' => true,
+        'production_area' => 'bar',
+    ]);
+
+    $platoKitchen = \App\Models\Plato::create([
+        'nombre' => 'Hamburguesa',
+        'precio' => 12.00,
+        'categoria_id' => $categoria->id,
+        'restaurante_id' => $restaurante->id,
+        'activo' => true,
+        'disponible' => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    $user = \App\Models\User::create([
+        'name' => 'Mesero',
+        'email' => 'mesero2@test.com',
+        'password' => bcrypt('password'),
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+    $pedido = $pedidoService->crearPedidoMesero(
+        mesaId: $mesa->id,
+        items: [
+            ['producto_id' => $platoBar->id, 'cantidad' => 2, 'notas' => null],
+            ['producto_id' => $platoKitchen->id, 'cantidad' => 1, 'notas' => null],
+        ],
+        userId: $user->id,
+    );
+
+    $detalles = $pedido->detalles()->with('producto')->get();
+    $detalleBar = $detalles->where('producto_id', $platoBar->id)->first();
+    $detalleKitchen = $detalles->where('producto_id', $platoKitchen->id)->first();
+
+    expect($detalleBar->production_area)->toBe('bar');
+    expect($detalleKitchen->production_area)->toBe('kitchen');
+    expect($detalleBar->estado)->toBe('pendiente');
+    expect($detalleKitchen->estado)->toBe('pendiente');
+});

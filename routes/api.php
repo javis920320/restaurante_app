@@ -28,10 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/dashboard/pedidos-kanban', [DashboardController::class, 'pedidosKanban'])->name('api.dashboard.pedidos-kanban');
     Route::get('/admin/mesas/status', [DashboardController::class, 'mesasStatus'])->name('api.mesas.status');
     Route::get('/admin/cocina/pedidos', [DashboardController::class, 'cocinaKDS'])->name('api.cocina.pedidos');
+    Route::get('/admin/bar/pedidos', [DashboardController::class, 'barKDS'])->name('api.bar.pedidos');
     
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');
     Route::post('/pedidos/mesero', [PedidoController::class, 'storeMesero'])->name('api.pedidos.store-mesero');
     Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('api.pedidos.cambiar-estado');
+    Route::patch('/pedidos/{pedido}/detalles/{detalle}/estado', [PedidoController::class, 'cambiarEstadoDetalle'])->name('api.pedidos.detalles.cambiar-estado');
     Route::post('/pedidos/{pedido}/cerrar-mesa', [PedidoController::class, 'cerrarMesa'])->name('api.pedidos.cerrar-mesa');
 });

@@ -13,6 +13,7 @@ class DashboardService
     /**
      * Get orders for the kitchen display system
      * Returns pending, confirmed and in-preparation orders grouped with product details
+     * Only includes items assigned to the kitchen production area
      *
      * @return array
      */
@@ -22,9 +23,13 @@ class DashboardService
 
         $pedidos = Pedido::with(['mesa', 'detalles.producto'])
             ->whereIn('estado', $estados)
+            ->whereHas('detalles', function ($q) {
+                $q->where('production_area', 'kitchen');
+            })
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($pedido) {
+                $itemsCocina = $pedido->detalles->filter(fn($d) => $d->production_area === 'kitchen');
                 return [
                     'id' => $pedido->id,
                     'mesa_nombre' => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
@@ -32,13 +37,59 @@ class DashboardService
                     'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
                     'notas' => $pedido->notas,
                     'created_at' => $pedido->created_at->toISOString(),
-                    'productos' => $pedido->detalles->map(function ($detalle) {
+                    'productos' => $itemsCocina->map(function ($detalle) {
                         return [
+                            'id' => $detalle->id,
                             'nombre' => $detalle->producto->nombre,
                             'cantidad' => $detalle->cantidad,
                             'notas' => $detalle->notas ?? null,
+                            'production_area' => $detalle->production_area,
+                            'estado' => $detalle->estado,
                         ];
-                    })->toArray(),
+                    })->values()->toArray(),
+                ];
+            });
+
+        return $pedidos->toArray();
+    }
+
+    /**
+     * Get orders for the bar display system
+     * Returns pending, confirmed and in-preparation orders grouped with product details
+     * Only includes items assigned to the bar production area
+     *
+     * @return array
+     */
+    public function getPedidosParaBar(): array
+    {
+        $estados = ['pendiente', 'confirmado', 'en_preparacion'];
+
+        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+            ->whereIn('estado', $estados)
+            ->whereHas('detalles', function ($q) {
+                $q->where('production_area', 'bar');
+            })
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(function ($pedido) {
+                $itemsBar = $pedido->detalles->filter(fn($d) => $d->production_area === 'bar');
+                return [
+                    'id' => $pedido->id,
+                    'mesa_nombre' => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
+                    'estado' => $pedido->estado,
+                    'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
+                    'notas' => $pedido->notas,
+                    'created_at' => $pedido->created_at->toISOString(),
+                    'productos' => $itemsBar->map(function ($detalle) {
+                        return [
+                            'id' => $detalle->id,
+                            'nombre' => $detalle->producto->nombre,
+                            'cantidad' => $detalle->cantidad,
+                            'notas' => $detalle->notas ?? null,
+                            'production_area' => $detalle->production_area,
+                            'estado' => $detalle->estado,
+                        ];
+                    })->values()->toArray(),
                 ];
             });
 

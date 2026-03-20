@@ -115,9 +115,25 @@ export interface Plato {
     disponible: boolean;
     orden: number;
     stock?: number | null;
+    production_area: 'kitchen' | 'bar' | 'none';
     created_at: string;
     updated_at: string;
     imagen: string;
     opciones?: Opcion[];
     categoria?: Categoria;
+}
+
+export interface PedidoDetalle {
+    id: number;
+    pedido_id: number;
+    producto_id: number;
+    cantidad: number;
+    precio_unitario: number;
+    subtotal: number;
+    notas?: string | null;
+    production_area: 'kitchen' | 'bar' | 'none';
+    estado: 'pendiente' | 'en_preparacion' | 'listo' | 'entregado';
+    created_at: string;
+    updated_at: string;
+    producto?: Plato;
 }
