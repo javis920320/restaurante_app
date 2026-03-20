@@ -173,6 +173,8 @@ class PedidoService
                 'precio_unitario' => $precioUnitario,
                 'subtotal' => $subtotalItem,
                 'notas' => $item['notas'] ?? null,
+                'production_area' => $producto->production_area ?? 'none',
+                'estado' => 'pendiente',
             ]);
 
             $subtotal += $subtotalItem;
@@ -284,6 +286,47 @@ class PedidoService
             'subtotal' => $subtotal,
             'total' => $total,
         ];
+    }
+
+    /**
+     * Cambiar el estado de un ítem individual de pedido
+     *
+     * @param PedidoDetalle $detalle
+     * @param string $nuevoEstado
+     * @return PedidoDetalle
+     * @throws Exception
+     */
+    public function cambiarEstadoDetalle(PedidoDetalle $detalle, string $nuevoEstado): PedidoDetalle
+    {
+        $estadosValidos = PedidoDetalle::ESTADOS;
+
+        if (!in_array($nuevoEstado, $estadosValidos)) {
+            throw new Exception('Estado de ítem inválido: ' . $nuevoEstado);
+        }
+
+        $transicionesPermitidas = [
+            'pendiente' => ['en_preparacion'],
+            'en_preparacion' => ['listo'],
+            'listo' => ['entregado'],
+            'entregado' => [],
+        ];
+
+        $estadoActual = $detalle->estado;
+
+        if (!in_array($nuevoEstado, $transicionesPermitidas[$estadoActual] ?? [])) {
+            throw new Exception("No se puede cambiar el estado del ítem de '{$estadoActual}' a '{$nuevoEstado}'");
+        }
+
+        $detalle->update(['estado' => $nuevoEstado]);
+
+        Log::info('Estado de ítem de pedido actualizado', [
+            'detalle_id' => $detalle->id,
+            'pedido_id' => $detalle->pedido_id,
+            'estado_anterior' => $estadoActual,
+            'estado_nuevo' => $nuevoEstado,
+        ]);
+
+        return $detalle->fresh();
     }
 
     /**

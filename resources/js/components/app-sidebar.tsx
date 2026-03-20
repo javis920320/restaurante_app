@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { usePermissions } from '@/hooks/use-permissions';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, LayoutGrid, MenuSquare, Settings, Shield, Table2, UserCog, UtensilsCrossed } from 'lucide-react';
+import { BarChart3, BookOpen, ChefHat, ClipboardList, Folder, GlassWater, LayoutGrid, MenuSquare, Settings, Shield, Table2, UserCog, UtensilsCrossed } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -23,6 +23,11 @@ const mainNavItems: NavItem[] = [
         title: 'Cocina (KDS)',
         href: '/cocina',
         icon: ChefHat,
+    },
+    {
+        title: 'Bar (KDS)',
+        href: '/bar',
+        icon: GlassWater,
     },
     {
         title: 'Reportes',

@@ -144,6 +144,22 @@ export default function Index({ categorias, platos }: { categorias: { id: number
                                     >
                                         {plato.disponible ? 'Disponible' : 'Agotado'}
                                     </Badge>
+                                    <Badge
+                                        variant="outline"
+                                        className={`text-xs ${
+                                            plato.production_area === 'kitchen'
+                                                ? 'border-orange-400 text-orange-600'
+                                                : plato.production_area === 'bar'
+                                                  ? 'border-purple-400 text-purple-600'
+                                                  : 'border-gray-300 text-gray-500'
+                                        }`}
+                                    >
+                                        {plato.production_area === 'kitchen'
+                                            ? '🍳 Cocina'
+                                            : plato.production_area === 'bar'
+                                              ? '🍹 Bar'
+                                              : 'Sin área'}
+                                    </Badge>
                                 </div>
                             </div>
                             <p className="text-sm text-gray-600">{plato.descripcion}</p>

@@ -14,12 +14,21 @@ class PedidoDetalle extends Model
         'precio_unitario',
         'subtotal',
         'notas',
+        'production_area',
+        'estado',
     ];
+
+    const ESTADOS = ['pendiente', 'en_preparacion', 'listo', 'entregado'];
 
     protected $casts = [
         'cantidad' => 'integer',
         'precio_unitario' => 'decimal:2',
         'subtotal' => 'decimal:2',
+    ];
+
+    protected $attributes = [
+        'production_area' => 'none',
+        'estado' => 'pendiente',
     ];
 
     /**

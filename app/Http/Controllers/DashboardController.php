@@ -39,6 +39,14 @@ class DashboardController extends Controller
     }
 
     /**
+     * Display the bar display system page
+     */
+    public function bar()
+    {
+        return Inertia::render('Bar/Index');
+    }
+
+    /**
      * Display the reports page
      */
     public function reportesPage()
@@ -48,13 +56,26 @@ class DashboardController extends Controller
 
     /**
      * Get orders for the kitchen display system (KDS)
-     * Returns pending, confirmed and in_preparation orders
+     * Returns pending, confirmed and in_preparation orders (kitchen items only)
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function cocinaKDS()
     {
         $pedidos = $this->dashboardService->getPedidosParaCocina();
+
+        return response()->json($pedidos);
+    }
+
+    /**
+     * Get orders for the bar display system
+     * Returns pending, confirmed and in_preparation orders (bar items only)
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function barKDS()
+    {
+        $pedidos = $this->dashboardService->getPedidosParaBar();
 
         return response()->json($pedidos);
     }
