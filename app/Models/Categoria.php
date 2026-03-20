@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Categoria extends Model
 {
-    
+
     use HasFactory;
+
+    const PRODUCTION_AREAS = ['kitchen', 'bar', 'none'];
+
     protected $fillable = [
         'menu_id',
         'nombre',
         'activo',
         'orden',
+        'production_area',
     ];
 
     protected $casts = [

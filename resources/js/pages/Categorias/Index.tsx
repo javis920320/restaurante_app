@@ -6,6 +6,18 @@ import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useState } from 'react';
 
+const PRODUCTION_AREA_OPTIONS = [
+    { value: 'none', label: 'Sin área' },
+    { value: 'kitchen', label: '🍳 Cocina' },
+    { value: 'bar', label: '🍹 Bar' },
+] as const;
+
+const PRODUCTION_AREA_LABELS: Record<string, string> = {
+    none: 'Sin área',
+    kitchen: '🍳 Cocina',
+    bar: '🍹 Bar',
+};
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Categorias',
@@ -23,14 +35,19 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
         setError,
     } = useForm({
         nombre: '',
+        production_area: 'none' as 'none' | 'kitchen' | 'bar',
     });
     const CategoriaNueva: FormEventHandler = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(route('categorias.store'), { nombre: data.nombre });
+            const response = await axios.post(route('categorias.store'), {
+                nombre: data.nombre,
+                production_area: data.production_area,
+            });
 
             setCategorias((prev) => [...prev, response.data.categorianew]);
             setData('nombre', '');
+            setData('production_area', 'none');
         } catch (error) {
             console.log(error.response.data.message);
             setError('nombre', error.response.data.message);
@@ -71,21 +88,32 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                     <h1 className="text-2xl font-bold">Gestión de Categorías</h1>
                     <p className="mt-2 text-gray-600">Aquí puedes gestionar las categorías de los platos.</p>
 
-                    <form onSubmit={CategoriaNueva} className="mt-4 flex items-center">
-                        <input
-                            type="text"
-                            placeholder="Nueva Categoria..."
-                            className="rounded-md border p-2"
-                            onChange={(e) => setData('nombre', e.target.value)}
-                            value={data.nombre}
-                        />
-                        <button type="submit" className="ml-2 rounded-md bg-blue-500 p-2 text-white">
+                    <form onSubmit={CategoriaNueva} className="mt-4 flex flex-wrap items-start gap-2">
+                        <div className="flex flex-col gap-1">
+                            <input
+                                type="text"
+                                placeholder="Nueva Categoria..."
+                                className="rounded-md border p-2"
+                                onChange={(e) => setData('nombre', e.target.value)}
+                                value={data.nombre}
+                            />
+                            <InputError message={errors.nombre} />
+                        </div>
+                        <select
+                            className="rounded-md border p-2 text-sm"
+                            value={data.production_area}
+                            onChange={(e) => setData('production_area', e.target.value as 'none' | 'kitchen' | 'bar')}
+                        >
+                            {PRODUCTION_AREA_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                        <button type="submit" className="rounded-md bg-blue-500 p-2 text-white">
                             Agregar +
                         </button>
                     </form>
-                    <div>
-                        <InputError message={errors.nombre} />
-                    </div>
 
                     {deleteError && (
                         <div className="mt-2 rounded-md bg-red-100 p-2 text-sm text-red-700">{deleteError}</div>
@@ -104,6 +132,11 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                                             <span className={categoria.activo ? '' : 'text-gray-400 line-through'}>
                                                 {categoria.nombre}
                                             </span>
+                                            {categoria.production_area && categoria.production_area !== 'none' && (
+                                                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+                                                    {PRODUCTION_AREA_LABELS[categoria.production_area]}
+                                                </span>
+                                            )}
                                             {categoria.platos_count !== undefined && (
                                                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
                                                     {categoria.platos_count} platos

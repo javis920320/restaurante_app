@@ -26,12 +26,14 @@ class CategoriaController extends Controller
             'nombre' => 'required|string|max:255|unique:categorias,nombre',
             'orden' => 'nullable|integer|min:0',
             'menu_id' => 'nullable|exists:menus,id',
+            'production_area' => 'nullable|string|in:kitchen,bar,none',
         ]);
 
         $categoria = Categoria::create([
             'nombre' => $request->nombre,
             'orden' => $request->input('orden', 0),
             'menu_id' => $request->input('menu_id'),
+            'production_area' => $request->input('production_area', 'none'),
         ]);
 
         return response()->json([

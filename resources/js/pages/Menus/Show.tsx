@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import ConfiguracionLayout from '@/layouts/configuracion/layout';
 import { type BreadcrumbItem, type Categoria, type Menu, type Plato, type Restaurante } from '@/types';
@@ -9,6 +10,18 @@ import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronLeft, PackageOpen, Plus, QrCode, Tag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+
+const PRODUCTION_AREA_OPTIONS = [
+    { value: 'none', label: 'Sin área' },
+    { value: 'kitchen', label: '🍳 Cocina' },
+    { value: 'bar', label: '🍹 Bar' },
+] as const;
+
+const PRODUCTION_AREA_LABELS: Record<string, string> = {
+    none: 'Sin área',
+    kitchen: '🍳 Cocina',
+    bar: '🍹 Bar',
+};
 
 interface Props {
     menu: Menu;
@@ -21,12 +34,13 @@ export default function MenuShow({ menu: initialMenu }: Props) {
 
     // Categoría form
     const [nuevaCategoria, setNuevaCategoria] = useState('');
+    const [nuevaCategoriaArea, setNuevaCategoriaArea] = useState<'none' | 'kitchen' | 'bar'>('none');
     const [categoriaError, setCategoriaError] = useState('');
     const [savingCategoria, setSavingCategoria] = useState(false);
 
     // Plato inline form
     const [platoFormCategoriaId, setPlatoFormCategoriaId] = useState<number | null>(null);
-    const [nuevoPlato, setNuevoPlato] = useState({ nombre: '', precio: '', descripcion: '', stock: '' });
+    const [nuevoPlato, setNuevoPlato] = useState({ nombre: '', precio: '', descripcion: '', stock: '', production_area: 'none' as 'none' | 'kitchen' | 'bar' });
     const [platoError, setPlatoError] = useState('');
     const [savingPlato, setSavingPlato] = useState(false);
 
@@ -65,9 +79,11 @@ export default function MenuShow({ menu: initialMenu }: Props) {
             const response = await axios.post(route('categorias.store'), {
                 nombre: nuevaCategoria,
                 menu_id: menu.id,
+                production_area: nuevaCategoriaArea,
             });
             setCategorias((prev) => [...prev, { ...response.data.categorianew, platos: [] }]);
             setNuevaCategoria('');
+            setNuevaCategoriaArea('none');
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.data?.message) {
                 setCategoriaError(error.response.data.message);
@@ -111,12 +127,13 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                 categoria_id: categoriaId,
                 activo: true,
                 disponible: true,
+                production_area: nuevoPlato.production_area,
             });
             const platoNuevo: Plato = response.data.plato;
             setCategorias((prev) =>
                 prev.map((c) => (c.id === categoriaId ? { ...c, platos: [...(c.platos ?? []), platoNuevo] } : c)),
             );
-            setNuevoPlato({ nombre: '', precio: '', descripcion: '', stock: '' });
+            setNuevoPlato({ nombre: '', precio: '', descripcion: '', stock: '', production_area: 'none' });
             setPlatoFormCategoriaId(null);
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.data?.message) {
@@ -178,21 +195,39 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                     </div>
 
                     {/* Agregar categoría */}
-                    <form onSubmit={handleCrearCategoria} className="flex items-end gap-3 rounded-lg border p-4">
-                        <div className="flex-1 space-y-1">
-                            <Label htmlFor="nueva-cat">Nueva categoría</Label>
-                            <Input
-                                id="nueva-cat"
-                                value={nuevaCategoria}
-                                onChange={(e) => setNuevaCategoria(e.target.value)}
-                                placeholder="Ej: Bebidas, Platos fuertes, Postres..."
-                            />
-                            {categoriaError && <p className="text-destructive text-xs">{categoriaError}</p>}
+                    <form onSubmit={handleCrearCategoria} className="rounded-lg border p-4">
+                        <h4 className="mb-3 font-medium">Nueva categoría</h4>
+                        <div className="flex flex-wrap items-end gap-3">
+                            <div className="flex-1 space-y-1">
+                                <Label htmlFor="nueva-cat">Nombre</Label>
+                                <Input
+                                    id="nueva-cat"
+                                    value={nuevaCategoria}
+                                    onChange={(e) => setNuevaCategoria(e.target.value)}
+                                    placeholder="Ej: Bebidas, Platos fuertes, Postres..."
+                                />
+                                {categoriaError && <p className="text-destructive text-xs">{categoriaError}</p>}
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor="nueva-cat-area">Área de producción</Label>
+                                <Select value={nuevaCategoriaArea} onValueChange={(v) => setNuevaCategoriaArea(v as 'none' | 'kitchen' | 'bar')}>
+                                    <SelectTrigger id="nueva-cat-area" className="w-40">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PRODUCTION_AREA_OPTIONS.map((opt) => (
+                                            <SelectItem key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button type="submit" disabled={savingCategoria}>
+                                <Plus className="mr-1 h-4 w-4" />
+                                {savingCategoria ? 'Agregando...' : 'Agregar Categoría'}
+                            </Button>
                         </div>
-                        <Button type="submit" disabled={savingCategoria}>
-                            <Plus className="mr-1 h-4 w-4" />
-                            {savingCategoria ? 'Agregando...' : 'Agregar Categoría'}
-                        </Button>
                     </form>
 
                     {/* Lista de categorías y productos */}
@@ -212,6 +247,11 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                             <Badge variant={categoria.activo ? 'default' : 'secondary'} className="text-xs">
                                                 {categoria.activo ? 'Activa' : 'Inactiva'}
                                             </Badge>
+                                            {categoria.production_area && categoria.production_area !== 'none' && (
+                                                <Badge variant="outline" className="text-xs">
+                                                    {PRODUCTION_AREA_LABELS[categoria.production_area]}
+                                                </Badge>
+                                            )}
                                             <span className="text-muted-foreground text-xs">
                                                 {(categoria.platos ?? []).length} producto(s)
                                             </span>
@@ -222,7 +262,13 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                                 variant="outline"
                                                 onClick={() => {
                                                     setPlatoFormCategoriaId(platoFormCategoriaId === categoria.id ? null : categoria.id);
-                                                    setNuevoPlato({ nombre: '', precio: '', descripcion: '', stock: '' });
+                                                    setNuevoPlato({
+                                                        nombre: '',
+                                                        precio: '',
+                                                        descripcion: '',
+                                                        stock: '',
+                                                        production_area: (categoria.production_area ?? 'none') as 'none' | 'kitchen' | 'bar',
+                                                    });
                                                     setPlatoError('');
                                                 }}
                                             >
@@ -240,7 +286,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                     {/* Formulario inline para nuevo plato */}
                                     {platoFormCategoriaId === categoria.id && (
                                         <form onSubmit={(e) => handleCrearPlato(categoria.id, e)} className="border-b bg-muted/20 p-4">
-                                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                                 <div className="space-y-1">
                                                     <Label>Nombre *</Label>
                                                     <Input
@@ -260,6 +306,24 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                                         placeholder="0.00"
                                                         required
                                                     />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label>Área de producción</Label>
+                                                    <Select
+                                                        value={nuevoPlato.production_area}
+                                                        onValueChange={(v) => setNuevoPlato((p) => ({ ...p, production_area: v as 'none' | 'kitchen' | 'bar' }))}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {PRODUCTION_AREA_OPTIONS.map((opt) => (
+                                                                <SelectItem key={opt.value} value={opt.value}>
+                                                                    {opt.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <Label>Descripción</Label>
@@ -312,6 +376,11 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                                             {plato.stock !== null && plato.stock !== undefined && plato.stock === 0 && (
                                                                 <Badge variant="destructive" className="text-xs">
                                                                     Agotado
+                                                                </Badge>
+                                                            )}
+                                                            {plato.production_area && plato.production_area !== 'none' && (
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    {PRODUCTION_AREA_LABELS[plato.production_area]}
                                                                 </Badge>
                                                             )}
                                                         </div>
