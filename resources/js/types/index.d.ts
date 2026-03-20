@@ -64,6 +64,7 @@ export interface Categoria {
     nombre: string;
     activo: boolean;
     orden: number;
+    production_area: 'kitchen' | 'bar' | 'none';
     platos_count?: number;
     platos?: Plato[];
     created_at: string;
