@@ -17,11 +17,11 @@ interface KanbanBoardProps {
     pollingInterval?: number;
 }
 
-const COLUMNS: { status: ItemStatus; label: string; color: string }[] = [
-    { status: 'pendiente', label: 'Pendiente', color: 'bg-gray-400' },
-    { status: 'en_preparacion', label: 'En Preparación', color: 'bg-blue-500' },
-    { status: 'listo', label: 'Listo', color: 'bg-green-500' },
-    { status: 'entregado', label: 'Entregado', color: 'bg-purple-500' },
+const COLUMNS: { status: ItemStatus; label: string; dotColor: string }[] = [
+    { status: 'pendiente', label: 'Pendiente', dotColor: 'bg-gray-400' },
+    { status: 'en_preparacion', label: 'En Preparación', dotColor: 'bg-blue-500' },
+    { status: 'listo', label: 'Listo', dotColor: 'bg-green-500' },
+    { status: 'entregado', label: 'Entregado', dotColor: 'bg-purple-500' },
 ];
 
 export default function KanbanBoard({ area, title, pollingInterval = 10 }: KanbanBoardProps) {
@@ -109,13 +109,13 @@ export default function KanbanBoard({ area, title, pollingInterval = 10 }: Kanba
             {/* Board columns */}
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                 <div className="flex gap-4 overflow-x-auto pb-4">
-                    {COLUMNS.map(({ status, label, color }) => (
+                    {COLUMNS.map(({ status, label, dotColor }) => (
                         <KanbanColumn
                             key={status}
                             status={status}
                             label={label}
                             cards={columns[status]}
-                            color={color}
+                            dotColor={dotColor}
                         />
                     ))}
                 </div>

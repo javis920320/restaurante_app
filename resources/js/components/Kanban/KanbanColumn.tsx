@@ -6,10 +6,10 @@ interface KanbanColumnProps {
     status: ItemStatus;
     label: string;
     cards: KanbanCardType[];
-    color: string;
+    dotColor: string;
 }
 
-const STATUS_COLORS: Record<ItemStatus, string> = {
+const COLUMN_BG: Record<ItemStatus, string> = {
     pendiente: 'bg-gray-100 border-gray-300',
     en_preparacion: 'bg-blue-50 border-blue-300',
     listo: 'bg-green-50 border-green-300',
@@ -23,17 +23,17 @@ const BADGE_COLORS: Record<ItemStatus, string> = {
     entregado: 'bg-purple-100 text-purple-700',
 };
 
-export default function KanbanColumn({ status, label, cards, color }: KanbanColumnProps) {
+export default function KanbanColumn({ status, label, cards, dotColor }: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: status });
 
     return (
         <div className="flex w-72 shrink-0 flex-col">
             {/* Column header */}
             <div
-                className={`mb-2 flex items-center justify-between rounded-t-lg border px-3 py-2 ${STATUS_COLORS[status]}`}
+                className={`mb-2 flex items-center justify-between rounded-t-lg border px-3 py-2 ${COLUMN_BG[status]}`}
             >
                 <div className="flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
+                    <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
                     <h3 className="text-sm font-semibold text-gray-800">{label}</h3>
                 </div>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_COLORS[status]}`}>

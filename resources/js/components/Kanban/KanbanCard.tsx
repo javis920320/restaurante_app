@@ -8,16 +8,24 @@ interface KanbanCardProps {
     columnStatus: string;
 }
 
-function getTimeColor(minutes: number): string {
-    if (minutes < 15) return 'text-green-600';
-    if (minutes < 30) return 'text-yellow-600';
-    return 'text-red-600';
-}
+const TIME_TEXT_COLORS = {
+    green: 'text-green-600',
+    yellow: 'text-yellow-600',
+    red: 'text-red-600',
+} as const;
 
-function getTimeBorderColor(minutes: number): string {
-    if (minutes < 15) return 'border-l-green-400';
-    if (minutes < 30) return 'border-l-yellow-400';
-    return 'border-l-red-500';
+const TIME_BORDER_COLORS = {
+    green: 'border-l-green-400',
+    yellow: 'border-l-yellow-400',
+    red: 'border-l-red-500',
+} as const;
+
+type TimeLevel = keyof typeof TIME_TEXT_COLORS;
+
+function getTimeLevel(minutes: number): TimeLevel {
+    if (minutes < 15) return 'green';
+    if (minutes < 30) return 'yellow';
+    return 'red';
 }
 
 function formatTime(minutes: number): string {
@@ -39,8 +47,9 @@ export default function KanbanCard({ card, columnStatus }: KanbanCardProps) {
         cursor: isDragging ? 'grabbing' : 'grab',
     };
 
-    const timeColor = getTimeColor(card.tiempo_transcurrido);
-    const borderColor = getTimeBorderColor(card.tiempo_transcurrido);
+    const level = getTimeLevel(card.tiempo_transcurrido);
+    const timeTextColor = TIME_TEXT_COLORS[level];
+    const borderColor = TIME_BORDER_COLORS[level];
 
     return (
         <div
@@ -83,7 +92,7 @@ export default function KanbanCard({ card, columnStatus }: KanbanCardProps) {
             </ul>
 
             {/* Footer: time */}
-            <div className={`flex items-center gap-1 ${timeColor}`}>
+            <div className={`flex items-center gap-1 ${timeTextColor}`}>
                 <Clock className="h-3 w-3 shrink-0" />
                 <span className="text-xs font-medium">{formatTime(card.tiempo_transcurrido)}</span>
             </div>
