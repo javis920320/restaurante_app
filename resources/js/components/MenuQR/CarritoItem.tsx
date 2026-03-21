@@ -22,25 +22,25 @@ export default function CarritoItem({ item }: CarritoItemProps) {
     const opcionId = item.opcion?.id;
 
     return (
-        <div className="border-b border-gray-200 py-3 last:border-0">
+        <div className="border-b border-gray-200 py-3 last:border-0 dark:border-gray-700">
             <div className="mb-2 flex items-start justify-between">
                 <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{item.producto.nombre}</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">{item.producto.nombre}</h4>
                     {item.opcion && (
-                        <p className="text-xs text-blue-600">
+                        <p className="text-xs text-blue-600 dark:text-blue-400">
                             {item.opcion.nombre}
                             {item.opcion.precio_extra > 0 && ` (+${formatPrice(item.opcion.precio_extra)})`}
                         </p>
                     )}
-                    <p className="text-sm text-gray-600">{formatPrice(precioUnitario)}</p>
-                    {item.notas && <p className="mt-1 text-xs text-gray-500 italic">Nota: {item.notas}</p>}
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{formatPrice(precioUnitario)}</p>
+                    {item.notas && <p className="mt-1 text-xs text-gray-500 italic dark:text-gray-500">Nota: {item.notas}</p>}
                 </div>
 
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => eliminarProducto(item.producto.id, opcionId)}
-                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950"
                 >
                     <Trash2 className="h-4 w-4" />
                 </Button>
@@ -59,7 +59,7 @@ export default function CarritoItem({ item }: CarritoItemProps) {
                     </Button>
                 </div>
 
-                <span className="font-semibold text-gray-900">{formatPrice(subtotal)}</span>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">{formatPrice(subtotal)}</span>
             </div>
         </div>
     );

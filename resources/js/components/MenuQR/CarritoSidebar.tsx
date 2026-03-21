@@ -62,13 +62,13 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
     };
 
     return (
-        <div className="flex h-full flex-col bg-white">
+        <div className="flex h-full flex-col bg-white dark:bg-gray-900">
             {/* Header */}
-            <div className="border-b border-gray-200 p-4">
+            <div className="border-b border-gray-200 p-4 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-gray-700" />
-                        <h2 className="text-lg font-bold text-gray-900">Tu Pedido</h2>
+                        <ShoppingCart className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Tu Pedido</h2>
                         {cantidadTotal > 0 && (
                             <span className="rounded-full bg-blue-600 px-2 py-1 text-xs font-semibold text-white">{cantidadTotal}</span>
                         )}
@@ -86,9 +86,9 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
             <div className="flex-1 overflow-y-auto p-4">
                 {state.items.length === 0 ? (
                     <div className="py-12 text-center">
-                        <ShoppingCart className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                        <p className="text-gray-500">Tu carrito está vacío</p>
-                        <p className="mt-2 text-sm text-gray-400">Agrega productos del menú para comenzar</p>
+                        <ShoppingCart className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+                        <p className="text-gray-500 dark:text-gray-400">Tu carrito está vacío</p>
+                        <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">Agrega productos del menú para comenzar</p>
                     </div>
                 ) : (
                     <div className="space-y-1">
@@ -107,20 +107,20 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
 
             {/* Footer con total y botón */}
             {state.items.length > 0 && (
-                <div className="space-y-4 border-t border-gray-200 p-4">
+                <div className="space-y-4 border-t border-gray-200 p-4 dark:border-gray-700">
                     {/* Total */}
                     <div className="flex items-center justify-between">
-                        <span className="text-lg font-semibold text-gray-900">Total (estimado):</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">Total (estimado):</span>
                         <span className="text-2xl font-bold text-green-600">{formatPrice(state.total)}</span>
                     </div>
 
-                    <p className="text-center text-xs text-gray-500">El total final será calculado por el sistema</p>
+                    <p className="text-center text-xs text-gray-500 dark:text-gray-400">El total final será calculado por el sistema</p>
 
                     {/* Modal de confirmación */}
                     {showConfirmacion ? (
-                        <div className="space-y-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-                            <p className="text-sm font-medium text-gray-700">¿Confirmar pedido?</p>
-                            <p className="text-xs text-gray-600">Se enviará tu pedido a la cocina con {cantidadTotal} producto(s)</p>
+                        <div className="space-y-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">¿Confirmar pedido?</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">Se enviará tu pedido a la cocina con {cantidadTotal} producto(s)</p>
                             <div className="flex gap-2">
                                 <Button onClick={handleConfirmarPedido} disabled={loading} className="flex-1">
                                     {loading ? (

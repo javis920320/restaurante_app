@@ -35,7 +35,7 @@ export default function ProductCard({ producto }: ProductCardProps) {
     };
 
     return (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
             <div className="flex gap-4 p-4">
                 {/* Imagen del producto */}
                 {producto.imagen && (
@@ -46,14 +46,14 @@ export default function ProductCard({ producto }: ProductCardProps) {
 
                 {/* Información del producto */}
                 <div className="min-w-0 flex-1">
-                    <h3 className="mb-1 text-lg font-semibold text-gray-900">{producto.nombre}</h3>
+                    <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-100">{producto.nombre}</h3>
 
-                    {producto.descripcion && <p className="mb-2 line-clamp-2 text-sm text-gray-600">{producto.descripcion}</p>}
+                    {producto.descripcion && <p className="mb-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{producto.descripcion}</p>}
 
                     {/* Opciones/Variantes */}
                     {tieneOpciones && (
                         <div className="mb-2">
-                            <p className="mb-1 text-xs font-medium text-gray-500">Opciones:</p>
+                            <p className="mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">Opciones:</p>
                             <div className="flex flex-wrap gap-1">
                                 {producto.opciones!.map((opcion) => (
                                     <button
@@ -61,8 +61,8 @@ export default function ProductCard({ producto }: ProductCardProps) {
                                         onClick={() => setOpcionSeleccionada(opcionSeleccionada?.id === opcion.id ? null : opcion)}
                                         className={`rounded-full border px-2 py-0.5 text-xs transition-colors ${
                                             opcionSeleccionada?.id === opcion.id
-                                                ? 'border-green-500 bg-green-50 text-green-700'
-                                                : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                                                ? 'border-green-500 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
+                                                : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-500'
                                         }`}
                                     >
                                         {opcion.nombre}
