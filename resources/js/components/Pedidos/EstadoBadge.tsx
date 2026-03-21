@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 
+/** Operational states. 'pagado' is kept for backward-compat with historical records. */
 interface EstadoBadgeProps {
-    estado: 'pendiente' | 'confirmado' | 'en_preparacion' | 'listo' | 'entregado' | 'pagado' | 'cancelado';
+    estado: 'pendiente' | 'confirmado' | 'en_preparacion' | 'listo' | 'entregado' | 'cancelado' | 'pagado';
 }
 
 const estadosConfig = {

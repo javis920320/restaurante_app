@@ -27,7 +27,7 @@ class CambiarEstadoPedidoRequest extends FormRequest
             'estado' => [
                 'required',
                 'string',
-                Rule::in(['pendiente', 'confirmado', 'en_preparacion', 'listo', 'entregado', 'pagado', 'cancelado'])
+                Rule::in(\App\Models\Pedido::ESTADOS_OPERATIVOS),
             ],
         ];
     }
@@ -41,7 +41,7 @@ class CambiarEstadoPedidoRequest extends FormRequest
     {
         return [
             'estado.required' => 'El estado es obligatorio.',
-            'estado.in' => 'El estado debe ser uno de: pendiente, confirmado, en_preparacion, listo, entregado, pagado, cancelado.',
+            'estado.in' => 'El estado debe ser uno de: ' . implode(', ', \App\Models\Pedido::ESTADOS_OPERATIVOS) . '.',
         ];
     }
 }

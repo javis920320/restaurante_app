@@ -29,11 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/mesas/status', [DashboardController::class, 'mesasStatus'])->name('api.mesas.status');
     Route::get('/admin/cocina/pedidos', [DashboardController::class, 'cocinaKDS'])->name('api.cocina.pedidos');
     Route::get('/admin/bar/pedidos', [DashboardController::class, 'barKDS'])->name('api.bar.pedidos');
+    Route::get('/admin/caja/pedidos', [DashboardController::class, 'cajaKDS'])->name('api.caja.pedidos');
     
     // Gestión de pedidos
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('api.pedidos.index');
     Route::post('/pedidos/mesero', [PedidoController::class, 'storeMesero'])->name('api.pedidos.store-mesero');
     Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('api.pedidos.cambiar-estado');
+    Route::patch('/pedidos/{pedido}/pagar', [PedidoController::class, 'marcarComoPagado'])->name('api.pedidos.pagar');
     Route::patch('/pedidos/{pedido}/detalles/{detalle}/estado', [PedidoController::class, 'cambiarEstadoDetalle'])->name('api.pedidos.detalles.cambiar-estado');
     Route::patch('/pedidos/{pedido}/detalles/estado-bulk', [PedidoController::class, 'cambiarEstadoDetalles'])->name('api.pedidos.detalles.cambiar-estado-bulk');
     Route::post('/pedidos/{pedido}/cerrar-mesa', [PedidoController::class, 'cerrarMesa'])->name('api.pedidos.cerrar-mesa');

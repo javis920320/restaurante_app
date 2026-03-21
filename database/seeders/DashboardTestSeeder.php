@@ -126,14 +126,15 @@ class DashboardTestSeeder extends Seeder
             }
         }
 
-        // Create some paid orders for today's sales
+        // Create some paid orders for today's sales (using payment_status = 'paid', not estado = 'pagado')
         $mesasLibres = \App\Models\Mesa::where('estado', 'disponible')->take(3)->get();
         foreach ($mesasLibres as $mesa) {
             $pedido = \App\Models\Pedido::create([
                 'mesa_id' => $mesa->id,
                 'cliente_id' => $cliente->id,
                 'user_id' => $admin->id,
-                'estado' => 'pagado',
+                'estado' => 'entregado',
+                'payment_status' => 'paid',
                 'subtotal' => 0,
                 'total' => 0,
                 'created_at' => now()->subHours(rand(1, 8)),

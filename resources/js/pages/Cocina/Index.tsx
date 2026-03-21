@@ -2,11 +2,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { KanbanBoard } from '@/components/Kanban';
+import PagoBadge from '@/components/Pedidos/PagoBadge';
 import { useCocinaKDS, type PedidoCocina } from '@/hooks/useCocinaKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, Lock, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -14,7 +15,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Cocina', href: '/cocina' },
 ];
 
-export default function Index() {
+interface Props {
+    requirePaymentBeforePreparation?: boolean;
+}
+
+export default function Index({ requirePaymentBeforePreparation = false }: Props) {
     const { pedidos, loading, error, actionError, marcarListo, marcarEnPreparacion, refetch } = useCocinaKDS({
         pollingInterval: 10,
     });
@@ -40,6 +45,12 @@ export default function Index() {
                             <p className="text-gray-400">
                                 {pedidos.length} pedido(s) activo(s) • Actualización automática cada 10s
                             </p>
+                            {requirePaymentBeforePreparation && (
+                                <p className="mt-1 flex items-center gap-1 text-sm text-yellow-400">
+                                    <Lock className="h-4 w-4" />
+                                    Solo se muestran pedidos pagados
+                                </p>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -132,6 +143,7 @@ export default function Index() {
                                                 onAccion={() => marcarEnPreparacion(pedido.id)}
                                                 accionLabel="▶ Iniciar Preparación"
                                                 accionColor="bg-blue-600 hover:bg-blue-700"
+                                                requirePaymentBeforePreparation={requirePaymentBeforePreparation}
                                             />
                                         ))
                                     )}
@@ -159,6 +171,7 @@ export default function Index() {
                                                 onAccion={() => marcarListo(pedido.id)}
                                                 accionLabel="✓ Marcar como Listo"
                                                 accionColor="bg-green-600 hover:bg-green-700"
+                                                requirePaymentBeforePreparation={requirePaymentBeforePreparation}
                                             />
                                         ))
                                     )}
@@ -191,12 +204,14 @@ interface PedidoKDSCardProps {
     onAccion: () => void;
     accionLabel: string;
     accionColor: string;
+    requirePaymentBeforePreparation: boolean;
 }
 
-function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDSCardProps) {
+function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaymentBeforePreparation }: PedidoKDSCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
     const isDelayed = pedido.tiempo_transcurrido > 20;
     const isCritical = pedido.tiempo_transcurrido > 35;
+    const isBlocked = requirePaymentBeforePreparation && pedido.payment_status !== 'paid';
 
     const handleAccion = async () => {
         setIsUpdating(true);
@@ -210,11 +225,13 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDS
     return (
         <div
             className={`rounded-xl border p-5 transition-all ${
-                isCritical
-                    ? 'border-red-500 bg-red-950/50 shadow-lg shadow-red-900/30'
-                    : isDelayed
-                      ? 'border-yellow-600 bg-yellow-950/30'
-                      : 'border-gray-700 bg-gray-900'
+                isBlocked
+                    ? 'border-gray-600 bg-gray-900/50 opacity-75'
+                    : isCritical
+                      ? 'border-red-500 bg-red-950/50 shadow-lg shadow-red-900/30'
+                      : isDelayed
+                        ? 'border-yellow-600 bg-yellow-950/30'
+                        : 'border-gray-700 bg-gray-900'
             }`}
         >
             {/* Header */}
@@ -222,6 +239,15 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDS
                 <div>
                     <h3 className="text-xl font-bold text-white">Pedido #{pedido.id}</h3>
                     <p className="text-lg text-gray-300">{pedido.mesa_nombre}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                        <PagoBadge payment_status={pedido.payment_status} />
+                        {isBlocked && (
+                            <Badge className="bg-gray-700 text-xs text-gray-300">
+                                <Lock className="mr-1 h-3 w-3" />
+                                Esperando pago
+                            </Badge>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                     <div
@@ -236,7 +262,7 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDS
                         <Clock className="h-4 w-4" />
                         {pedido.tiempo_transcurrido} min
                     </div>
-                    {isCritical && (
+                    {isCritical && !isBlocked && (
                         <Badge className="bg-red-600 text-xs">
                             <AlertTriangle className="mr-1 h-3 w-3" />
                             Demorado
@@ -290,13 +316,21 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor }: PedidoKDS
             )}
 
             {/* Action button */}
-            <button
-                onClick={handleAccion}
-                disabled={isUpdating}
-                className={`w-full rounded-lg py-3 text-base font-bold text-white transition-all ${accionColor} disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-                {isUpdating ? '⏳ Actualizando...' : accionLabel}
-            </button>
+            {isBlocked ? (
+                <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-800 py-3 text-base font-bold text-gray-500">
+                    <Lock className="h-4 w-4" />
+                    Pendiente de pago en caja
+                </div>
+            ) : (
+                <button
+                    onClick={handleAccion}
+                    disabled={isUpdating}
+                    className={`w-full rounded-lg py-3 text-base font-bold text-white transition-all ${accionColor} disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                    {isUpdating ? '⏳ Actualizando...' : accionLabel}
+                </button>
+            )}
         </div>
     );
 }
+

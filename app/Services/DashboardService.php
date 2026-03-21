@@ -15,36 +15,45 @@ class DashboardService
      * Returns pending, confirmed and in-preparation orders grouped with product details
      * Only includes items assigned to the kitchen production area
      *
+     * When require_payment_before_preparation is true, only paid orders are shown.
+     *
      * @return array
      */
     public function getPedidosParaCocina(): array
     {
         $estados = ['pendiente', 'confirmado', 'en_preparacion'];
+        $requirePayment = config('restaurant.require_payment_before_preparation');
 
-        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+        $query = Pedido::with(['mesa', 'detalles.producto'])
             ->whereIn('estado', $estados)
             ->whereHas('detalles', function ($q) {
                 $q->where('production_area', 'kitchen');
-            })
-            ->orderBy('created_at', 'asc')
+            });
+
+        if ($requirePayment) {
+            $query->where('payment_status', 'paid');
+        }
+
+        $pedidos = $query->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($pedido) {
                 $itemsCocina = $pedido->detalles->filter(fn($d) => $d->production_area === 'kitchen');
                 return [
-                    'id' => $pedido->id,
-                    'mesa_nombre' => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
-                    'estado' => $pedido->estado,
+                    'id'                 => $pedido->id,
+                    'mesa_nombre'        => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
+                    'estado'             => $pedido->estado,
+                    'payment_status'     => $pedido->payment_status,
                     'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
-                    'notas' => $pedido->notas,
-                    'created_at' => $pedido->created_at->toISOString(),
-                    'productos' => $itemsCocina->map(function ($detalle) {
+                    'notas'              => $pedido->notas,
+                    'created_at'         => $pedido->created_at->toISOString(),
+                    'productos'          => $itemsCocina->map(function ($detalle) {
                         return [
-                            'id' => $detalle->id,
-                            'nombre' => $detalle->producto->nombre,
-                            'cantidad' => $detalle->cantidad,
-                            'notas' => $detalle->notas ?? null,
+                            'id'             => $detalle->id,
+                            'nombre'         => $detalle->producto->nombre,
+                            'cantidad'       => $detalle->cantidad,
+                            'notas'          => $detalle->notas ?? null,
                             'production_area' => $detalle->production_area,
-                            'estado' => $detalle->estado,
+                            'estado'         => $detalle->estado,
                         ];
                     })->values()->toArray(),
                 ];
@@ -58,42 +67,87 @@ class DashboardService
      * Returns pending, confirmed and in-preparation orders grouped with product details
      * Only includes items assigned to the bar production area
      *
+     * When require_payment_before_preparation is true, only paid orders are shown.
+     *
      * @return array
      */
     public function getPedidosParaBar(): array
     {
         $estados = ['pendiente', 'confirmado', 'en_preparacion'];
+        $requirePayment = config('restaurant.require_payment_before_preparation');
 
-        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+        $query = Pedido::with(['mesa', 'detalles.producto'])
             ->whereIn('estado', $estados)
             ->whereHas('detalles', function ($q) {
                 $q->where('production_area', 'bar');
-            })
-            ->orderBy('created_at', 'asc')
+            });
+
+        if ($requirePayment) {
+            $query->where('payment_status', 'paid');
+        }
+
+        $pedidos = $query->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($pedido) {
                 $itemsBar = $pedido->detalles->filter(fn($d) => $d->production_area === 'bar');
                 return [
-                    'id' => $pedido->id,
-                    'mesa_nombre' => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
-                    'estado' => $pedido->estado,
+                    'id'                 => $pedido->id,
+                    'mesa_nombre'        => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
+                    'estado'             => $pedido->estado,
+                    'payment_status'     => $pedido->payment_status,
                     'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
-                    'notas' => $pedido->notas,
-                    'created_at' => $pedido->created_at->toISOString(),
-                    'productos' => $itemsBar->map(function ($detalle) {
+                    'notas'              => $pedido->notas,
+                    'created_at'         => $pedido->created_at->toISOString(),
+                    'productos'          => $itemsBar->map(function ($detalle) {
                         return [
-                            'id' => $detalle->id,
-                            'nombre' => $detalle->producto->nombre,
-                            'cantidad' => $detalle->cantidad,
-                            'notas' => $detalle->notas ?? null,
+                            'id'             => $detalle->id,
+                            'nombre'         => $detalle->producto->nombre,
+                            'cantidad'       => $detalle->cantidad,
+                            'notas'          => $detalle->notas ?? null,
                             'production_area' => $detalle->production_area,
-                            'estado' => $detalle->estado,
+                            'estado'         => $detalle->estado,
                         ];
                     })->values()->toArray(),
                 ];
             });
 
         return $pedidos->toArray();
+    }
+
+    /**
+     * Get orders for the cashier (caja) view.
+     * Returns orders grouped by payment_status (pending/paid).
+     *
+     * @return array{pending: array, paid: array}
+     */
+    public function getPedidosCaja(): array
+    {
+        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+            ->whereNotIn('estado', ['cancelado'])
+            ->whereIn('payment_status', ['pending', 'paid'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $result = ['pending' => [], 'paid' => []];
+
+        foreach ($pedidos as $pedido) {
+            $key = $pedido->payment_status === 'paid' ? 'paid' : 'pending';
+            $result[$key][] = [
+                'id'                 => $pedido->id,
+                'mesa_nombre'        => $pedido->mesa ? $pedido->mesa->nombre : "Mesa #{$pedido->mesa_id}",
+                'estado'             => $pedido->estado,
+                'payment_status'     => $pedido->payment_status,
+                'total'              => round($pedido->total, 2),
+                'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
+                'created_at'         => $pedido->created_at->toISOString(),
+                'productos_resumen'  => $pedido->detalles->map(fn($d) => [
+                    'nombre'   => $d->producto->nombre,
+                    'cantidad' => $d->cantidad,
+                ])->toArray(),
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -114,14 +168,14 @@ class DashboardService
             $mesasOcupadas = Mesa::where('estado', 'ocupada')->where('activa', true)->count();
             $mesasLibres = Mesa::where('estado', 'disponible')->where('activa', true)->count();
 
-            // Today's sales
+            // Today's sales (by payment_status = 'paid')
             $ventasDia = Pedido::whereDate('created_at', today())
-                ->whereIn('estado', ['pagado'])
+                ->where('payment_status', 'paid')
                 ->sum('total');
 
             // Average ticket (paid orders today)
             $ticketPromedio = Pedido::whereDate('created_at', today())
-                ->whereIn('estado', ['pagado'])
+                ->where('payment_status', 'paid')
                 ->avg('total') ?? 0;
 
             return [
@@ -302,7 +356,7 @@ class DashboardService
             : 'HOUR(created_at)';
 
         $ventasPorHora = Pedido::whereBetween('created_at', [$inicio, $fin])
-            ->whereIn('estado', ['pagado'])
+            ->where('payment_status', 'paid')
             ->select(
                 DB::raw($hourExpr . ' as hora'),
                 DB::raw('COUNT(*) as total_pedidos'),
@@ -322,7 +376,7 @@ class DashboardService
         // Top products sold in date range
         $productosMasVendidos = PedidoDetalle::whereHas('pedido', function ($query) use ($inicio, $fin) {
                 $query->whereBetween('created_at', [$inicio, $fin])
-                    ->whereIn('estado', ['pagado']);
+                    ->where('payment_status', 'paid');
             })
             ->with('producto')
             ->select(
@@ -348,7 +402,8 @@ class DashboardService
         // Average preparation time
         // Note: assumes updated_at reflects when the order reached its final state
         $tiempoPromedioPreparacion = Pedido::whereBetween('created_at', [$inicio, $fin])
-            ->whereIn('estado', ['listo', 'entregado', 'pagado'])
+            ->whereIn('estado', ['listo', 'entregado'])
+            ->where('payment_status', 'paid')
             ->get()
             ->map(function ($pedido) {
                 return $pedido->created_at->diffInMinutes($pedido->updated_at);
