@@ -39,14 +39,14 @@ export default function Show({ mesa, restaurante, menu }: MenuQRShowProps) {
         <CarritoProvider>
             <Head title={`Menú - ${restaurante.nombre}`} />
 
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
                 {/* Header */}
-                <div className="sticky top-0 z-40 bg-white shadow-sm">
+                <div className="sticky top-0 z-40 bg-white shadow-sm dark:bg-gray-900 dark:shadow-gray-800">
                     <div className="container mx-auto px-4 py-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">{restaurante.nombre}</h1>
-                                <p className="text-sm text-gray-600">Mesa: {mesa.nombre}</p>
+                                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{restaurante.nombre}</h1>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Mesa: {mesa.nombre}</p>
                             </div>
 
                             {/* Botón para abrir carrito en móvil */}
@@ -64,7 +64,7 @@ export default function Show({ mesa, restaurante, menu }: MenuQRShowProps) {
                         <div className="flex-1">
                             {menu.length === 0 ? (
                                 <div className="py-12 text-center">
-                                    <p className="text-lg text-gray-500">No hay productos disponibles en este momento.</p>
+                                    <p className="text-lg text-gray-500 dark:text-gray-400">No hay productos disponibles en este momento.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-8">
@@ -85,7 +85,7 @@ export default function Show({ mesa, restaurante, menu }: MenuQRShowProps) {
                         {/* Modal del carrito - Mobile */}
                         {carritoAbierto && (
                             <div className="fixed inset-0 z-50 bg-black/50 lg:hidden">
-                                <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-xl">
+                                <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-xl dark:bg-gray-900">
                                     <CarritoSidebar qrToken={mesa.qr_token} showAsModal={true} onClose={() => setCarritoAbierto(false)} />
                                 </div>
                             </div>
