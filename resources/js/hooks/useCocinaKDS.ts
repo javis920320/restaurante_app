@@ -14,6 +14,7 @@ export interface PedidoCocina {
     id: number;
     mesa_nombre: string;
     estado: string;
+    payment_status: 'pending' | 'paid' | 'cancelled' | 'refunded';
     tiempo_transcurrido: number;
     productos: ProductoCocina[];
     created_at: string;

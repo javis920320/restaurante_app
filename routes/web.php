@@ -39,6 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Panel de Bar
     Route::get('/bar', [DashboardController::class, 'bar'])->name('bar.index');
 
+    // Panel de Caja
+    Route::get('/caja', [DashboardController::class, 'caja'])->name('caja.index');
+
     // Reportes y Analítica
     Route::get('/reportes', [DashboardController::class, 'reportesPage'])->name('reportes.index');
 

@@ -222,25 +222,24 @@ class PedidoService
      */
     public function cambiarEstado(Pedido $pedido, string $nuevoEstado, ?int $userId = null): Pedido
     {
-        $estadosValidos = ['pendiente', 'confirmado', 'en_preparacion', 'listo', 'entregado', 'pagado', 'cancelado'];
+        $estadosValidos = Pedido::ESTADOS_OPERATIVOS;
 
         if (!in_array($nuevoEstado, $estadosValidos)) {
             throw new Exception('Estado inválido: ' . $nuevoEstado);
         }
 
-        // Validate state transitions
+        // Validate state transitions (operational states only – 'pagado' is now payment_status)
         $transicionesPermitidas = [
-            'pendiente' => ['confirmado', 'en_preparacion', 'cancelado'],
-            'confirmado' => ['en_preparacion', 'cancelado'],
+            'pendiente'     => ['confirmado', 'en_preparacion', 'cancelado'],
+            'confirmado'    => ['en_preparacion', 'cancelado'],
             'en_preparacion' => ['listo', 'cancelado'],
-            'listo' => ['entregado'],
-            'entregado' => ['pagado'],
-            'pagado' => [], // Terminal state
-            'cancelado' => [], // Terminal state
+            'listo'         => ['entregado'],
+            'entregado'     => ['cancelado'],
+            'cancelado'     => [], // Terminal state
         ];
 
         $estadoActual = $pedido->estado;
-        
+
         // Check if transition is allowed
         if (!in_array($nuevoEstado, $transicionesPermitidas[$estadoActual] ?? [])) {
             throw new Exception("No se puede cambiar de estado '{$estadoActual}' a '{$nuevoEstado}'");
@@ -261,10 +260,10 @@ class PedidoService
             event(new PedidoEstadoActualizado($pedido, $estadoAnterior, $nuevoEstado));
 
             Log::info('Estado de pedido actualizado', [
-                'pedido_id' => $pedido->id,
+                'pedido_id'      => $pedido->id,
                 'estado_anterior' => $estadoAnterior,
-                'estado_nuevo' => $nuevoEstado,
-                'user_id' => $userId,
+                'estado_nuevo'   => $nuevoEstado,
+                'user_id'        => $userId,
             ]);
 
             return $pedido->fresh();
@@ -305,10 +304,10 @@ class PedidoService
         }
 
         $transicionesPermitidas = [
-            'pendiente' => ['en_preparacion'],
+            'pendiente'      => ['en_preparacion'],
             'en_preparacion' => ['listo'],
-            'listo' => ['entregado'],
-            'entregado' => [],
+            'listo'          => ['entregado'],
+            'entregado'      => [],
         ];
 
         $estadoActual = $detalle->estado;
@@ -317,20 +316,59 @@ class PedidoService
             throw new Exception("No se puede cambiar el estado del ítem de '{$estadoActual}' a '{$nuevoEstado}'");
         }
 
+        // Enforce payment-before-preparation rule when moving to 'en_preparacion'
+        if ($nuevoEstado === 'en_preparacion' && config('restaurant.require_payment_before_preparation')) {
+            $pedido = $detalle->pedido;
+            if (!$pedido->estaPagado()) {
+                throw new Exception('El pedido debe estar pagado antes de iniciar la preparación.');
+            }
+        }
+
         $detalle->update(['estado' => $nuevoEstado]);
 
         Log::info('Estado de ítem de pedido actualizado', [
-            'detalle_id' => $detalle->id,
-            'pedido_id' => $detalle->pedido_id,
+            'detalle_id'     => $detalle->id,
+            'pedido_id'      => $detalle->pedido_id,
             'estado_anterior' => $estadoActual,
-            'estado_nuevo' => $nuevoEstado,
+            'estado_nuevo'   => $nuevoEstado,
         ]);
 
         return $detalle->fresh();
     }
 
     /**
-     * Cerrar una mesa (marcar pedido como pagado y liberar mesa)
+     * Marcar un pedido como pagado (sin liberar la mesa).
+     * Utilizado por el rol "caja".
+     *
+     * @param Pedido $pedido
+     * @param int $userId
+     * @return Pedido
+     * @throws Exception
+     */
+    public function markAsPaid(Pedido $pedido, int $userId): Pedido
+    {
+        if ($pedido->payment_status === 'paid') {
+            throw new Exception('El pedido ya está marcado como pagado.');
+        }
+
+        return DB::transaction(function () use ($pedido, $userId) {
+            $pedido->update([
+                'payment_status' => 'paid',
+                'user_id'        => $userId,
+            ]);
+
+            Log::info('Pedido marcado como pagado', [
+                'pedido_id' => $pedido->id,
+                'total'     => $pedido->total,
+                'user_id'   => $userId,
+            ]);
+
+            return $pedido->fresh();
+        });
+    }
+
+    /**
+     * Cerrar una mesa (marcar pedido como pagado y liberar mesa).
      *
      * @param Pedido $pedido
      * @param int $userId
@@ -340,17 +378,25 @@ class PedidoService
     public function cerrarMesa(Pedido $pedido, int $userId): Pedido
     {
         return DB::transaction(function () use ($pedido, $userId) {
-            // Cambiar estado a pagado
-            $this->cambiarEstado($pedido, 'pagado', $userId);
+            // Mark payment as paid (financial axis)
+            $pedido->update([
+                'payment_status' => 'paid',
+                'user_id'        => $userId,
+            ]);
+
+            // Move operational state to entregado if not already in a terminal state
+            if (in_array($pedido->estado, ['pendiente', 'confirmado', 'en_preparacion', 'listo'])) {
+                $this->cambiarEstado($pedido, 'entregado', $userId);
+            }
 
             // Liberar la mesa
             $this->mesaService->liberarMesa($pedido->mesa);
 
             Log::info('Mesa cerrada', [
                 'pedido_id' => $pedido->id,
-                'mesa_id' => $pedido->mesa_id,
-                'total' => $pedido->total,
-                'user_id' => $userId,
+                'mesa_id'   => $pedido->mesa_id,
+                'total'     => $pedido->total,
+                'user_id'   => $userId,
             ]);
 
             return $pedido->fresh();

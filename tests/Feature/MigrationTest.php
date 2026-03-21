@@ -238,3 +238,275 @@ test('pedido_detalle production_area is copied from product when order is create
     expect($detalleBar->estado)->toBe('pendiente');
     expect($detalleKitchen->estado)->toBe('pendiente');
 });
+
+// ─── Dual State System ────────────────────────────────────────────────────────
+
+test('pedidos table has payment_status column', function () {
+    expect(Schema::hasColumn('pedidos', 'payment_status'))->toBeTrue();
+});
+
+test('new pedido defaults to payment_status pending', function () {
+    $user = \App\Models\User::create([
+        'name' => 'Test User',
+        'email' => 'payment_test@example.com',
+        'password' => bcrypt('password'),
+    ]);
+
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Payment Mesa',
+        'capacidad' => 4,
+        'estado' => 'disponible',
+        'activa' => true,
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'pendiente',
+        'subtotal' => 10.00,
+        'total' => 10.00,
+    ]);
+
+    expect($pedido->payment_status)->toBe('pending');
+    expect($pedido->estaPagado())->toBeFalse();
+});
+
+test('pedido can be marked as paid via markAsPaid service method', function () {
+    $user = \App\Models\User::create([
+        'name' => 'Cajero',
+        'email' => 'cajero@example.com',
+        'password' => bcrypt('password'),
+    ]);
+
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Pago',
+        'capacidad' => 2,
+        'estado' => 'disponible',
+        'activa' => true,
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'entregado',
+        'subtotal' => 25.00,
+        'total' => 25.00,
+    ]);
+
+    expect($pedido->payment_status)->toBe('pending');
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+    $pedidoPagado = $pedidoService->markAsPaid($pedido, $user->id);
+
+    expect($pedidoPagado->payment_status)->toBe('paid');
+    expect($pedidoPagado->estaPagado())->toBeTrue();
+    expect($pedidoPagado->estado)->toBe('entregado'); // operational state unchanged
+});
+
+test('cambiarEstado no longer allows estado pagado', function () {
+    $user = \App\Models\User::create([
+        'name' => 'Test User Estado',
+        'email' => 'estado_test@example.com',
+        'password' => bcrypt('password'),
+    ]);
+
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Estado',
+        'capacidad' => 2,
+        'estado' => 'disponible',
+        'activa' => true,
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'entregado',
+        'subtotal' => 10.00,
+        'total' => 10.00,
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+
+    expect(fn() => $pedidoService->cambiarEstado($pedido, 'pagado', $user->id))
+        ->toThrow(\Exception::class);
+});
+
+test('cerrarMesa sets payment_status to paid and does not set estado to pagado', function () {
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Test R', 'activo' => true]);
+    $user = \App\Models\User::create([
+        'name' => 'Test Cerrar',
+        'email' => 'cerrar@example.com',
+        'password' => bcrypt('password'),
+    ]);
+
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Cerrar',
+        'capacidad' => 2,
+        'estado' => 'ocupada',
+        'activa' => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'entregado',
+        'subtotal' => 15.00,
+        'total' => 15.00,
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+    $pedidoCerrado = $pedidoService->cerrarMesa($pedido, $user->id);
+
+    expect($pedidoCerrado->payment_status)->toBe('paid');
+    expect($pedidoCerrado->estado)->not->toBe('pagado');
+    expect($mesa->fresh()->estado)->toBe('disponible');
+});
+
+test('cambiarEstadoDetalle blocks en_preparacion when not paid and require_payment_before_preparation is true', function () {
+    config(['restaurant.require_payment_before_preparation' => true]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Gastrobar', 'activo' => true]);
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Bebidas KDS']);
+    $user = \App\Models\User::create([
+        'name' => 'Bartender',
+        'email' => 'bartender@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Bar',
+        'capacidad' => 2,
+        'estado' => 'ocupada',
+        'activa' => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $plato = \App\Models\Plato::create([
+        'nombre' => 'Cerveza Block',
+        'precio' => 5.00,
+        'categoria_id' => $categoria->id,
+        'restaurante_id' => $restaurante->id,
+        'activo' => true,
+        'disponible' => true,
+        'production_area' => 'bar',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'pendiente',
+        'payment_status' => 'pending', // NOT paid
+        'subtotal' => 5.00,
+        'total' => 5.00,
+    ]);
+
+    $detalle = \App\Models\PedidoDetalle::create([
+        'pedido_id' => $pedido->id,
+        'producto_id' => $plato->id,
+        'cantidad' => 1,
+        'precio_unitario' => 5.00,
+        'subtotal' => 5.00,
+        'production_area' => 'bar',
+        'estado' => 'pendiente',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+
+    expect(fn() => $pedidoService->cambiarEstadoDetalle($detalle, 'en_preparacion'))
+        ->toThrow(\Exception::class, 'El pedido debe estar pagado antes de iniciar la preparación.');
+});
+
+test('cambiarEstadoDetalle allows en_preparacion when paid and require_payment_before_preparation is true', function () {
+    config(['restaurant.require_payment_before_preparation' => true]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Gastrobar2', 'activo' => true]);
+    $categoria = \App\Models\Categoria::create(['nombre' => 'Bebidas Paid']);
+    $user = \App\Models\User::create([
+        'name' => 'Bartender2',
+        'email' => 'bartender2@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Bar Paid',
+        'capacidad' => 2,
+        'estado' => 'ocupada',
+        'activa' => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $plato = \App\Models\Plato::create([
+        'nombre' => 'Cerveza Allow',
+        'precio' => 5.00,
+        'categoria_id' => $categoria->id,
+        'restaurante_id' => $restaurante->id,
+        'activo' => true,
+        'disponible' => true,
+        'production_area' => 'bar',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'pendiente',
+        'payment_status' => 'paid', // IS paid
+        'subtotal' => 5.00,
+        'total' => 5.00,
+    ]);
+
+    $detalle = \App\Models\PedidoDetalle::create([
+        'pedido_id' => $pedido->id,
+        'producto_id' => $plato->id,
+        'cantidad' => 1,
+        'precio_unitario' => 5.00,
+        'subtotal' => 5.00,
+        'production_area' => 'bar',
+        'estado' => 'pendiente',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+    $detalleActualizado = $pedidoService->cambiarEstadoDetalle($detalle, 'en_preparacion');
+
+    expect($detalleActualizado->estado)->toBe('en_preparacion');
+});
+
+test('dashboard metrics ventas_dia counts by payment_status not estado', function () {
+    $user = \App\Models\User::create([
+        'name' => 'Ventas User',
+        'email' => 'ventas@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre' => 'Mesa Ventas',
+        'capacidad' => 2,
+        'estado' => 'disponible',
+        'activa' => true,
+    ]);
+
+    // Paid order (payment_status=paid, estado=entregado)
+    \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'entregado',
+        'payment_status' => 'paid',
+        'subtotal' => 50.00,
+        'total' => 50.00,
+        'created_at' => today(),
+    ]);
+
+    // Unpaid order (payment_status=pending, estado=entregado)
+    \App\Models\Pedido::create([
+        'user_id' => $user->id,
+        'mesa_id' => $mesa->id,
+        'estado' => 'entregado',
+        'payment_status' => 'pending',
+        'subtotal' => 30.00,
+        'total' => 30.00,
+        'created_at' => today(),
+    ]);
+
+    $service = app(\App\Services\DashboardService::class);
+    // Clear any cached metrics
+    \Illuminate\Support\Facades\Cache::forget('dashboard.metrics');
+    $metrics = $service->getMetrics();
+
+    expect($metrics['ventas_dia'])->toBe(50.0);
+    expect($metrics['ticket_promedio'])->toBe(50.0);
+});

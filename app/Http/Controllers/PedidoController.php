@@ -166,6 +166,31 @@ class PedidoController extends Controller
     }
 
     /**
+     * Mark an order as paid (cashier action, without closing the table).
+     */
+    public function marcarComoPagado(Pedido $pedido)
+    {
+        $this->authorize('update', $pedido);
+
+        try {
+            $pedidoPagado = $this->pedidoService->markAsPaid(
+                pedido: $pedido,
+                userId: Auth::id()
+            );
+
+            return response()->json([
+                'message' => 'Pedido marcado como pagado exitosamente.',
+                'pedido' => $pedidoPagado,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al marcar el pedido como pagado.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
      * Close the table (mark order as paid and free the table).
      */
     public function cerrarMesa(Pedido $pedido)

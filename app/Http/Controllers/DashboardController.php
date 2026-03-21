@@ -35,7 +35,9 @@ class DashboardController extends Controller
      */
     public function cocina()
     {
-        return Inertia::render('Cocina/Index');
+        return Inertia::render('Cocina/Index', [
+            'requirePaymentBeforePreparation' => config('restaurant.require_payment_before_preparation'),
+        ]);
     }
 
     /**
@@ -43,7 +45,21 @@ class DashboardController extends Controller
      */
     public function bar()
     {
-        return Inertia::render('Bar/Index');
+        return Inertia::render('Bar/Index', [
+            'requirePaymentBeforePreparation' => config('restaurant.require_payment_before_preparation'),
+        ]);
+    }
+
+    /**
+     * Display the cashier (caja) page
+     */
+    public function caja()
+    {
+        $pedidosCaja = $this->dashboardService->getPedidosCaja();
+
+        return Inertia::render('Caja/Index', [
+            'initialPedidos' => $pedidosCaja,
+        ]);
     }
 
     /**
@@ -52,6 +68,18 @@ class DashboardController extends Controller
     public function reportesPage()
     {
         return Inertia::render('Reportes/Index');
+    }
+
+    /**
+     * Get orders for the cashier (caja) view grouped by payment_status
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cajaKDS()
+    {
+        $pedidos = $this->dashboardService->getPedidosCaja();
+
+        return response()->json($pedidos);
     }
 
     /**

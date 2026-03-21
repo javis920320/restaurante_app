@@ -14,6 +14,7 @@ export interface PedidoBar {
     id: number;
     mesa_nombre: string;
     estado: string;
+    payment_status: 'pending' | 'paid' | 'cancelled' | 'refunded';
     tiempo_transcurrido: number;
     productos: ProductoBar[];
     created_at: string;
