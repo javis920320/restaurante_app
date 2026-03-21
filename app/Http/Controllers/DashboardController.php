@@ -131,4 +131,22 @@ class DashboardController extends Controller
 
         return response()->json($pedidos);
     }
+
+    /**
+     * Get Kanban board data for a production area (kitchen or bar).
+     * Returns order-item groups organised by item-level status columns.
+     *
+     * @param string $area
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function kanbanPorArea(string $area)
+    {
+        if (!in_array($area, ['kitchen', 'bar'])) {
+            return response()->json(['message' => 'Área no válida. Use "kitchen" o "bar".'], 422);
+        }
+
+        $data = $this->dashboardService->getKanbanPorArea($area);
+
+        return response()->json($data);
+    }
 }
