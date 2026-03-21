@@ -175,6 +175,69 @@ class DashboardService
     }
 
     /**
+     * Get order items for a production area grouped by item status (Kanban view).
+     * Each card represents all items from one order in the given area.
+     * The card's column is determined by the minimum (most-pending) item status.
+     *
+     * @param string $area 'kitchen' or 'bar'
+     * @return array{pendiente: array, en_preparacion: array, listo: array, entregado: array}
+     */
+    public function getKanbanPorArea(string $area): array
+    {
+        $statusOrder = ['pendiente' => 0, 'en_preparacion' => 1, 'listo' => 2, 'entregado' => 3];
+
+        $pedidos = Pedido::with(['mesa', 'detalles.producto'])
+            ->whereHas('detalles', function ($q) use ($area) {
+                $q->where('production_area', $area)
+                  ->whereIn('estado', array_keys($statusOrder));
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $columns = ['pendiente' => [], 'en_preparacion' => [], 'listo' => [], 'entregado' => []];
+
+        foreach ($pedidos as $pedido) {
+            $items = $pedido->detalles->filter(fn($d) =>
+                $d->production_area === $area &&
+                isset($statusOrder[$d->estado])
+            );
+
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            // Determine group status = minimum (most pending) item status
+            $groupStatus = $items->reduce(function ($carry, $item) use ($statusOrder) {
+                if ($carry === null || $statusOrder[$item->estado] < $statusOrder[$carry]) {
+                    return $item->estado;
+                }
+                return $carry;
+            }, null) ?? 'pendiente';
+
+            $columns[$groupStatus][] = [
+                'group_id'           => "{$pedido->id}_{$area}",
+                'pedido_id'          => $pedido->id,
+                'mesa'               => [
+                    'id'     => $pedido->mesa?->id ?? $pedido->mesa_id,
+                    'nombre' => $pedido->mesa?->nombre ?? "Mesa #{$pedido->mesa_id}",
+                ],
+                'created_at'         => $pedido->created_at->toISOString(),
+                'tiempo_transcurrido' => $pedido->created_at->diffInMinutes(now()),
+                'item_ids'           => $items->pluck('id')->values()->toArray(),
+                'items'              => $items->map(fn($d) => [
+                    'id'      => $d->id,
+                    'nombre'  => $d->producto->nombre,
+                    'cantidad' => $d->cantidad,
+                    'notas'   => $d->notas,
+                    'estado'  => $d->estado,
+                ])->values()->toArray(),
+            ];
+        }
+
+        return $columns;
+    }
+
+    /**
      * Get orders grouped by status (Kanban view)
      * 
      * @return array

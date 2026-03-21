@@ -35,5 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pedidos/mesero', [PedidoController::class, 'storeMesero'])->name('api.pedidos.store-mesero');
     Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('api.pedidos.cambiar-estado');
     Route::patch('/pedidos/{pedido}/detalles/{detalle}/estado', [PedidoController::class, 'cambiarEstadoDetalle'])->name('api.pedidos.detalles.cambiar-estado');
+    Route::patch('/pedidos/{pedido}/detalles/estado-bulk', [PedidoController::class, 'cambiarEstadoDetalles'])->name('api.pedidos.detalles.cambiar-estado-bulk');
     Route::post('/pedidos/{pedido}/cerrar-mesa', [PedidoController::class, 'cerrarMesa'])->name('api.pedidos.cerrar-mesa');
+
+    // Kanban por área de producción (cocina / bar)
+    Route::get('/admin/kanban/{area}', [DashboardController::class, 'kanbanPorArea'])->name('api.kanban.area');
 });

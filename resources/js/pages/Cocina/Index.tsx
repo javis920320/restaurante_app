@@ -1,11 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { KanbanBoard } from '@/components/Kanban';
 import { useCocinaKDS, type PedidoCocina } from '@/hooks/useCocinaKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, ChefHat, Clock, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -17,6 +18,8 @@ export default function Index() {
     const { pedidos, loading, error, actionError, marcarListo, marcarEnPreparacion, refetch } = useCocinaKDS({
         pollingInterval: 10,
     });
+
+    const [vista, setVista] = useState<'kds' | 'kanban'>('kds');
 
     const pendientes = pedidos.filter((p) => p.estado === 'pendiente' || p.estado === 'confirmado');
     const enPreparacion = pedidos.filter((p) => p.estado === 'en_preparacion');
@@ -39,15 +42,42 @@ export default function Index() {
                             </p>
                         </div>
                     </div>
-                    <Button
-                        onClick={refetch}
-                        variant="outline"
-                        size="sm"
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                    >
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Actualizar
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        {/* View toggle */}
+                        <div className="flex rounded-lg border border-gray-600 overflow-hidden">
+                            <button
+                                onClick={() => setVista('kds')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    vista === 'kds'
+                                        ? 'bg-orange-600 text-white'
+                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                }`}
+                            >
+                                <LayoutList className="h-4 w-4" />
+                                KDS
+                            </button>
+                            <button
+                                onClick={() => setVista('kanban')}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    vista === 'kanban'
+                                        ? 'bg-orange-600 text-white'
+                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                }`}
+                            >
+                                <Kanban className="h-4 w-4" />
+                                Kanban
+                            </button>
+                        </div>
+                        <Button
+                            onClick={refetch}
+                            variant="outline"
+                            size="sm"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                        >
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Actualizar
+                        </Button>
+                    </div>
                 </div>
 
                 {error && (
@@ -62,77 +92,89 @@ export default function Index() {
                     </div>
                 )}
 
-                {loading && pedidos.length === 0 ? (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {[...Array(6)].map((_, i) => (
-                            <Skeleton key={i} className="h-64 w-full bg-gray-800" />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid gap-6 lg:grid-cols-2">
-                        {/* Nuevos / Confirmados */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 rounded-lg bg-yellow-900 px-4 py-2">
-                                <AlertTriangle className="h-5 w-5 text-yellow-400" />
-                                <h2 className="text-lg font-bold text-yellow-300">
-                                    Nuevos Pedidos ({pendientes.length})
-                                </h2>
-                            </div>
-
-                            {pendientes.length === 0 ? (
-                                <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
-                                    <CheckCircle2 className="mx-auto h-12 w-12 text-gray-600" />
-                                    <p className="mt-3 text-gray-500">Sin pedidos nuevos</p>
-                                </div>
-                            ) : (
-                                pendientes.map((pedido) => (
-                                    <PedidoKDSCard
-                                        key={pedido.id}
-                                        pedido={pedido}
-                                        onAccion={() => marcarEnPreparacion(pedido.id)}
-                                        accionLabel="▶ Iniciar Preparación"
-                                        accionColor="bg-blue-600 hover:bg-blue-700"
-                                    />
-                                ))
-                            )}
-                        </div>
-
-                        {/* En Preparación */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2">
-                                <ChefHat className="h-5 w-5 text-blue-400" />
-                                <h2 className="text-lg font-bold text-blue-300">
-                                    En Preparación ({enPreparacion.length})
-                                </h2>
-                            </div>
-
-                            {enPreparacion.length === 0 ? (
-                                <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
-                                    <ChefHat className="mx-auto h-12 w-12 text-gray-600" />
-                                    <p className="mt-3 text-gray-500">Sin pedidos en preparación</p>
-                                </div>
-                            ) : (
-                                enPreparacion.map((pedido) => (
-                                    <PedidoKDSCard
-                                        key={pedido.id}
-                                        pedido={pedido}
-                                        onAccion={() => marcarListo(pedido.id)}
-                                        accionLabel="✓ Marcar como Listo"
-                                        accionColor="bg-green-600 hover:bg-green-700"
-                                    />
-                                ))
-                            )}
-                        </div>
+                {/* Kanban view */}
+                {vista === 'kanban' && (
+                    <div className="rounded-xl bg-gray-900 p-4">
+                        <KanbanBoard area="kitchen" pollingInterval={10} />
                     </div>
                 )}
 
-                {/* Empty state */}
-                {!loading && pedidos.length === 0 && (
-                    <div className="rounded-xl border border-gray-700 bg-gray-900 py-20 text-center">
-                        <ChefHat className="mx-auto h-20 w-20 text-gray-700" />
-                        <h3 className="mt-4 text-2xl font-bold text-gray-400">¡Todo al día!</h3>
-                        <p className="mt-2 text-gray-500">No hay pedidos activos en este momento</p>
-                    </div>
+                {/* KDS view */}
+                {vista === 'kds' && (
+                    <>
+                        {loading && pedidos.length === 0 ? (
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {[...Array(6)].map((_, i) => (
+                                    <Skeleton key={i} className="h-64 w-full bg-gray-800" />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="grid gap-6 lg:grid-cols-2">
+                                {/* Nuevos / Confirmados */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 rounded-lg bg-yellow-900 px-4 py-2">
+                                        <AlertTriangle className="h-5 w-5 text-yellow-400" />
+                                        <h2 className="text-lg font-bold text-yellow-300">
+                                            Nuevos Pedidos ({pendientes.length})
+                                        </h2>
+                                    </div>
+
+                                    {pendientes.length === 0 ? (
+                                        <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
+                                            <CheckCircle2 className="mx-auto h-12 w-12 text-gray-600" />
+                                            <p className="mt-3 text-gray-500">Sin pedidos nuevos</p>
+                                        </div>
+                                    ) : (
+                                        pendientes.map((pedido) => (
+                                            <PedidoKDSCard
+                                                key={pedido.id}
+                                                pedido={pedido}
+                                                onAccion={() => marcarEnPreparacion(pedido.id)}
+                                                accionLabel="▶ Iniciar Preparación"
+                                                accionColor="bg-blue-600 hover:bg-blue-700"
+                                            />
+                                        ))
+                                    )}
+                                </div>
+
+                                {/* En Preparación */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 rounded-lg bg-blue-900 px-4 py-2">
+                                        <ChefHat className="h-5 w-5 text-blue-400" />
+                                        <h2 className="text-lg font-bold text-blue-300">
+                                            En Preparación ({enPreparacion.length})
+                                        </h2>
+                                    </div>
+
+                                    {enPreparacion.length === 0 ? (
+                                        <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
+                                            <ChefHat className="mx-auto h-12 w-12 text-gray-600" />
+                                            <p className="mt-3 text-gray-500">Sin pedidos en preparación</p>
+                                        </div>
+                                    ) : (
+                                        enPreparacion.map((pedido) => (
+                                            <PedidoKDSCard
+                                                key={pedido.id}
+                                                pedido={pedido}
+                                                onAccion={() => marcarListo(pedido.id)}
+                                                accionLabel="✓ Marcar como Listo"
+                                                accionColor="bg-green-600 hover:bg-green-700"
+                                            />
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Empty state */}
+                        {!loading && pedidos.length === 0 && (
+                            <div className="rounded-xl border border-gray-700 bg-gray-900 py-20 text-center">
+                                <ChefHat className="mx-auto h-20 w-20 text-gray-700" />
+                                <h3 className="mt-4 text-2xl font-bold text-gray-400">¡Todo al día!</h3>
+                                <p className="mt-2 text-gray-500">No hay pedidos activos en este momento</p>
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {/* Footer */}

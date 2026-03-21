@@ -220,6 +220,50 @@ class PedidoController extends Controller
     }
 
     /**
+     * Bulk update the status of multiple order items in one request.
+     * Used by the Kanban drag-and-drop board.
+     */
+    public function cambiarEstadoDetalles(Request $request, Pedido $pedido)
+    {
+        $this->authorize('cambiarEstado', $pedido);
+
+        $request->validate([
+            'item_ids'   => ['required', 'array', 'min:1'],
+            'item_ids.*' => ['integer'],
+            'estado'     => ['required', 'string', 'in:' . implode(',', PedidoDetalle::ESTADOS)],
+        ]);
+
+        $updatedCount = 0;
+        $errors = [];
+
+        foreach ($request->item_ids as $itemId) {
+            $detalle = $pedido->detalles()->find($itemId);
+            if (!$detalle) {
+                continue;
+            }
+            try {
+                $this->pedidoService->cambiarEstadoDetalle($detalle, $request->estado);
+                $updatedCount++;
+            } catch (\Exception $e) {
+                $errors[] = "Ítem #{$itemId}: " . $e->getMessage();
+            }
+        }
+
+        if ($updatedCount === 0 && !empty($errors)) {
+            return response()->json([
+                'message' => 'No se pudo actualizar ningún ítem.',
+                'errors'  => $errors,
+            ], 422);
+        }
+
+        return response()->json([
+            'message'       => "Estado de {$updatedCount} ítem(s) actualizado(s) exitosamente.",
+            'updated_count' => $updatedCount,
+            'errors'        => $errors,
+        ]);
+    }
+
+    /**
      * Mostrar estado del pedido (público)
      */
     public function showStatus(Pedido $pedido)
