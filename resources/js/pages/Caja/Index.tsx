@@ -339,7 +339,7 @@ function PagoModal({ pedido, activeRegistroId, onClose, onSuccess }: PagoModalPr
                         </div>
                         <div className="mt-2 flex flex-wrap gap-1">
                             {pedido.productos_resumen.map((p, i) => (
-                                <span key={i} className="rounded-full bg-white border px-2 py-0.5 text-xs text-gray-600">
+                                <span key={`${p.nombre}-${i}`} className="rounded-full bg-white border px-2 py-0.5 text-xs text-gray-600">
                                     {p.cantidad}× {p.nombre}
                                 </span>
                             ))}
@@ -1173,7 +1173,7 @@ function PedidoCajaCard({
 
             <div className="mt-3 flex flex-wrap gap-2">
                 {pedido.productos_resumen.map((p, idx) => (
-                    <span key={idx} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                    <span key={`${p.nombre}-${idx}`} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
                         {p.cantidad}× {p.nombre}
                     </span>
                 ))}
