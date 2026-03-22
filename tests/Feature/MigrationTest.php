@@ -467,6 +467,254 @@ test('cambiarEstadoDetalle allows en_preparacion when paid and require_payment_b
     expect($detalleActualizado->estado)->toBe('en_preparacion');
 });
 
+// ─── Auto-sync pedido estado from item states ─────────────────────────────────
+
+test('cambiarEstadoDetalle auto-advances pedido to en_preparacion when first item starts preparation', function () {
+    config(['restaurant.require_payment_before_preparation' => false]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Sync Test R1', 'activo' => true]);
+    $categoria   = \App\Models\Categoria::create(['nombre' => 'Sync Cat1']);
+    $user        = \App\Models\User::create([
+        'name'     => 'Sync User1',
+        'email'    => 'sync1@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre'        => 'Mesa Sync1',
+        'capacidad'     => 2,
+        'estado'        => 'ocupada',
+        'activa'        => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $plato = \App\Models\Plato::create([
+        'nombre'          => 'Plato Sync1',
+        'precio'          => 10.00,
+        'categoria_id'    => $categoria->id,
+        'restaurante_id'  => $restaurante->id,
+        'activo'          => true,
+        'disponible'      => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id'  => $user->id,
+        'mesa_id'  => $mesa->id,
+        'estado'   => 'pendiente',
+        'subtotal' => 10.00,
+        'total'    => 10.00,
+    ]);
+
+    $detalle = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $plato->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'pendiente',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+    $pedidoService->cambiarEstadoDetalle($detalle, 'en_preparacion');
+
+    expect($pedido->fresh()->estado)->toBe('en_preparacion');
+});
+
+test('cambiarEstadoDetalle does NOT advance pedido to listo until ALL production-area items are ready', function () {
+    config(['restaurant.require_payment_before_preparation' => false]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Sync Test R2', 'activo' => true]);
+    $categoria   = \App\Models\Categoria::create(['nombre' => 'Sync Cat2']);
+    $user        = \App\Models\User::create([
+        'name'     => 'Sync User2',
+        'email'    => 'sync2@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre'         => 'Mesa Sync2',
+        'capacidad'      => 2,
+        'estado'         => 'ocupada',
+        'activa'         => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $plato = \App\Models\Plato::create([
+        'nombre'          => 'Plato Sync2a',
+        'precio'          => 10.00,
+        'categoria_id'    => $categoria->id,
+        'restaurante_id'  => $restaurante->id,
+        'activo'          => true,
+        'disponible'      => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id'  => $user->id,
+        'mesa_id'  => $mesa->id,
+        'estado'   => 'en_preparacion',
+        'subtotal' => 20.00,
+        'total'    => 20.00,
+    ]);
+
+    $detalle1 = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $plato->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'en_preparacion',
+    ]);
+
+    $detalle2 = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $plato->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'en_preparacion',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+
+    // Move only the first item to listo – second is still en_preparacion
+    $pedidoService->cambiarEstadoDetalle($detalle1, 'listo');
+
+    // Pedido should still be en_preparacion (not all items are listo yet)
+    expect($pedido->fresh()->estado)->toBe('en_preparacion');
+});
+
+test('cambiarEstadoDetalle auto-advances pedido to listo when all items become ready', function () {
+    config(['restaurant.require_payment_before_preparation' => false]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Sync Test R3', 'activo' => true]);
+    $categoria   = \App\Models\Categoria::create(['nombre' => 'Sync Cat3']);
+    $user        = \App\Models\User::create([
+        'name'     => 'Sync User3',
+        'email'    => 'sync3@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre'         => 'Mesa Sync3',
+        'capacidad'      => 2,
+        'estado'         => 'ocupada',
+        'activa'         => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $plato = \App\Models\Plato::create([
+        'nombre'          => 'Plato Sync3',
+        'precio'          => 10.00,
+        'categoria_id'    => $categoria->id,
+        'restaurante_id'  => $restaurante->id,
+        'activo'          => true,
+        'disponible'      => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id'  => $user->id,
+        'mesa_id'  => $mesa->id,
+        'estado'   => 'en_preparacion',
+        'subtotal' => 20.00,
+        'total'    => 20.00,
+    ]);
+
+    $detalle1 = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $plato->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'en_preparacion',
+    ]);
+
+    $detalle2 = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $plato->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'en_preparacion',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+
+    $pedidoService->cambiarEstadoDetalle($detalle1, 'listo');
+    $pedidoService->cambiarEstadoDetalle($detalle2, 'listo');
+
+    // Now all items are listo – pedido should advance to listo
+    expect($pedido->fresh()->estado)->toBe('listo');
+});
+
+test('cambiarEstadoDetalle items with production_area none do not affect pedido state sync', function () {
+    config(['restaurant.require_payment_before_preparation' => false]);
+
+    $restaurante = \App\Models\Restaurante::create(['nombre' => 'Sync Test R4', 'activo' => true]);
+    $categoria   = \App\Models\Categoria::create(['nombre' => 'Sync Cat4']);
+    $user        = \App\Models\User::create([
+        'name'     => 'Sync User4',
+        'email'    => 'sync4@example.com',
+        'password' => bcrypt('password'),
+    ]);
+    $mesa = \App\Models\Mesa::create([
+        'nombre'         => 'Mesa Sync4',
+        'capacidad'      => 2,
+        'estado'         => 'ocupada',
+        'activa'         => true,
+        'restaurante_id' => $restaurante->id,
+    ]);
+    $platoKitchen = \App\Models\Plato::create([
+        'nombre'          => 'Plato Kitchen Sync4',
+        'precio'          => 10.00,
+        'categoria_id'    => $categoria->id,
+        'restaurante_id'  => $restaurante->id,
+        'activo'          => true,
+        'disponible'      => true,
+        'production_area' => 'kitchen',
+    ]);
+
+    $pedido = \App\Models\Pedido::create([
+        'user_id'  => $user->id,
+        'mesa_id'  => $mesa->id,
+        'estado'   => 'en_preparacion',
+        'subtotal' => 20.00,
+        'total'    => 20.00,
+    ]);
+
+    // A kitchen item in en_preparacion
+    $detalleKitchen = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $platoKitchen->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'kitchen',
+        'estado'          => 'en_preparacion',
+    ]);
+
+    // A 'none' area item – it will never change state via kanban
+    $detalleNone = \App\Models\PedidoDetalle::create([
+        'pedido_id'       => $pedido->id,
+        'producto_id'     => $platoKitchen->id,
+        'cantidad'        => 1,
+        'precio_unitario' => 10.00,
+        'subtotal'        => 10.00,
+        'production_area' => 'none',
+        'estado'          => 'pendiente',
+    ]);
+
+    $pedidoService = app(\App\Services\PedidoService::class);
+
+    // Move the kitchen item to listo
+    $pedidoService->cambiarEstadoDetalle($detalleKitchen, 'listo');
+
+    // Even though the 'none' item is still pendiente, pedido advances to listo
+    // because only production-area items are considered for state sync.
+    expect($pedido->fresh()->estado)->toBe('listo');
+});
+
 test('dashboard metrics ventas_dia counts by payment_status not estado', function () {
     $user = \App\Models\User::create([
         'name' => 'Ventas User',
