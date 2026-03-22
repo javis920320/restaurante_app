@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CajaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuQRController;
 use App\Http\Controllers\PedidoController;
@@ -42,4 +43,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Kanban por área de producción (cocina / bar)
     Route::get('/admin/kanban/{area}', [DashboardController::class, 'kanbanPorArea'])->name('api.kanban.area');
+
+    // Módulo de Caja
+    Route::prefix('admin/caja')->group(function () {
+        Route::get('/registros', [CajaController::class, 'index'])->name('api.caja.registros.index');
+        Route::post('/registros', [CajaController::class, 'store'])->name('api.caja.registros.store');
+        Route::get('/registros/{cashRegister}', [CajaController::class, 'show'])->name('api.caja.registros.show');
+        Route::post('/registros/{cashRegister}/abrir', [CajaController::class, 'abrir'])->name('api.caja.registros.abrir');
+        Route::post('/registros/{cashRegister}/cerrar', [CajaController::class, 'cerrar'])->name('api.caja.registros.cerrar');
+        Route::get('/registros/{cashRegister}/movimientos', [CajaController::class, 'movimientos'])->name('api.caja.registros.movimientos');
+        Route::post('/registros/{cashRegister}/movimientos', [CajaController::class, 'registrarMovimiento'])->name('api.caja.registros.movimientos.store');
+        Route::get('/registros/{cashRegister}/resumen', [CajaController::class, 'resumen'])->name('api.caja.registros.resumen');
+        Route::post('/pagos', [CajaController::class, 'registrarPago'])->name('api.caja.pagos.store');
+        Route::get('/pagos/pedido/{pedido}', [CajaController::class, 'getPagosByPedido'])->name('api.caja.pagos.by-pedido');
+    });
 });
