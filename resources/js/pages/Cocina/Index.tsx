@@ -8,7 +8,9 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, Lock, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const COCINA_VISTA_KEY = 'cocina:vista';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -24,7 +26,14 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
         pollingInterval: 10,
     });
 
-    const [vista, setVista] = useState<'kds' | 'kanban'>('kds');
+    const [vista, setVista] = useState<'kds' | 'kanban'>(() => {
+        const saved = localStorage.getItem(COCINA_VISTA_KEY);
+        return saved === 'kanban' ? 'kanban' : 'kds';
+    });
+
+    useEffect(() => {
+        localStorage.setItem(COCINA_VISTA_KEY, vista);
+    }, [vista]);
 
     const pendientes = pedidos.filter((p) => p.estado === 'pendiente' || p.estado === 'confirmado');
     const enPreparacion = pedidos.filter((p) => p.estado === 'en_preparacion');
