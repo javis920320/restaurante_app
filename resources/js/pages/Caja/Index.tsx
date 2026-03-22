@@ -35,7 +35,7 @@ import {
     Wallet,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -757,9 +757,9 @@ function CerrarCajaModal({ registro, resumen, onClose, onConfirm, onSelectRegist
     const diferencia = montoTeorico !== null ? montoNum - montoTeorico : null;
 
     // Load summary on mount
-    useState(() => {
+    useEffect(() => {
         onSelectRegistro();
-    });
+    }, [onSelectRegistro]);
 
     const handleConfirm = async () => {
         const num = parseFloat(montoReal);
