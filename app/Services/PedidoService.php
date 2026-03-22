@@ -324,16 +324,82 @@ class PedidoService
             }
         }
 
-        $detalle->update(['estado' => $nuevoEstado]);
+        return DB::transaction(function () use ($detalle, $nuevoEstado, $estadoActual) {
+            $detalle->update(['estado' => $nuevoEstado]);
 
-        Log::info('Estado de ítem de pedido actualizado', [
-            'detalle_id'     => $detalle->id,
-            'pedido_id'      => $detalle->pedido_id,
-            'estado_anterior' => $estadoActual,
-            'estado_nuevo'   => $nuevoEstado,
-        ]);
+            Log::info('Estado de ítem de pedido actualizado', [
+                'detalle_id'      => $detalle->id,
+                'pedido_id'       => $detalle->pedido_id,
+                'estado_anterior' => $estadoActual,
+                'estado_nuevo'    => $nuevoEstado,
+            ]);
 
-        return $detalle->fresh();
+            // Automatically advance the parent order status based on the
+            // aggregate state of all production-area items.
+            $this->sincronizarEstadoPedido($detalle->pedido_id);
+
+            return $detalle->fresh();
+        });
+    }
+
+    /**
+     * Automatically advance the pedido's operational estado to reflect the
+     * aggregate estado of its production-area (kitchen / bar) items.
+     *
+     * Rules:
+     *  - Any item in 'en_preparacion' + pedido in 'pendiente'|'confirmado'
+     *      → advance pedido to 'en_preparacion'
+     *  - All items in 'listo' or 'entregado' + pedido in 'en_preparacion'
+     *      → advance pedido to 'listo'
+     *  - All items in 'entregado' + pedido in 'listo'
+     *      → advance pedido to 'entregado'
+     *
+     * Items with production_area 'none' are excluded from the calculation
+     * because they never flow through the kitchen / bar Kanban boards.
+     *
+     * @param int $pedidoId
+     */
+    protected function sincronizarEstadoPedido(int $pedidoId): void
+    {
+        $pedido = Pedido::find($pedidoId);
+
+        if (!$pedido) {
+            return;
+        }
+
+        $estadoActual = $pedido->estado;
+
+        // Nothing to do if the order is already in a terminal state.
+        if (in_array($estadoActual, ['entregado', 'cancelado'])) {
+            return;
+        }
+
+        // Only consider items assigned to a production area.
+        $itemsConArea = PedidoDetalle::where('pedido_id', $pedidoId)
+            ->whereIn('production_area', ['kitchen', 'bar'])
+            ->get();
+
+        if ($itemsConArea->isEmpty()) {
+            return;
+        }
+
+        $hayEnPreparacion     = $itemsConArea->contains(fn($d) => $d->estado === 'en_preparacion');
+        $todosListosOEntregados = $itemsConArea->every(fn($d) => in_array($d->estado, ['listo', 'entregado']));
+        $todosEntregados      = $itemsConArea->every(fn($d) => $d->estado === 'entregado');
+
+        $nuevoEstado = null;
+
+        if ($hayEnPreparacion && in_array($estadoActual, ['pendiente', 'confirmado'])) {
+            $nuevoEstado = 'en_preparacion';
+        } elseif ($todosListosOEntregados && $estadoActual === 'en_preparacion') {
+            $nuevoEstado = 'listo';
+        } elseif ($todosEntregados && $estadoActual === 'listo') {
+            $nuevoEstado = 'entregado';
+        }
+
+        if ($nuevoEstado !== null) {
+            $this->cambiarEstado($pedido, $nuevoEstado, null);
+        }
     }
 
     /**
