@@ -241,7 +241,7 @@ class DashboardService
         $statusOrder = ['pendiente' => 0, 'en_preparacion' => 1, 'listo' => 2, 'entregado' => 3];
 
         $pedidos = Pedido::with(['mesa', 'detalles.producto'])
-            ->whereHas('detalles', function ($q) use ($area) {
+            ->whereHas('detalles', function ($q) use ($area, $statusOrder) {
                 $q->where('production_area', $area)
                   ->whereIn('estado', array_keys($statusOrder));
             })

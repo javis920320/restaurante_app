@@ -10,6 +10,8 @@ import { Head, Link } from '@inertiajs/react';
 import { ChefHat, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search } from 'lucide-react';
 import React from 'react';
 
+const PEDIDOS_VISTA_KEY = 'pedidos:vista';
+
 interface PageProps {
     filters?: {
         estado?: string;
@@ -20,8 +22,15 @@ interface PageProps {
 export default function Index({ filters }: PageProps) {
     const [filtroEstado, setFiltroEstado] = React.useState<string>(filters?.estado || 'all');
     const [busqueda, setBusqueda] = React.useState('');
-    const [vista, setVista] = React.useState<'lista' | 'kanban'>('lista');
+    const [vista, setVista] = React.useState<'lista' | 'kanban'>(() => {
+        const saved = localStorage.getItem(PEDIDOS_VISTA_KEY);
+        return saved === 'kanban' ? 'kanban' : 'lista';
+    });
     const [areaKanban, setAreaKanban] = React.useState<'kitchen' | 'bar'>('kitchen');
+
+    React.useEffect(() => {
+        localStorage.setItem(PEDIDOS_VISTA_KEY, vista);
+    }, [vista]);
 
     const { pedidos, loading, error, refetch, cambiarEstado } = useAdminPedidos({
         estado: filtroEstado !== 'all' ? filtroEstado : undefined,
