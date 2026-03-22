@@ -55,7 +55,7 @@ export default function Index({ filters }: PageProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Pedidos</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Pedidos</h1>
                         <p className="mt-1 text-gray-600">Gestiona los pedidos del restaurante en tiempo real</p>
                     </div>
 
@@ -142,7 +142,7 @@ export default function Index({ filters }: PageProps) {
                 {vista === 'lista' && (
                     <>
                         {/* Filtros */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:bg-neutral-950">
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="flex-1">
                                     <label className="mb-2 block text-sm font-medium text-gray-700">Buscar por mesa</label>
@@ -255,7 +255,7 @@ export default function Index({ filters }: PageProps) {
 
                         {/* Empty state */}
                         {!loading && pedidosFiltrados.length === 0 && (
-                            <div className="rounded-lg border border-gray-200 bg-white py-12 text-center">
+                            <div className="rounded-lg border border-gray-200 bg-white py-12 text-center dark:bg-neutral-950">
                                 <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                                     <Search className="h-8 w-8 text-gray-400" />
                                 </div>

@@ -51,7 +51,7 @@ export default function Index() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Administrativo</h1>
                         <p className="mt-1 text-gray-600">Monitoreo en tiempo real del restaurante</p>
                     </div>
                     <Button onClick={handleRefreshAll} variant="outline" size="sm">

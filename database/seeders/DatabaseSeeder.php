@@ -28,5 +28,6 @@ class DatabaseSeeder extends Seeder
 
         // Create or update the app owner account with admin access
         $this->call(AdminUserSeeder::class);
+        $this->call(MesaSeeder::class);
     }
 }
