@@ -10,17 +10,17 @@ interface KanbanColumnProps {
 }
 
 const COLUMN_BG: Record<ItemStatus, string> = {
-    pendiente: 'bg-gray-100 border-gray-300',
-    en_preparacion: 'bg-blue-50 border-blue-300',
-    listo: 'bg-green-50 border-green-300',
-    entregado: 'bg-purple-50 border-purple-300',
+    pendiente: 'bg-gray-100 border-gray-300 dark:bg-gray-900 dark:border-gray-600',
+    en_preparacion: 'bg-blue-50 border-blue-300 dark:bg-blue-950 dark:border-blue-700',
+    listo: 'bg-green-50 border-green-300 dark:bg-green-950 dark:border-green-700',
+    entregado: 'bg-purple-50 border-purple-300 dark:bg-purple-950 dark:border-purple-700',
 };
 
 const BADGE_COLORS: Record<ItemStatus, string> = {
-    pendiente: 'bg-gray-200 text-gray-700',
-    en_preparacion: 'bg-blue-100 text-blue-700',
-    listo: 'bg-green-100 text-green-700',
-    entregado: 'bg-purple-100 text-purple-700',
+    pendiente: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
+    en_preparacion: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
+    listo: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200',
+    entregado: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200',
 };
 
 export default function KanbanColumn({ status, label, cards, dotColor }: KanbanColumnProps) {
@@ -34,7 +34,7 @@ export default function KanbanColumn({ status, label, cards, dotColor }: KanbanC
             >
                 <div className="flex items-center gap-2">
                     <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
-                    <h3 className="text-sm font-semibold text-gray-800">{label}</h3>
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{label}</h3>
                 </div>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_COLORS[status]}`}>
                     {cards.length}
@@ -46,8 +46,8 @@ export default function KanbanColumn({ status, label, cards, dotColor }: KanbanC
                 ref={setNodeRef}
                 className={`flex-1 overflow-y-auto rounded-b-lg border p-2 transition-colors ${
                     isOver
-                        ? 'border-blue-400 bg-blue-50/60'
-                        : 'border-gray-200 bg-gray-50/80'
+                        ? 'border-blue-400 bg-blue-50/60 dark:border-blue-600 dark:bg-blue-950/60'
+                        : 'border-gray-200 bg-gray-50/80 dark:border-gray-700 dark:bg-gray-900/80'
                 }`}
                 style={{ minHeight: '12rem', maxHeight: 'calc(100vh - 18rem)' }}
             >
@@ -57,8 +57,8 @@ export default function KanbanColumn({ status, label, cards, dotColor }: KanbanC
                     ))}
 
                     {cards.length === 0 && (
-                        <div className="flex h-20 items-center justify-center rounded-lg border-2 border-dashed border-gray-200">
-                            <p className="text-xs text-gray-400">Sin pedidos</p>
+                        <div className="flex h-20 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                            <span className="text-xs text-gray-400 dark:text-gray-500">Sin elementos</span>
                         </div>
                     )}
                 </div>

@@ -42,7 +42,7 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
     };
 
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+        <div className="rounded-lg border border-gray-200  p-4 shadow-sm transition-shadow hover:shadow-md ">
             {/* Header */}
             <div className="mb-3 flex items-start justify-between">
                 <div className="flex-1">

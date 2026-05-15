@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Toggle } from '@/components/ui/toggle';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
@@ -187,6 +188,19 @@ interface MesaCardProps {
 function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete }: MesaCardProps) {
     const isOcupada = mesa.estado === 'ocupada';
     const isInactiva = !mesa.activa;
+    const [loading, setLoading] = React.useState(false);
+
+    const handleCambiarEstado = () => {
+        setLoading(true);
+        router.patch(
+            route('mesas.cambiar-estado', mesa.id),
+            {},
+            {
+                onSuccess: () => setLoading(false),
+                onError: () => setLoading(false),
+            },
+        );
+    };
 
     return (
         <Card
@@ -232,6 +246,27 @@ function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete 
                 <p className="truncate text-xs text-gray-500 dark:text-gray-500">
                     Token: {mesa.qr_token.slice(0, 12)}...
                 </p>
+
+                {/* Quick availability toggle */}
+                <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                        Disponibilidad
+                    </span>
+                    <Toggle
+                        aria-label="Cambiar disponibilidad"
+                        pressed={!isOcupada}
+                        onPressedChange={handleCambiarEstado}
+                        disabled={loading || isInactiva}
+                        className={`data-[state=on]:bg-green-600 data-[state=on]:hover:bg-green-700 data-[state=off]:bg-orange-600 data-[state=off]:hover:bg-orange-700 ${
+                            loading ? 'opacity-60' : ''
+                        }`}
+                        size="sm"
+                    >
+                        <span className="text-xs font-semibold">
+                            {loading ? '...' : isOcupada ? 'Ocupada' : 'Libre'}
+                        </span>
+                    </Toggle>
+                </div>
 
                 {/* Actions */}
                 {isConfirmingDelete ? (

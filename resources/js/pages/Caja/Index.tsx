@@ -326,7 +326,7 @@ function PagoModal({ pedido, activeRegistroId, onClose, onSuccess }: PagoModalPr
 
                 <div className="space-y-4">
                     {/* Order info */}
-                    <div className="rounded-lg bg-gray-50 p-4">
+                    <div className="rounded-lg  p-4">
                         <div className="flex justify-between text-sm text-gray-600">
                             <span>Mesa</span>
                             <span className="font-medium">{pedido.mesa_nombre}</span>
@@ -381,7 +381,7 @@ function PagoModal({ pedido, activeRegistroId, onClose, onSuccess }: PagoModalPr
                     </div>
 
                     {/* Cambio */}
-                    <div className="rounded-lg border bg-emerald-50 p-3">
+                    <div className="rounded-lg border  p-3">
                         <div className="flex justify-between">
                             <span className="text-sm font-medium text-gray-700">Cambio</span>
                             <span className={`text-lg font-bold ${insuficiente ? 'text-red-500' : 'text-emerald-600'}`}>
@@ -629,15 +629,15 @@ function RegistroCard({ registro, resumen, onSelect, onAbrir, onCerrar, onIngres
             {isOpen && resumen && (
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                     <div className="rounded-lg bg-white border p-2">
-                        <div className="font-bold text-emerald-600 text-sm">${resumen.saldo_actual.toFixed(2)}</div>
+                        <div className="font-bold text-emerald-600 text-sm">${resumen.saldo_actual?.toFixed(2) ?? '0.00'}</div>
                         <div className="text-gray-500">Saldo</div>
                     </div>
                     <div className="rounded-lg bg-white border p-2">
-                        <div className="font-bold text-green-600 text-sm">${resumen.total_ingresos.toFixed(2)}</div>
+                        <div className="font-bold text-green-600 text-sm">${resumen.total_ingresos?.toFixed(2) ?? '0.00'}</div>
                         <div className="text-gray-500">Ingresos</div>
                     </div>
                     <div className="rounded-lg bg-white border p-2">
-                        <div className="font-bold text-red-500 text-sm">${resumen.total_egresos.toFixed(2)}</div>
+                        <div className="font-bold text-red-500 text-sm">${resumen.total_egresos?.toFixed(2) ?? '0.00'}</div>
                         <div className="text-gray-500">Egresos</div>
                     </div>
                 </div>
@@ -788,7 +788,7 @@ function CerrarCajaModal({ registro, resumen, onClose, onConfirm, onSelectRegist
                         <div className="grid grid-cols-2 gap-3">
                             <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-center">
                                 <div className="text-xs text-blue-600 font-medium">Monto Teórico</div>
-                                <div className="text-xl font-bold text-blue-700">${montoTeorico.toFixed(2)}</div>
+                                <div className="text-xl font-bold text-blue-700">${montoTeorico?.toFixed(2) ?? '0.00'}</div>
                                 <div className="text-xs text-blue-400">Calculado por sistema</div>
                             </div>
                             <div className="rounded-lg bg-gray-50 border p-3 text-center">

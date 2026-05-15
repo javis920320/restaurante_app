@@ -45,8 +45,8 @@ function HistorialTimeline({ historial }: { historial: HistorialEstado[] }) {
     };
 
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">Historial de Estados</h2>
+        <div className="rounded-lg border   p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold ">Historial de Estados</h2>
             <ol className="relative border-l border-gray-200">
                 {historial.map((entrada, index) => (
                     <li key={entrada.id} className={`mb-4 ml-4 ${index === historial.length - 1 ? '' : ''}`}>
@@ -127,7 +127,7 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                         </Link>
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold text-gray-900">Pedido #{pedidoInicial.id}</h1>
+                        <h1 className="text-3xl font-bold ">Pedido #{pedidoInicial.id}</h1>
                         {pedidoInicial.canal && (
                             <span className="mt-1 inline-flex items-center gap-1 text-sm text-gray-500">
                                 {pedidoInicial.canal === 'qr' ? (
@@ -145,18 +145,18 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                     {/* Información principal */}
                     <div className="space-y-6 lg:col-span-2">
                         {/* Detalles del pedido */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Productos</h2>
+                        <div className="rounded-lg border   p-6 shadow-sm">
+                            <h2 className="mb-4 text-lg font-semibold ">Productos</h2>
 
                             {pedidoInicial.detalles && pedidoInicial.detalles.length > 0 ? (
                                 <div className="space-y-4">
                                     {pedidoInicial.detalles.map((detalle) => (
                                         <div
                                             key={detalle.id}
-                                            className="flex items-start justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+                                            className="flex items-start justify-between border-b  pb-4 last:border-0 last:pb-0"
                                         >
                                             <div className="flex-1">
-                                                <h3 className="font-medium text-gray-900">{detalle.producto.nombre}</h3>
+                                                <h3 className="font-medium ">{detalle.producto.nombre}</h3>
                                                 {detalle.producto.descripcion && (
                                                     <p className="mt-1 text-sm text-gray-600">{detalle.producto.descripcion}</p>
                                                 )}
@@ -170,19 +170,19 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                                 )}
                                             </div>
                                             <div className="ml-4 text-right">
-                                                <span className="font-semibold text-gray-900">{formatPrice(detalle.subtotal)}</span>
+                                                <span className="font-semibold ">{formatPrice(detalle.subtotal)}</span>
                                             </div>
                                         </div>
                                     ))}
 
                                     {/* Totales */}
-                                    <div className="space-y-2 border-t-2 border-gray-200 pt-4">
+                                    <div className="space-y-2 border-t-2  pt-4">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600">Subtotal:</span>
                                             <span className="font-medium">{formatPrice(pedidoInicial.subtotal)}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-semibold text-gray-900">Total:</span>
+                                            <span className="text-lg font-semibold ">Total:</span>
                                             <span className="text-2xl font-bold text-green-600">{formatPrice(pedidoInicial.total)}</span>
                                         </div>
                                     </div>
@@ -215,8 +215,8 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                     <div className="space-y-6">
                         {/* Cambiar estado */}
                         {puedeEditarEstado && (
-                            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                                <h2 className="mb-4 text-lg font-semibold text-gray-900">Cambiar Estado</h2>
+                            <div className="rounded-lg border   p-6 shadow-sm">
+                                <h2 className="mb-4 text-lg font-semibold ">Cambiar Estado</h2>
                                 <EstadoSelector
                                     estadoActual={pedidoInicial.estado}
                                     pedidoId={pedidoInicial.id}
@@ -226,15 +226,15 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                         )}
 
                         {/* Información de la mesa */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Información</h2>
+                        <div className="rounded-lg border p-6 shadow-sm">
+                            <h2 className="mb-4 text-lg font-semibold ">Información</h2>
 
                             <div className="space-y-4">
                                 <div className="flex items-start gap-3">
                                     <MapPin className="mt-0.5 h-5 w-5 text-gray-500" />
                                     <div>
                                         <p className="text-sm text-gray-600">Mesa</p>
-                                        <p className="font-medium text-gray-900">{pedidoInicial.mesa?.nombre || `Mesa #${pedidoInicial.mesa_id}`}</p>
+                                        <p className="font-medium ">{pedidoInicial.mesa?.nombre || `Mesa #${pedidoInicial.mesa_id}`}</p>
                                     </div>
                                 </div>
 
@@ -242,7 +242,7 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                     <Clock className="mt-0.5 h-5 w-5 text-gray-500" />
                                     <div>
                                         <p className="text-sm text-gray-600">Fecha y hora</p>
-                                        <p className="font-medium text-gray-900">{formatDate(pedidoInicial.created_at)}</p>
+                                        <p className="font-medium ">{formatDate(pedidoInicial.created_at)}</p>
                                     </div>
                                 </div>
 
@@ -251,7 +251,7 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                         <User className="mt-0.5 h-5 w-5 text-gray-500" />
                                         <div>
                                             <p className="text-sm text-gray-600">Atendido por</p>
-                                            <p className="font-medium text-gray-900">{pedidoInicial.user.name}</p>
+                                            <p className="font-medium ">{pedidoInicial.user.name}</p>
                                         </div>
                                     </div>
                                 )}

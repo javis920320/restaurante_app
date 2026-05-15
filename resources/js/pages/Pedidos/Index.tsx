@@ -65,7 +65,7 @@ export default function Index({ filters }: PageProps) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Pedidos</h1>
-                        <p className="mt-1 text-gray-600">Gestiona los pedidos del restaurante en tiempo real</p>
+                        <p className="mt-1 text-gray-600 dark:text-gray-400">Gestiona los pedidos del restaurante en tiempo real</p>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -113,14 +113,14 @@ export default function Index({ filters }: PageProps) {
                     <div className="space-y-4">
                         {/* Area selector */}
                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700">Estación:</span>
-                            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estación:</span>
+                            <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                 <button
                                     onClick={() => setAreaKanban('kitchen')}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
                                         areaKanban === 'kitchen'
                                             ? 'bg-orange-600 text-white'
-                                            : 'text-gray-600 hover:bg-gray-100'
+                                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-900'
                                     }`}
                                 >
                                     <ChefHat className="h-4 w-4" />
@@ -131,7 +131,7 @@ export default function Index({ filters }: PageProps) {
                                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
                                         areaKanban === 'bar'
                                             ? 'bg-purple-700 text-white'
-                                            : 'text-gray-600 hover:bg-gray-100'
+                                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-900'
                                     }`}
                                 >
                                     <GlassWater className="h-4 w-4" />
@@ -141,7 +141,7 @@ export default function Index({ filters }: PageProps) {
                         </div>
 
                         {/* Kanban board */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="rounded-lg border border-gray-200  p-4 shadow-sm dark:border-gray-700 ">
                             <KanbanBoard area={areaKanban} pollingInterval={10} />
                         </div>
                     </div>
@@ -151,12 +151,12 @@ export default function Index({ filters }: PageProps) {
                 {vista === 'lista' && (
                     <>
                         {/* Filtros */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:bg-neutral-950">
+                        <div className="rounded-lg border border-gray-200  p-4 shadow-sm ">
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="flex-1">
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">Buscar por mesa</label>
+                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar por mesa</label>
                                     <div className="relative">
-                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                         <Input
                                             type="text"
                                             placeholder="Nombre de mesa..."
@@ -168,7 +168,7 @@ export default function Index({ filters }: PageProps) {
                                 </div>
 
                                 <div className="w-full md:w-64">
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">Filtrar por estado</label>
+                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por estado</label>
                                     <Select value={filtroEstado} onValueChange={setFiltroEstado}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Todos los estados" />
@@ -188,11 +188,11 @@ export default function Index({ filters }: PageProps) {
                             </div>
 
                             <div className="mt-4 flex items-center gap-2 text-sm">
-                                <span className="text-gray-600">{pedidosFiltrados.length} pedido(s)</span>
+                                <span className="text-gray-600 dark:text-gray-400">{pedidosFiltrados.length} pedido(s)</span>
                                 {filtroEstado !== 'all' && (
                                     <>
-                                        <span className="text-gray-400">•</span>
-                                        <span className="text-gray-600">
+                                        <span className="text-gray-400 dark:text-gray-500">•</span>
+                                        <span className="text-gray-600 dark:text-gray-400">
                                             Filtrado por: <span className="font-medium">{filtroEstado.replace('_', ' ')}</span>
                                         </span>
                                     </>
@@ -239,7 +239,7 @@ export default function Index({ filters }: PageProps) {
 
                                             return (
                                                 <div key={estado}>
-                                                    <h2 className="mb-4 text-xl font-semibold text-gray-900">
+                                                    <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
                                                         {estadoLabels[estado]} ({pedidosEstado.length})
                                                     </h2>
                                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -264,12 +264,12 @@ export default function Index({ filters }: PageProps) {
 
                         {/* Empty state */}
                         {!loading && pedidosFiltrados.length === 0 && (
-                            <div className="rounded-lg border border-gray-200 bg-white py-12 text-center dark:bg-neutral-950">
+                            <div className="rounded-lg border border-gray-200  py-12 text-center ">
                                 <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                                    <Search className="h-8 w-8 text-gray-400" />
+                                    <Search className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-medium text-gray-900">No hay pedidos</h3>
-                                <p className="mb-4 text-gray-600">
+                                <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">No hay pedidos</h3>
+                                <p className="mb-4 text-gray-600 dark:text-gray-400">
                                     {busqueda
                                         ? 'No se encontraron pedidos para esa mesa'
                                         : filtroEstado !== 'all'
@@ -293,7 +293,7 @@ export default function Index({ filters }: PageProps) {
                 )}
 
                 {/* Auto-refresh indicator */}
-                <p className="text-center text-sm text-gray-500">Los pedidos se actualizan automáticamente cada 30 segundos</p>
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400">Los pedidos se actualizan automáticamente cada 30 segundos</p>
             </div>
         </AppLayout>
     );

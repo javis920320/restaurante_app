@@ -7,6 +7,7 @@ use App\Models\Pedido;
 use App\Models\PedidoDetalle;
 use App\Models\Mesa;
 use App\Models\Plato;
+use App\Models\CashMovement;
 use App\Events\PedidoCreado;
 use App\Events\PedidoEstadoActualizado;
 use Illuminate\Support\Facades\DB;
@@ -404,7 +405,7 @@ class PedidoService
 
     /**
      * Marcar un pedido como pagado (sin liberar la mesa).
-     * Utilizado por el rol "caja".
+     * Utilizado por el rol "caja". Registra el movimiento de caja automáticamente.
      *
      * @param Pedido $pedido
      * @param int $userId
@@ -422,6 +423,26 @@ class PedidoService
                 'payment_status' => 'paid',
                 'user_id'        => $userId,
             ]);
+
+            // Register cash movement for the sale income
+            // Try to find an active cash opening
+            $cajaService = new CajaService();
+            $apertura = $cajaService->getAperturaActiva();
+            
+            if ($apertura) {
+                CashMovement::create([
+                    'cash_register_id' => $apertura->cash_register_id,
+                    'cash_opening_id'  => $apertura->id,
+                    'tipo'             => 'ingreso',
+                    'subtipo'          => 'venta',
+                    'monto'            => (float) $pedido->total,
+                    'metodo_pago'      => 'efectivo',
+                    'referencia_id'    => $pedido->id,
+                    'descripcion'      => "Pago pedido #{$pedido->id}",
+                    'usuario_id'       => $userId,
+                    'fecha'            => now(),
+                ]);
+            }
 
             Log::info('Pedido marcado como pagado', [
                 'pedido_id' => $pedido->id,
@@ -444,11 +465,35 @@ class PedidoService
     public function cerrarMesa(Pedido $pedido, int $userId): Pedido
     {
         return DB::transaction(function () use ($pedido, $userId) {
+            // Check if payment_status was not already paid before updating
+            $wasNotPaid = $pedido->payment_status !== 'paid';
+
             // Mark payment as paid (financial axis)
             $pedido->update([
                 'payment_status' => 'paid',
                 'user_id'        => $userId,
             ]);
+
+            // Register cash movement for the sale income (only if it wasn't already paid)
+            if ($wasNotPaid) {
+                $cajaService = new CajaService();
+                $apertura = $cajaService->getAperturaActiva();
+                
+                if ($apertura) {
+                    CashMovement::create([
+                        'cash_register_id' => $apertura->cash_register_id,
+                        'cash_opening_id'  => $apertura->id,
+                        'tipo'             => 'ingreso',
+                        'subtipo'          => 'venta',
+                        'monto'            => (float) $pedido->total,
+                        'metodo_pago'      => 'efectivo',
+                        'referencia_id'    => $pedido->id,
+                        'descripcion'      => "Pago pedido #{$pedido->id}",
+                        'usuario_id'       => $userId,
+                        'fecha'            => now(),
+                    ]);
+                }
+            }
 
             // Move operational state to entregado if not already in a terminal state
             if (in_array($pedido->estado, ['pendiente', 'confirmado', 'en_preparacion', 'listo'])) {

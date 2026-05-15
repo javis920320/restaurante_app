@@ -117,6 +117,19 @@ class MesaController extends Controller
     }
 
     /**
+     * Cambiar rápidamente el estado de disponibilidad de una mesa.
+     */
+    public function cambiarEstado(Mesa $mesa)
+    {
+        $this->authorize('update', $mesa);
+
+        $nuevoEstado = $mesa->estado === 'disponible' ? 'ocupada' : 'disponible';
+        $mesa->update(['estado' => $nuevoEstado]);
+
+        return back()->with('success', "Mesa actualizada a: {$nuevoEstado}");
+    }
+
+    /**
      * Generate QR code for a table.
      */
     public function generarQR(Mesa $mesa)

@@ -78,7 +78,8 @@ export const useCajaKDS = ({
             try {
                 await api.patch(`/pedidos/${pedidoId}/pagar`);
                 setActionError(null);
-                refetch();
+                // Refetch with a slight delay to ensure backend has processed the change
+                setTimeout(() => refetch(), 500);
             } catch (err) {
                 setActionError(`Error al marcar el pedido #${pedidoId} como pagado`);
                 console.error('Error al marcar como pagado:', err);
@@ -92,7 +93,8 @@ export const useCajaKDS = ({
             try {
                 await api.post(`/pedidos/${pedidoId}/cerrar-mesa`);
                 setActionError(null);
-                refetch();
+                // Refetch with a slight delay to ensure backend has processed the change
+                setTimeout(() => refetch(), 500);
             } catch (err) {
                 setActionError(`Error al cerrar la mesa del pedido #${pedidoId}`);
                 console.error('Error al cerrar mesa:', err);

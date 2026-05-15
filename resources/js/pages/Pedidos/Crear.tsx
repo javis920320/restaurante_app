@@ -168,8 +168,8 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Nuevo Pedido</h1>
-                        <p className="mt-1 text-gray-600">Registra un pedido asistido por mesero</p>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Nuevo Pedido</h1>
+                        <p className="mt-1 text-gray-600 dark:text-gray-300">Registra un pedido asistido por mesero</p>
                     </div>
                 </div>
 
@@ -177,8 +177,8 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                     {/* Panel izquierdo: selección de mesa + menú */}
                     <div className="space-y-4 lg:col-span-2">
                         {/* Selección de mesa */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                            <label className="mb-2 block text-sm font-medium text-gray-700">Mesa *</label>
+                        <div className="rounded-lg border  p-4 shadow-sm ">
+                            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Mesa *</label>
                             <Select value={mesaSeleccionada} onValueChange={setMesaSeleccionada}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Seleccionar mesa..." />
@@ -188,7 +188,7 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                                         <SelectItem key={mesa.id} value={mesa.id.toString()}>
                                             {mesa.nombre}
                                             {mesa.estado !== 'disponible' && (
-                                                <span className="ml-2 text-xs text-orange-500">({mesa.estado})</span>
+                                                <span className="ml-2 text-xs text-orange-500 dark:text-orange-400">({mesa.estado})</span>
                                             )}
                                         </SelectItem>
                                     ))}
@@ -197,7 +197,7 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                         </div>
 
                         {/* Filtros de menú */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="rounded-lg border  p-4 shadow-sm">
                             <div className="flex flex-col gap-3 sm:flex-row">
                                 <div className="flex-1">
                                     <Input
@@ -227,21 +227,21 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                         {/* Lista de platos */}
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {platosFiltrados.length === 0 && (
-                                <p className="col-span-2 py-8 text-center text-gray-500">No hay platos disponibles</p>
+                                <p className="col-span-2 py-8 text-center text-gray-500 dark:text-gray-400">No hay platos disponibles</p>
                             )}
                             {platosFiltrados.map((plato) => {
                                 const qty = cantidadEnCarrito(plato.id);
                                 return (
                                     <div
                                         key={plato.id}
-                                        className={`flex items-center justify-between rounded-lg border p-4 transition-colors ${qty > 0 ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'}`}
+                                        className={`flex items-center justify-between rounded-lg border p-4 transition-colors ${qty > 0 ? 'border-blue-200  dark:border-blue-700 ' : '  dark:border-gray-700 '}`}
                                     >
                                         <div className="flex-1 min-w-0">
-                                            <p className="truncate font-medium text-gray-900">{plato.nombre}</p>
+                                            <p className="truncate font-medium text-gray-900 dark:text-white">{plato.nombre}</p>
                                             {plato.categoria && (
-                                                <p className="text-xs text-gray-500">{plato.categoria.nombre}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{plato.categoria.nombre}</p>
                                             )}
-                                            <p className="mt-1 font-semibold text-green-600">{formatPrice(plato.precio)}</p>
+                                            <p className="mt-1 font-semibold text-green-600 dark:text-green-400">{formatPrice(plato.precio)}</p>
                                         </div>
                                         <div className="ml-3 flex items-center gap-2">
                                             {qty > 0 ? (
@@ -274,10 +274,10 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
 
                     {/* Panel derecho: carrito */}
                     <div className="space-y-4">
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="rounded-lg border   p-4 shadow-sm ">
                             <div className="mb-4 flex items-center gap-2">
-                                <ShoppingCart className="h-5 w-5 text-gray-600" />
-                                <h2 className="text-lg font-semibold text-gray-900">Pedido</h2>
+                                <ShoppingCart className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Pedido</h2>
                                 {carrito.length > 0 && (
                                     <span className="ml-auto rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
                                         {carrito.reduce((s, i) => s + i.cantidad, 0)}
@@ -286,22 +286,22 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                             </div>
 
                             {carrito.length === 0 ? (
-                                <p className="py-6 text-center text-sm text-gray-500">Agrega productos al pedido</p>
+                                <p className="py-6 text-center text-sm text-gray-500 dark:text-gray-400">Agrega productos al pedido</p>
                             ) : (
                                 <div className="space-y-3">
                                     {carrito.map((item) => (
                                         <div key={item.producto_id} className="flex items-center gap-2">
                                             <div className="flex-1 min-w-0">
-                                                <p className="truncate text-sm font-medium text-gray-900">{item.nombre}</p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{item.nombre}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {item.cantidad} × {formatPrice(item.precio)}
                                                 </p>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900">{formatPrice(item.subtotal)}</span>
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(item.subtotal)}</span>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-7 w-7 text-red-500 hover:text-red-700"
+                                                className="h-7 w-7 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                                                 onClick={() => eliminarDelCarrito(item.producto_id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -309,10 +309,10 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
                                         </div>
                                     ))}
 
-                                    <div className="border-t border-gray-200 pt-3">
+                                    <div className="border-t  pt-3 dark:border-gray-700">
                                         <div className="flex items-center justify-between">
-                                            <span className="font-semibold text-gray-900">Total</span>
-                                            <span className="text-xl font-bold text-green-600">{formatPrice(totalCarrito)}</span>
+                                            <span className="font-semibold text-gray-900 dark:text-white">Total</span>
+                                            <span className="text-xl font-bold text-green-600 dark:text-green-400">{formatPrice(totalCarrito)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -320,20 +320,20 @@ export default function Crear({ mesas, platos, mesa_id }: CrearProps) {
 
                             {/* Notas */}
                             <div className="mt-4">
-                                <label className="mb-1 block text-sm font-medium text-gray-700">Notas del pedido</label>
+                                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Notas del pedido</label>
                                 <textarea
                                     value={notas}
                                     onChange={(e) => setNotas(e.target.value)}
                                     rows={3}
-                                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                    className="w-full rounded-md border border-gray-300  px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600  dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                                     placeholder="Indicaciones especiales..."
                                 />
                             </div>
 
                             {/* Error */}
                             {error && (
-                                <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3">
-                                    <p className="text-sm text-red-700">{error}</p>
+                                <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950">
+                                    <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                                 </div>
                             )}
 

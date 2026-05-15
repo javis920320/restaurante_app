@@ -88,6 +88,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/configuracion/mesas', MesaController::class);
     Route::get('/configuracion/mesas/{mesa}/qr', [MesaController::class, 'generarQR'])
         ->name('mesas.generar-qr');
+    Route::patch('/configuracion/mesas/{mesa}/cambiar-estado', [MesaController::class, 'cambiarEstado'])
+        ->name('mesas.cambiar-estado');
 
     // Gestión de usuarios
     Route::resource('usuarios', UserController::class)->except(['show', 'create', 'edit']);

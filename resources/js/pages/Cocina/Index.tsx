@@ -42,7 +42,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Panel de Cocina" />
 
-            <div className="min-h-screen space-y-6 bg-gray-950 p-6 text-white">
+            <div className="min-h-screen space-y-6  p-6 text-white">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
 
                 {/* Kanban view */}
                 {vista === 'kanban' && (
-                    <div className="rounded-xl bg-gray-900 p-4">
+                    <div className="rounded-xl  p-4">
                         <KanbanBoard area="kitchen" pollingInterval={10} />
                     </div>
                 )}
@@ -125,7 +125,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                         {loading && pedidos.length === 0 ? (
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {[...Array(6)].map((_, i) => (
-                                    <Skeleton key={i} className="h-64 w-full bg-gray-800" />
+                                    <Skeleton key={i} className="h-64 w-full dark:bg-gray-800" />
                                 ))}
                             </div>
                         ) : (
@@ -140,7 +140,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                     </div>
 
                                     {pendientes.length === 0 ? (
-                                        <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
+                                        <div className="rounded-xl border border-gray-700  p-8 text-center">
                                             <CheckCircle2 className="mx-auto h-12 w-12 text-gray-600" />
                                             <p className="mt-3 text-gray-500">Sin pedidos nuevos</p>
                                         </div>
@@ -168,7 +168,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                     </div>
 
                                     {enPreparacion.length === 0 ? (
-                                        <div className="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center">
+                                        <div className="rounded-xl border border-gray-700  p-8 text-center">
                                             <ChefHat className="mx-auto h-12 w-12 text-gray-600" />
                                             <p className="mt-3 text-gray-500">Sin pedidos en preparación</p>
                                         </div>
@@ -190,7 +190,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
 
                         {/* Empty state */}
                         {!loading && pedidos.length === 0 && (
-                            <div className="rounded-xl border border-gray-700 bg-gray-900 py-20 text-center">
+                            <div className="rounded-xl border border-gray-700  py-20 text-center">
                                 <ChefHat className="mx-auto h-20 w-20 text-gray-700" />
                                 <h3 className="mt-4 text-2xl font-bold text-gray-400">¡Todo al día!</h3>
                                 <p className="mt-2 text-gray-500">No hay pedidos activos en este momento</p>

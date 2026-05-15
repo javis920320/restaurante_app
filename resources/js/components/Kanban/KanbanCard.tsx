@@ -9,9 +9,9 @@ interface KanbanCardProps {
 }
 
 const TIME_TEXT_COLORS = {
-    green: 'text-green-600',
-    yellow: 'text-yellow-600',
-    red: 'text-red-600',
+    green: 'text-green-600 dark:text-green-400',
+    yellow: 'text-yellow-600 dark:text-yellow-400',
+    red: 'text-red-600 dark:text-red-400',
 } as const;
 
 const TIME_BORDER_COLORS = {
@@ -55,18 +55,18 @@ export default function KanbanCard({ card, columnStatus }: KanbanCardProps) {
         <div
             ref={setNodeRef}
             style={style}
-            className={`rounded-lg border border-gray-200 border-l-4 ${borderColor} bg-white p-3 shadow-sm select-none touch-none ${isDragging ? 'shadow-lg ring-2 ring-blue-400' : 'hover:shadow-md'} transition-shadow`}
+            className={`rounded-lg border border-gray-200 border-l-4 ${borderColor} bg-white p-3 shadow-sm select-none touch-none ${isDragging ? 'shadow-lg ring-2 ring-blue-400' : 'hover:shadow-md'} transition-shadow dark:border-gray-700 dark:bg-gray-900`}
         >
             {/* Card Header */}
             <div className="mb-2 flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1">
-                        <UtensilsCrossed className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-                        <span className="truncate text-xs font-semibold text-gray-800">
+                        <UtensilsCrossed className="h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-gray-500" />
+                        <span className="truncate text-xs font-semibold text-gray-800 dark:text-white">
                             Pedido #{card.pedido_id}
                         </span>
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-gray-500">{card.mesa.nombre}</p>
+                    <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-300">{card.mesa.nombre}</p>
                 </div>
                 {/* Drag handle */}
                 <button
@@ -83,8 +83,8 @@ export default function KanbanCard({ card, columnStatus }: KanbanCardProps) {
             <ul className="mb-2 space-y-0.5">
                 {card.items.map((item) => (
                     <li key={item.id} className="flex items-baseline justify-between gap-1">
-                        <span className="min-w-0 truncate text-xs text-gray-700">{item.nombre}</span>
-                        <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
+                        <span className="min-w-0 truncate text-xs text-gray-700 dark:text-gray-200">{item.nombre}</span>
+                        <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                             x{item.cantidad}
                         </span>
                     </li>
