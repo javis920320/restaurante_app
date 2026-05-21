@@ -138,3 +138,16 @@ export interface PedidoDetalle {
     updated_at: string;
     producto?: Plato;
 }
+
+export interface Mesa {
+    id: number;
+    nombre: string;
+    capacidad: number;
+    estado: 'disponible' | 'ocupada';
+    activa: boolean;
+    qr_token: string;
+    restaurante_id: number;
+    created_at: string;
+    updated_at: string;
+    restaurante?: Restaurante;
+}
