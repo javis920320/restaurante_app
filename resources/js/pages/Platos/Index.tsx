@@ -1,11 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import ConfiguracionLayout from '@/layouts/configuracion/layout';
 import { Categoria, type Opcion, type Plato } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import React, { useState } from 'react';
+import { DollarSign } from 'lucide-react';
 import Formulario from './Formulario';
 
 export default function Index({ categorias, platos }: { categorias: { id: number; nombre: string }[]; platos: { data: Plato[] } | Plato[] }) {
@@ -101,16 +103,46 @@ export default function Index({ categorias, platos }: { categorias: { id: number
         router.reload({ only: ['platos'] });
     };
 
+    const [query, setQuery] = useState('');
+
+    const displayedPlatos = React.useMemo(() => {
+        const q = query.trim().toLowerCase();
+        return listaPlatos
+            .filter((p) => {
+                if (!q) return true;
+                return (
+                    p.nombre.toLowerCase().includes(q) ||
+                    (p.descripcion || '').toLowerCase().includes(q)
+                );
+            })
+            .sort((a, b) => Number(b.activo) - Number(a.activo));
+    }, [listaPlatos, query]);
+
     return (
         <AppLayout>
             <Head title="Platos" />
             <ConfiguracionLayout>
-                <div className="mb-4 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Platos</h1>
+                <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold">Platos</h1>
+                        <p className="text-sm text-gray-500">Administra el catálogo de productos y sus variantes</p>
+                    </div>
+                    <div className="w-full md:w-1/3">
+                        <Input
+                            placeholder="Buscar platos por nombre o descripción..."
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
-                <Formulario categorias={categorias} onCreated={handlePlatoCreado} />
 
-                <section className="mt-4 flex flex-wrap gap-2">
+                        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+                    <div className="col-span-1">
+                        <Formulario categorias={categorias} onCreated={handlePlatoCreado} />
+                    </div>
+
+                    <div className="col-span-2">
+                        <section className="mt-2 flex flex-wrap gap-2">
                     {categorias &&
                         categorias.map((categoria) => (
                             <Badge
@@ -124,128 +156,92 @@ export default function Index({ categorias, platos }: { categorias: { id: number
                                 {categoria.nombre}
                             </Badge>
                         ))}
-                </section>
+                        </section>
 
-                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {listaPlatos.length === 0 && (
-                        <div className="col-span-3 rounded-md bg-gray-100 p-4 text-center shadow-md">
-                            <p className="text-gray-600">No hay platos disponibles.</p>
-                        </div>
-                    )}
-                    {listaPlatos.map((plato) => (
-                        <div key={plato.id} className="rounded-md border p-4 shadow-md">
-                            {plato.imagen && (
-                                <img src={plato.imagen} alt={plato.nombre} className="mb-2 h-32 w-full rounded-md object-cover" />
-                            )}
-                            <div className="mb-2 flex items-start justify-between">
-                                <h2 className="text-lg font-semibold">{plato.nombre}</h2>
-                                <div className="flex flex-col gap-1 items-end">
-                                    <Badge variant={plato.activo ? 'default' : 'secondary'} className="text-xs">
-                                        {plato.activo ? 'Activo' : 'Inactivo'}
-                                    </Badge>
-                                    <Badge
-                                        variant={plato.disponible ? 'outline' : 'destructive'}
-                                        className="text-xs"
-                                    >
-                                        {plato.disponible ? 'Disponible' : 'Agotado'}
-                                    </Badge>
-                                    <Badge
-                                        variant="outline"
-                                        className={`text-xs ${
-                                            plato.production_area === 'kitchen'
-                                                ? 'border-orange-400 text-orange-600'
-                                                : plato.production_area === 'bar'
-                                                  ? 'border-purple-400 text-purple-600'
-                                                  : 'border-gray-300 text-gray-500'
-                                        }`}
-                                    >
-                                        {plato.production_area === 'kitchen'
-                                            ? '🍳 Cocina'
-                                            : plato.production_area === 'bar'
-                                              ? '🍹 Bar'
-                                              : 'Sin área'}
-                                    </Badge>
+                        <div className="mt-4">
+                            {displayedPlatos.length === 0 ? (
+                                <div className="rounded-md bg-gray-50 p-6 text-center shadow">
+                                    <p className="text-gray-600">No se encontraron platos que coincidan.</p>
                                 </div>
-                            </div>
-                            <p className="text-sm text-gray-600">{plato.descripcion}</p>
-                            <p className="mt-1 font-bold text-gray-800">${plato.precio}</p>
-
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                <Button
-                                    size="sm"
-                                    variant={plato.activo ? 'outline' : 'default'}
-                                    onClick={() => toggleActivo(plato.id)}
-                                >
-                                    {plato.activo ? 'Desactivar' : 'Activar'}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant={plato.disponible ? 'outline' : 'default'}
-                                    onClick={() => toggleDisponible(plato.id)}
-                                >
-                                    {plato.disponible ? 'Marcar Agotado' : 'Marcar Disponible'}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => setOpcionesPlato(opcionesPlato === plato.id ? null : plato.id)}
-                                >
-                                    Opciones ({(plato.opciones || []).length})
-                                </Button>
-                            </div>
-
-                            {/* Panel de opciones/variantes */}
-                            {opcionesPlato === plato.id && (
-                                <div className="mt-3 rounded-md bg-gray-50 p-3">
-                                    <h3 className="mb-2 text-sm font-semibold">Variantes / Opciones</h3>
-                                    {(plato.opciones || []).length === 0 && (
-                                        <p className="text-xs text-gray-500">Sin opciones aún.</p>
-                                    )}
-                                    <ul className="mb-2 space-y-1">
-                                        {(plato.opciones || []).map((opcion: Opcion) => (
-                                            <li key={opcion.id} className="flex items-center justify-between text-sm">
-                                                <span>
-                                                    {opcion.nombre}
-                                                    {opcion.precio_extra > 0 && (
-                                                        <span className="ml-1 text-green-600">(+${opcion.precio_extra})</span>
+                            ) : (
+                                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                                    {displayedPlatos.map((plato) => (
+                                        <article key={plato.id} className="flex flex-col sm:flex-row items-start rounded-xl border p-4 shadow-sm hover:shadow-md transition">
+                                            <div className="flex items-start gap-4 w-full">
+                                                <div className="h-20 w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+                                                    {plato.imagen ? (
+                                                        <img src={plato.imagen} alt={plato.nombre} className="h-full w-full object-cover" />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">Sin imagen</div>
                                                     )}
-                                                </span>
-                                                <button
-                                                    className="text-red-400 hover:text-red-600"
-                                                    onClick={() => eliminarOpcion(plato.id, opcion.id)}
-                                                >
-                                                    ✕
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            className="flex-1 rounded border px-2 py-1 text-sm"
-                                            placeholder="Nombre (ej: Con queso)"
-                                            value={nuevaOpcion.nombre}
-                                            onChange={(e) => setNuevaOpcion((prev) => ({ ...prev, nombre: e.target.value }))}
-                                        />
-                                        <input
-                                            type="number"
-                                            className="w-24 rounded border px-2 py-1 text-sm"
-                                            placeholder="Precio extra"
-                                            value={nuevaOpcion.precio_extra}
-                                            min={0}
-                                            onChange={(e) =>
-                                                setNuevaOpcion((prev) => ({ ...prev, precio_extra: parseFloat(e.target.value) || 0 }))
-                                            }
-                                        />
-                                        <Button size="sm" onClick={() => agregarOpcion(plato.id)}>
-                                            +
-                                        </Button>
-                                    </div>
-                                    {opcionError && <p className="mt-1 text-xs text-red-500">{opcionError}</p>}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="text-lg font-semibold">{plato.nombre}</h3>
+                                                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">{plato.descripcion}</p>
+                                                    <div className="mt-3 flex items-center justify-between w-full">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <Badge variant={plato.activo ? 'default' : 'outline'} className="text-xs">
+                                                                {plato.activo ? 'Activo' : 'Inactivo'}
+                                                            </Badge>
+                                                            <Badge variant={plato.disponible ? 'secondary' : 'destructive'} className="text-xs">
+                                                                {plato.disponible ? 'Disponible' : 'Agotado'}
+                                                            </Badge>
+                                                            <span className="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                                                <DollarSign className="h-3 w-3 text-gray-600" />
+                                                                ${(Number(plato.precio) || 0).toFixed(2)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 flex-wrap md:flex-nowrap">
+                                                            <Button variant="ghost" size="sm" onClick={() => setOpcionesPlato(opcionesPlato === plato.id ? null : plato.id)}>
+                                                                Opciones ({(plato.opciones || []).length})
+                                                            </Button>
+                                                            <Button variant="ghost" size="sm" onClick={() => toggleActivo(plato.id)}>
+                                                                {plato.activo ? 'Desactivar' : 'Activar'}
+                                                            </Button>
+                                                            <Button variant="ghost" size="sm" onClick={() => toggleDisponible(plato.id)}>
+                                                                {plato.disponible ? 'Marcar Agotado' : 'Marcar Disponible'}
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {opcionesPlato === plato.id && (
+                                                <div className="mt-3 rounded-md bg-gray-50 p-3">
+                                                    <h4 className="mb-2 text-sm font-semibold">Variantes / Opciones</h4>
+                                                    {(plato.opciones || []).length === 0 ? (
+                                                        <p className="text-xs text-gray-500">Sin opciones aún.</p>
+                                                    ) : (
+                                                        <ul className="mb-2 space-y-1">
+                                                            {(plato.opciones || []).map((opcion: Opcion) => (
+                                                                <li key={opcion.id} className="flex items-center justify-between text-sm">
+                                                                    <span>
+                                                                        {opcion.nombre}
+                                                                        {opcion.precio_extra > 0 && (
+                                                                            <span className="ml-1 text-green-600">(+${(Number(opcion.precio_extra) || 0).toFixed(2)})</span>
+                                                                        )}
+                                                                    </span>
+                                                                    <button className="text-red-400 hover:text-red-600" onClick={() => eliminarOpcion(plato.id, opcion.id)}>
+                                                                        ✕
+                                                                    </button>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                    <div className="flex gap-2">
+                                                        <input type="text" className="flex-1 rounded border px-2 py-1 text-sm" placeholder="Nombre (ej: Con queso)" value={nuevaOpcion.nombre} onChange={(e) => setNuevaOpcion((prev) => ({ ...prev, nombre: e.target.value }))} />
+                                                        <input type="number" className="w-28 rounded border px-2 py-1 text-sm" placeholder="Precio extra" value={nuevaOpcion.precio_extra} min={0} onChange={(e) => setNuevaOpcion((prev) => ({ ...prev, precio_extra: parseFloat(e.target.value) || 0 }))} />
+                                                        <Button size="sm" onClick={() => agregarOpcion(plato.id)}>Agregar</Button>
+                                                    </div>
+                                                    {opcionError && <p className="mt-1 text-xs text-red-500">{opcionError}</p>}
+                                                </div>
+                                            )}
+                                        </article>
+                                    ))}
                                 </div>
                             )}
                         </div>
-                    ))}
+                    </div>
                 </div>
             </ConfiguracionLayout>
         </AppLayout>
