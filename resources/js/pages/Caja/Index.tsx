@@ -1063,10 +1063,10 @@ function MovimientosTab({ caja }: MovimientosTabProps) {
                                 </td>
                                 <td className="px-4 py-3 text-right font-bold">
                                     {(() => {
-                                        const total = caja.movimientos.reduce(
-                                            (sum, m) => sum + (m.tipo === 'ingreso' ? m.monto : -m.monto),
-                                            0,
-                                        );
+                                        const total = caja.movimientos.reduce((sum, m) => {
+                                            const monto = typeof m.monto === 'string' ? parseFloat(m.monto) : m.monto;
+                                            return sum + (m.tipo === 'ingreso' ? monto : -monto);
+                                        }, 0);
                                         return (
                                             <span className={total >= 0 ? 'text-emerald-600' : 'text-red-600'}>
                                                 {total >= 0 ? '+' : ''}${total.toFixed(2)}

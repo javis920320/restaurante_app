@@ -145,7 +145,7 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
                         <p className="text-sm text-gray-600">Mesa: {pedido.mesa.nombre}</p>
                     </div>
                     {isDelayed && (
-                        <AlertTriangle className="h-5 w-5 text-red-600" title="Pedido demorado" />
+                        <AlertTriangle className="h-5 w-5 text-red-600" aria-label="Pedido demorado" />
                     )}
                 </div>
             </CardHeader>

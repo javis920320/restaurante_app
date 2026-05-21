@@ -11,7 +11,7 @@ import Formulario from './Formulario';
 export default function Index({ categorias, platos }: { categorias: { id: number; nombre: string }[]; platos: { data: Plato[] } | Plato[] }) {
     const platosArray: Plato[] = Array.isArray(platos) ? platos : (platos as { data: Plato[] }).data;
     const [listaPlatos, setListaPlatos] = React.useState<Plato[]>(platosArray);
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = React.useState<Categoria[]>([]);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = React.useState<Array<{ id: number; nombre: string }>>([]);
 
     // Opciones management state
     const [opcionesPlato, setOpcionesPlato] = useState<number | null>(null);
@@ -19,7 +19,7 @@ export default function Index({ categorias, platos }: { categorias: { id: number
     const [opcionError, setOpcionError] = useState<string | null>(null);
 
     const handleClickCategoria = (categoriaId: number) => {
-        setCategoriaSeleccionada((prevCategorias: Categoria[]) => {
+        setCategoriaSeleccionada((prevCategorias) => {
             const existeCategoria = prevCategorias.some((cat) => cat.id === categoriaId);
             let nuevasCategorias;
 
@@ -68,13 +68,18 @@ export default function Index({ categorias, platos }: { categorias: { id: number
                 ),
             );
             setNuevaOpcion({ nombre: '', precio_extra: 0 });
-        } catch (error) {
-            const msg =
-                error?.response?.data?.errors
-                    ? Object.values(error.response.data.errors as Record<string, string[]>)
-                          .flat()
-                          .join(' ')
-                    : error?.response?.data?.message || 'Error al agregar opción.';
+        } catch (error: unknown) {
+            let msg = 'Error al agregar opción.';
+            if (axios.isAxiosError(error) && error.response) {
+                const responseData = error.response.data as any;
+                if (responseData?.errors) {
+                    msg = Object.values(responseData.errors as Record<string, string[]>).flat().join(' ');
+                } else if (responseData?.message) {
+                    msg = responseData.message;
+                }
+            } else {
+                console.error(error);
+            }
             setOpcionError(msg);
         }
     };
@@ -112,7 +117,7 @@ export default function Index({ categorias, platos }: { categorias: { id: number
                                 key={categoria.id}
                                 variant="outline"
                                 className={`cursor-pointer ${
-                                    categoriaSeleccionada.some((cat: Categoria) => cat.id === categoria.id) ? 'bg-gray-500 text-white' : ''
+                                    categoriaSeleccionada.some((cat) => cat.id === categoria.id) ? 'bg-gray-500 text-white' : ''
                                 }`}
                                 onClick={() => handleClickCategoria(categoria.id)}
                             >

@@ -48,9 +48,13 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
             setCategorias((prev) => [...prev, response.data.categorianew]);
             setData('nombre', '');
             setData('production_area', 'none');
-        } catch (error) {
-            console.log(error.response.data.message);
-            setError('nombre', error.response.data.message);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response) {
+                const message = error.response.data?.message ?? 'Error al crear categoría';
+                setError('nombre', message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -71,9 +75,9 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
         try {
             await axios.delete(route('categorias.destroy', id));
             setCategorias((prev) => prev.filter((categoria) => categoria.id !== id));
-        } catch (error) {
-            if (error?.response?.status === 422) {
-                setDeleteError(error.response.data.message);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
+                setDeleteError((error.response.data as any).message ?? 'Error al eliminar categoría');
             } else {
                 console.error(error);
             }

@@ -143,7 +143,7 @@ export default function Index({ mesas }: MesasIndexProps) {
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                         {mesasData.map((mesa) => (
                             <MesaCard
                                 key={mesa.id}
@@ -189,6 +189,7 @@ function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete 
     const isOcupada = mesa.estado === 'ocupada';
     const isInactiva = !mesa.activa;
     const [loading, setLoading] = React.useState(false);
+    const [copied, setCopied] = React.useState(false);
 
     const handleCambiarEstado = () => {
         setLoading(true);
@@ -202,23 +203,41 @@ function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete 
         );
     };
 
+    const copyToken = async () => {
+        try {
+            await navigator.clipboard.writeText(mesa.qr_token);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        } catch {
+            // ignore
+        }
+    };
+
     return (
         <Card
-            className={`transition-all ${
+            className={`relative overflow-hidden transition-all rounded-xl shadow-sm hover:shadow-lg transform hover:-translate-y-0.5 ${
                 isInactiva
                     ? 'opacity-60'
                     : isOcupada
-                      ? 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950'
-                      : 'border-green-200 dark:border-green-800'
+                    ? 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950'
+                    : 'border-green-200 bg-white dark:border-green-800'
             }`}
         >
+            {/* Colored status stripe */}
+            <div
+                aria-hidden
+                className={`absolute left-0 top-0 h-1 w-full ${isOcupada ? 'bg-orange-500' : 'bg-emerald-500'}`}
+            />
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-lg">{mesa.nombre}</CardTitle>
-                        <p className="mt-1 flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                            <Users className="h-3 w-3" />
-                            {mesa.capacidad} personas
+                        <CardTitle className="text-lg font-semibold">{mesa.nombre}</CardTitle>
+                        <p className="mt-1 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                                <Users className="h-3 w-3 text-gray-600" />
+                                {mesa.capacidad}
+                            </span>
+                            <span className="text-xs text-gray-500">personas</span>
                         </p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
@@ -243,9 +262,27 @@ function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete 
 
             <CardContent className="space-y-3">
                 {/* QR Token info */}
-                <p className="truncate text-xs text-gray-500 dark:text-gray-500">
-                    Token: {mesa.qr_token.slice(0, 12)}...
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-xs text-gray-500 dark:text-gray-400">Token: {mesa.qr_token.slice(0, 12)}...</p>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={copyToken}
+                            className="text-xs text-emerald-600 hover:text-emerald-700"
+                            title="Copiar token"
+                        >
+                            {copied ? 'Copiado' : 'Copiar'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onGetQR(mesa)}
+                            className="text-xs text-gray-600 hover:text-gray-800"
+                            title="Abrir QR"
+                        >
+                            Ver QR
+                        </button>
+                    </div>
+                </div>
 
                 {/* Quick availability toggle */}
                 <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
@@ -289,31 +326,23 @@ function MesaCard({ mesa, onDelete, onGetQR, isConfirmingDelete, onCancelDelete 
                         </div>
                     </div>
                 ) : (
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() => onGetQR(mesa)}
-                            title="Ver código QR"
-                        >
-                            <QrCode className="mr-1 h-3 w-3" />
-                            QR
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="px-2 py-1" onClick={() => onGetQR(mesa)} title="Ver código QR">
+                            <QrCode className="h-4 w-4" />
                         </Button>
-                        <Button variant="outline" size="sm" className="flex-1 text-xs" asChild>
-                            <Link href={route('mesas.edit', mesa.id)}>
-                                <Edit className="mr-1 h-3 w-3" />
-                                Editar
+                        <Button variant="ghost" size="sm" className="px-2 py-1" asChild>
+                            <Link href={route('mesas.edit', mesa.id)} title="Editar mesa">
+                                <Edit className="h-4 w-4" />
                             </Link>
                         </Button>
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950"
+                            className="text-red-600 hover:bg-red-50 dark:text-red-400"
                             onClick={() => onDelete(mesa.id)}
                             title="Eliminar mesa"
                         >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 )}

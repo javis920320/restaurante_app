@@ -24,7 +24,7 @@ export default function Formulario({ categorias, onCreated }: FormularioProps) {
         descripcion: '',
         categoria_id: 0,
         imagen: '',
-        disponible: true,
+        disponible: true as boolean,
         production_area: 'none' as 'none' | 'kitchen' | 'bar',
     });
     const handleSubmit = async (e: React.FormEvent) => {
@@ -45,16 +45,11 @@ export default function Formulario({ categorias, onCreated }: FormularioProps) {
                 onCreated?.();
             }
         } catch (error: unknown) {
-            if (error && typeof error === 'object' && 'response' in error) {
-                const errorResponse = error as {
-                    response?: { data?: { errors?: Record<string, string[]> } };
-                };
-                const backendErrors = errorResponse.response?.data?.errors;
-                if (backendErrors) {
-                    Object.keys(backendErrors).forEach((key: string) => {
-                        setError(key, backendErrors[key][0]);
-                    });
-                }
+            if (axios.isAxiosError(error) && error.response?.data?.errors) {
+                const backendErrors = error.response.data.errors as Record<string, string[]>;
+                Object.keys(backendErrors).forEach((key: string) => {
+                    setError(key as keyof typeof data, backendErrors[key][0]);
+                });
             }
         }
     };

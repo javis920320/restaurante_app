@@ -30,7 +30,7 @@ export default function RestaurantesIndex({ restaurantes }: { restaurantes: Rest
         direccion: '',
         telefono: '',
         email: '',
-        activo: true,
+        activo: true as boolean,
     });
 
     const editForm = useForm({
@@ -38,7 +38,7 @@ export default function RestaurantesIndex({ restaurantes }: { restaurantes: Rest
         direccion: '',
         telefono: '',
         email: '',
-        activo: true,
+        activo: true as boolean,
     });
 
     const handleCreate = (e: React.FormEvent) => {
