@@ -1,16 +1,37 @@
 import PedidoCard from '@/components/Pedidos/PedidoCard';
 import { KanbanBoard } from '@/components/Kanban';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminPedidos } from '@/hooks/useAdminPedidos';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
-import { ChefHat, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search } from 'lucide-react';
+import { CheckCircle2, ChefHat, Clock3, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search, X } from 'lucide-react';
 import React from 'react';
 
 const PEDIDOS_VISTA_KEY = 'pedidos:vista';
+const ESTADOS_ORDEN = ['pendiente', 'confirmado', 'en_preparacion', 'listo', 'entregado', 'pagado', 'cancelado'] as const;
+const ESTADOS_LABELS: Record<string, string> = {
+    pendiente: 'Pendientes',
+    confirmado: 'Confirmados',
+    en_preparacion: 'En Preparación',
+    listo: 'Listos',
+    entregado: 'Entregados',
+    pagado: 'Pagados',
+    cancelado: 'Cancelados',
+};
+const ESTADO_FILTER_OPTIONS = [
+    { value: 'all', label: 'Todos' },
+    { value: 'pendiente', label: 'Pendientes' },
+    { value: 'confirmado', label: 'Confirmados' },
+    { value: 'en_preparacion', label: 'En Preparación' },
+    { value: 'listo', label: 'Listos' },
+    { value: 'entregado', label: 'Entregados' },
+    { value: 'pagado', label: 'Pagados' },
+    { value: 'cancelado', label: 'Cancelados' },
+] as const;
+type EstadoFilter = (typeof ESTADO_FILTER_OPTIONS)[number]['value'];
 
 interface PageProps {
     filters?: {
@@ -20,16 +41,19 @@ interface PageProps {
 }
 
 export default function Index({ filters }: PageProps) {
-    const [filtroEstado, setFiltroEstado] = React.useState<string>(filters?.estado || 'all');
+    const [filtroEstado, setFiltroEstado] = React.useState<EstadoFilter>((filters?.estado as EstadoFilter) || 'all');
     const [busqueda, setBusqueda] = React.useState('');
     const [vista, setVista] = React.useState<'lista' | 'kanban'>(() => {
-        const saved = localStorage.getItem(PEDIDOS_VISTA_KEY);
+        if (typeof window === 'undefined') return 'lista';
+        const saved = window.localStorage.getItem(PEDIDOS_VISTA_KEY);
         return saved === 'kanban' ? 'kanban' : 'lista';
     });
     const [areaKanban, setAreaKanban] = React.useState<'kitchen' | 'bar'>('kitchen');
 
     React.useEffect(() => {
-        localStorage.setItem(PEDIDOS_VISTA_KEY, vista);
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem(PEDIDOS_VISTA_KEY, vista);
+        }
     }, [vista]);
 
     const { pedidos, loading, error, refetch, cambiarEstado } = useAdminPedidos({
@@ -40,43 +64,69 @@ export default function Index({ filters }: PageProps) {
         await cambiarEstado(pedidoId, nuevoEstado);
     };
 
-    // Aplicar filtro de búsqueda por nombre de mesa
-    const pedidosFiltrados = busqueda
-        ? pedidos.filter((p) => p.mesa?.nombre?.toLowerCase().includes(busqueda.toLowerCase()))
-        : pedidos;
+    const pedidosFiltrados = React.useMemo(() => {
+        const term = busqueda.trim().toLowerCase();
 
-    // Agrupar pedidos por estado
-    const pedidosPorEstado = {
-        pendiente: pedidosFiltrados.filter((p) => p.estado === 'pendiente'),
-        confirmado: pedidosFiltrados.filter((p) => p.estado === 'confirmado'),
-        en_preparacion: pedidosFiltrados.filter((p) => p.estado === 'en_preparacion'),
-        listo: pedidosFiltrados.filter((p) => p.estado === 'listo'),
-        entregado: pedidosFiltrados.filter((p) => p.estado === 'entregado'),
-        pagado: pedidosFiltrados.filter((p) => p.estado === 'pagado'),
-        cancelado: pedidosFiltrados.filter((p) => p.estado === 'cancelado'),
-    };
+        return pedidos.filter((pedido) => {
+            if (filtroEstado !== 'all' && pedido.estado !== filtroEstado) {
+                return false;
+            }
+
+            if (!term) return true;
+
+            const searchableValues = [
+                pedido.mesa?.nombre ?? '',
+                `mesa ${pedido.mesa_id}`,
+                `pedido ${pedido.id}`,
+                pedido.cliente ?? '',
+                pedido.notas ?? '',
+            ];
+
+            return searchableValues.some((value) => value.toLowerCase().includes(term));
+        });
+    }, [pedidos, busqueda, filtroEstado]);
+
+    const pedidosPorEstado = React.useMemo(() => {
+        return ESTADOS_ORDEN.reduce(
+            (acc, estado) => {
+                acc[estado] = pedidosFiltrados.filter((pedido) => pedido.estado === estado);
+                return acc;
+            },
+            {} as Record<(typeof ESTADOS_ORDEN)[number], typeof pedidosFiltrados>,
+        );
+    }, [pedidosFiltrados]);
+
+    const stats = React.useMemo(() => {
+        const total = pedidos.length;
+        const pendientes = pedidos.filter((pedido) => pedido.estado === 'pendiente').length;
+        const enProduccion = pedidos.filter((pedido) => ['confirmado', 'en_preparacion'].includes(pedido.estado)).length;
+        const listos = pedidos.filter((pedido) => pedido.estado === 'listo').length;
+        const cerrados = pedidos.filter((pedido) => ['entregado', 'pagado'].includes(pedido.estado)).length;
+        return { total, pendientes, enProduccion, listos, cerrados };
+    }, [pedidos]);
 
     return (
         <AppLayout>
             <Head title="Gestión de Pedidos" />
 
             <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Pedidos</h1>
-                        <p className="mt-1 text-gray-600 dark:text-gray-400">Gestiona los pedidos del restaurante en tiempo real</p>
+                        <h1 className="flex items-center gap-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
+                            Gestión de Pedidos <Clock3 className="h-6 w-6 text-indigo-500" />
+                        </h1>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            Controla el flujo de pedidos en tiempo real con vista por estados y tablero operativo.
+                        </p>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                        {/* Vista toggle: Lista / Kanban */}
-                        <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex gap-0.5 rounded-xl bg-slate-100 p-0.5 text-xs font-medium dark:bg-slate-800">
                             <button
                                 onClick={() => setVista('lista')}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 transition ${
                                     vista === 'lista'
-                                        ? 'bg-gray-900 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
+                                        ? 'bg-white font-semibold text-indigo-600 shadow-xs dark:bg-slate-950 dark:text-indigo-400'
+                                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                 }`}
                             >
                                 <LayoutList className="h-4 w-4" />
@@ -84,43 +134,98 @@ export default function Index({ filters }: PageProps) {
                             </button>
                             <button
                                 onClick={() => setVista('kanban')}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 transition ${
                                     vista === 'kanban'
-                                        ? 'bg-gray-900 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
+                                        ? 'bg-white font-semibold text-indigo-600 shadow-xs dark:bg-slate-950 dark:text-indigo-400'
+                                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                 }`}
                             >
                                 <Kanban className="h-4 w-4" />
                                 Kanban
                             </button>
                         </div>
-
-                        <Button asChild size="sm">
+                        <Button asChild className="h-11 rounded-xl bg-indigo-600 px-5 font-semibold text-white shadow-md shadow-indigo-100 hover:bg-indigo-700 dark:shadow-none">
                             <Link href="/pedidos/crear">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Nuevo Pedido
                             </Link>
                         </Button>
-                        <Button onClick={refetch} variant="outline" size="sm">
-                            <RefreshCw className="mr-2 h-4 w-4" />
+                        <Button onClick={refetch} variant="outline" className="h-11 rounded-xl border-slate-200 px-4 font-semibold">
+                            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                             Actualizar
                         </Button>
                     </div>
                 </div>
 
-                {/* Kanban view */}
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+                    <div className="rounded-2xl border border-indigo-100 bg-indigo-50/10 p-4 dark:border-indigo-950/40 dark:bg-indigo-950/10">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-indigo-100 p-2 dark:bg-indigo-900">
+                                <LayoutList className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Total pedidos</p>
+                                <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{stats.total}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-amber-150 bg-amber-50/10 p-4 dark:border-amber-950/40 dark:bg-amber-950/10">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-amber-100 p-2 dark:bg-amber-900">
+                                <Clock3 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Pendientes</p>
+                                <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{stats.pendientes}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-blue-150 bg-blue-50/10 p-4 dark:border-blue-950/40 dark:bg-blue-950/10">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-blue-100 p-2 dark:bg-blue-900">
+                                <ChefHat className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">En producción</p>
+                                <p className="text-2xl font-black text-blue-700 dark:text-blue-400">{stats.enProduccion}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-emerald-150 bg-emerald-50/10 p-4 dark:border-emerald-950/40 dark:bg-emerald-950/10">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-emerald-100 p-2 dark:bg-emerald-900">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Listos</p>
+                                <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{stats.listos}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/20 p-4 dark:border-slate-800 dark:bg-slate-900/10">
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-slate-100 p-2 dark:bg-slate-800">
+                                <RefreshCw className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                            </div>
+                            <div>
+                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cerrados</p>
+                                <p className="text-2xl font-black text-slate-700 dark:text-slate-300">{stats.cerrados}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {vista === 'kanban' && (
                     <div className="space-y-4">
-                        {/* Area selector */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estación:</span>
-                            <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
+                            <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Seleccionar estación de trabajo</p>
+                            <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setAreaKanban('kitchen')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition ${
                                         areaKanban === 'kitchen'
-                                            ? 'bg-orange-600 text-white'
-                                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-900'
+                                            ? 'border-orange-200 bg-orange-500 text-white dark:border-orange-800'
+                                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
                                     }`}
                                 >
                                     <ChefHat className="h-4 w-4" />
@@ -128,10 +233,10 @@ export default function Index({ filters }: PageProps) {
                                 </button>
                                 <button
                                     onClick={() => setAreaKanban('bar')}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
+                                    className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold transition ${
                                         areaKanban === 'bar'
-                                            ? 'bg-purple-700 text-white'
-                                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-900'
+                                            ? 'border-cyan-200 bg-cyan-600 text-white dark:border-cyan-800'
+                                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
                                     }`}
                                 >
                                     <GlassWater className="h-4 w-4" />
@@ -139,120 +244,114 @@ export default function Index({ filters }: PageProps) {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Kanban board */}
-                        <div className="rounded-lg border border-gray-200  p-4 shadow-sm dark:border-gray-700 ">
+                        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                             <KanbanBoard area={areaKanban} pollingInterval={10} />
                         </div>
                     </div>
                 )}
 
-                {/* Lista view */}
                 {vista === 'lista' && (
                     <>
-                        {/* Filtros */}
-                        <div className="rounded-lg border border-gray-200  p-4 shadow-sm ">
-                            <div className="flex flex-col gap-4 md:flex-row">
+                        <div className="space-y-4 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center">
                                 <div className="flex-1">
-                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Buscar por mesa</label>
                                     <div className="relative">
-                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                                        <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
                                         <Input
                                             type="text"
-                                            placeholder="Nombre de mesa..."
+                                            placeholder="Buscar por mesa, pedido o notas..."
                                             value={busqueda}
                                             onChange={(e) => setBusqueda(e.target.value)}
-                                            className="pl-10"
+                                            className="h-11 rounded-xl border-slate-200 bg-white pl-10 dark:border-slate-700 dark:bg-slate-950"
                                         />
+                                        {busqueda && (
+                                            <button onClick={() => setBusqueda('')} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-
-                                <div className="w-full md:w-64">
-                                    <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar por estado</label>
-                                    <Select value={filtroEstado} onValueChange={setFiltroEstado}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Todos los estados" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Todos</SelectItem>
-                                            <SelectItem value="pendiente">Pendiente</SelectItem>
-                                            <SelectItem value="confirmado">Confirmado</SelectItem>
-                                            <SelectItem value="en_preparacion">En Preparación</SelectItem>
-                                            <SelectItem value="listo">Listo</SelectItem>
-                                            <SelectItem value="entregado">Entregado</SelectItem>
-                                            <SelectItem value="pagado">Pagado</SelectItem>
-                                            <SelectItem value="cancelado">Cancelado</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                            </div>
+                            <div className="border-t border-slate-200/50 pt-2 dark:border-slate-800/50">
+                                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por estado</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {ESTADO_FILTER_OPTIONS.map((estado) => (
+                                        <button
+                                            key={estado.value}
+                                            onClick={() => setFiltroEstado(estado.value)}
+                                            className={`rounded-xl border px-3 py-1.5 text-xs transition ${
+                                                filtroEstado === estado.value
+                                                    ? 'border-indigo-600 bg-indigo-600 font-semibold text-white shadow-xs shadow-indigo-100 dark:shadow-none'
+                                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
+                                            }`}
+                                        >
+                                            {estado.label}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
-                            <div className="mt-4 flex items-center gap-2 text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">{pedidosFiltrados.length} pedido(s)</span>
-                                {filtroEstado !== 'all' && (
-                                    <>
-                                        <span className="text-gray-400 dark:text-gray-500">•</span>
-                                        <span className="text-gray-600 dark:text-gray-400">
-                                            Filtrado por: <span className="font-medium">{filtroEstado.replace('_', ' ')}</span>
-                                        </span>
-                                    </>
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/50 pt-2 text-xs text-slate-500 dark:border-slate-800/50 dark:text-slate-400">
+                                <span>{pedidosFiltrados.length} pedido(s) visibles</span>
+                                {(filtroEstado !== 'all' || busqueda) && (
+                                    <button
+                                        onClick={() => {
+                                            setFiltroEstado('all');
+                                            setBusqueda('');
+                                        }}
+                                        className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+                                    >
+                                        Limpiar filtros
+                                    </button>
                                 )}
                             </div>
                         </div>
 
-                        {/* Error message */}
                         {error && (
-                            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                                <p className="text-red-700">{error}</p>
+                            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300">
+                                {error}
                             </div>
                         )}
 
-                        {/* Loading state */}
                         {loading && pedidos.length === 0 && (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {[...Array(6)].map((_, i) => (
                                     <div key={i} className="space-y-3">
-                                        <Skeleton className="h-48 w-full" />
+                                        <Skeleton className="h-64 w-full rounded-2xl" />
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        {/* Pedidos agrupados por estado */}
                         {!loading && pedidosFiltrados.length > 0 && (
                             <div className="space-y-8">
                                 {filtroEstado === 'all' ? (
-                                    // Vista agrupada por estado
                                     <>
-                                        {Object.entries(pedidosPorEstado).map(([estado, pedidosEstado]) => {
+                                        {ESTADOS_ORDEN.map((estado) => {
+                                            const pedidosEstado = pedidosPorEstado[estado];
                                             if (pedidosEstado.length === 0) return null;
 
-                                            const estadoLabels: Record<string, string> = {
-                                                pendiente: 'Pendientes',
-                                                confirmado: 'Confirmados',
-                                                en_preparacion: 'En Preparación',
-                                                listo: 'Listos',
-                                                entregado: 'Entregados',
-                                                pagado: 'Pagados',
-                                                cancelado: 'Cancelados',
-                                            };
-
                                             return (
-                                                <div key={estado}>
-                                                    <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                                        {estadoLabels[estado]} ({pedidosEstado.length})
-                                                    </h2>
+                                                <section key={estado} className="space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{ESTADOS_LABELS[estado]}</h2>
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                                        >
+                                                            {pedidosEstado.length}
+                                                        </Badge>
+                                                    </div>
                                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                                         {pedidosEstado.map((pedido) => (
                                                             <PedidoCard key={pedido.id} pedido={pedido} onCambiarEstado={handleCambiarEstado} />
                                                         ))}
                                                     </div>
-                                                </div>
+                                                </section>
                                             );
                                         })}
                                     </>
                                 ) : (
-                                    // Vista de lista simple con filtro
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                         {pedidosFiltrados.map((pedido) => (
                                             <PedidoCard key={pedido.id} pedido={pedido} onCambiarEstado={handleCambiarEstado} />
@@ -262,19 +361,18 @@ export default function Index({ filters }: PageProps) {
                             </div>
                         )}
 
-                        {/* Empty state */}
                         {!loading && pedidosFiltrados.length === 0 && (
-                            <div className="rounded-lg border border-gray-200  py-12 text-center ">
-                                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                                    <Search className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                            <div className="mx-auto mt-8 max-w-xl rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/20 p-12 text-center dark:border-slate-800">
+                                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+                                    <Search className="h-6 w-6 text-slate-400" />
                                 </div>
-                                <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">No hay pedidos</h3>
-                                <p className="mb-4 text-gray-600 dark:text-gray-400">
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">No se encontraron pedidos</h3>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                     {busqueda
-                                        ? 'No se encontraron pedidos para esa mesa'
+                                        ? 'No se encontraron pedidos para ese criterio de búsqueda.'
                                         : filtroEstado !== 'all'
-                                          ? 'No se encontraron pedidos con este estado'
-                                          : 'Aún no hay pedidos registrados'}
+                                          ? `No hay pedidos en estado ${filtroEstado.replace('_', ' ')}.`
+                                          : 'Todavía no hay pedidos registrados.'}
                                 </p>
                                 {(filtroEstado !== 'all' || busqueda) && (
                                     <Button
@@ -283,6 +381,7 @@ export default function Index({ filters }: PageProps) {
                                             setBusqueda('');
                                         }}
                                         variant="outline"
+                                        className="mt-4 rounded-xl border-slate-200 hover:bg-slate-50"
                                     >
                                         Ver todos los pedidos
                                     </Button>
@@ -292,8 +391,7 @@ export default function Index({ filters }: PageProps) {
                     </>
                 )}
 
-                {/* Auto-refresh indicator */}
-                <p className="text-center text-sm text-gray-500 dark:text-gray-400">Los pedidos se actualizan automáticamente cada 30 segundos</p>
+                <p className="text-center text-xs text-slate-500 dark:text-slate-400">Los pedidos se actualizan automáticamente cada 30 segundos.</p>
             </div>
         </AppLayout>
     );
