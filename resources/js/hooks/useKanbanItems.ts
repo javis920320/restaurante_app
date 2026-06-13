@@ -72,6 +72,7 @@ export function useKanbanItems({
     const [actionError, setActionError] = useState<string | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const isFirstLoad = useRef(true);
 
     const refetch = useCallback(() => setRefreshKey((k) => k + 1), []);
 
@@ -94,7 +95,10 @@ export function useKanbanItems({
             }
         };
 
-        setLoading(true);
+        if (isFirstLoad.current) {
+            setLoading(true);
+            isFirstLoad.current = false;
+        }
         fetchData();
 
         intervalRef.current = setInterval(fetchData, pollingInterval * 1000);

@@ -10,8 +10,7 @@ use App\Models\Mesa;
 use App\Models\Pedido;
 use App\Models\PedidoDetalle;
 use App\Models\Plato;
-use App\Services\PedidoService;
-use Illuminate\Http\Request;
+use App\Services\PedidoService;use Carbon\Carbon;use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -43,6 +42,20 @@ class PedidoController extends Controller
             $query->where('mesa_id', $request->mesa_id);
         }
 
+        if ($request->filled('fecha')) {
+            switch ($request->fecha) {
+                case 'hoy':
+                    $query->whereDate('created_at', Carbon::today());
+                    break;
+                case 'ayer':
+                    $query->whereDate('created_at', Carbon::yesterday());
+                    break;
+                case 'semana':
+                    $query->whereBetween('created_at', [Carbon::today()->subDays(6)->startOfDay(), Carbon::today()->endOfDay()]);
+                    break;
+            }
+        }
+
         $pedidos = $query->paginate(20);
 
         if ($request->wantsJson()) {
@@ -53,7 +66,7 @@ class PedidoController extends Controller
 
         return Inertia::render('Pedidos/Index', [
             'pedidos' => $pedidos,
-            'filters' => $request->only(['estado', 'mesa_id']),
+            'filters' => $request->only(['estado', 'mesa_id', 'fecha']),
         ]);
     }
 

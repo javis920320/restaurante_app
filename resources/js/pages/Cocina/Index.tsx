@@ -9,7 +9,7 @@ import { useCocinaKDS, type PedidoCocina } from '@/hooks/useCocinaKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, Lock, RefreshCw } from 'lucide-react';
+import { Check, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, Lock, Play, RefreshCw } from 'lucide-react';
 import { ChangeEvent, useState, useEffect, useMemo } from 'react';
 
 const COCINA_VISTA_KEY = 'cocina:vista';
@@ -237,9 +237,17 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                         ) : (
                             <div className="grid gap-6 lg:grid-cols-2">
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-2 rounded-2xl border border-yellow-200 bg-yellow-50/80 p-4 dark:border-yellow-800 dark:bg-yellow-950/20">
-                                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                                        <h2 className="text-lg font-bold text-slate-950 dark:text-white">Nuevos Pedidos ({pendientes.length})</h2>
+                                    <div className="flex items-center justify-between rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-50/80 to-transparent p-4 dark:border-amber-900/30 dark:from-amber-950/20 shadow-sm">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                                            </span>
+                                            <h2 className="text-lg font-bold text-slate-950 dark:text-white">Nuevos Pedidos</h2>
+                                        </div>
+                                        <Badge className="rounded-2xl bg-amber-500 px-3 py-1 font-extrabold text-white dark:bg-amber-600 shadow-sm shadow-amber-500/10">
+                                            {pendientes.length}
+                                        </Badge>
                                     </div>
 
                                     {pendientes.length === 0 ? (
@@ -262,9 +270,14 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-2 rounded-2xl border border-sky-200 bg-sky-50/80 p-4 dark:border-sky-800 dark:bg-sky-950/20">
-                                        <ChefHat className="h-5 w-5 text-sky-600" />
-                                        <h2 className="text-lg font-bold text-slate-950 dark:text-white">En Preparación ({enPreparacion.length})</h2>
+                                    <div className="flex items-center justify-between rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-50/80 to-transparent p-4 dark:border-sky-900/30 dark:from-sky-950/20 shadow-sm">
+                                        <div className="flex items-center gap-2.5">
+                                            <ChefHat className="h-5 w-5 text-sky-600 dark:text-sky-400 animate-bounce" />
+                                            <h2 className="text-lg font-bold text-slate-950 dark:text-white">En Preparación</h2>
+                                        </div>
+                                        <Badge className="rounded-2xl bg-sky-600 px-3 py-1 font-extrabold text-white dark:bg-sky-500 shadow-sm shadow-sky-500/10">
+                                            {enPreparacion.length}
+                                        </Badge>
                                     </div>
 
                                     {enPreparacion.length === 0 ? (
@@ -331,99 +344,140 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
 
     return (
         <div
-            className={`rounded-2xl border p-5 transition-all shadow-sm ${
+            className={`rounded-3xl border p-6 transition-all duration-300 shadow-md hover:shadow-lg ${
                 isBlocked
-                    ? 'border-slate-700 bg-slate-950/80 opacity-90'
+                    ? 'border-slate-200 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/50 opacity-90'
                     : isCritical
-                      ? 'border-red-500 bg-red-50/80 dark:bg-red-950/40 shadow-red-900/10'
+                      ? 'border-red-300 bg-gradient-to-b from-red-50/50 to-white dark:border-red-950/30 dark:from-red-950/10 dark:to-slate-950 shadow-red-500/5'
                       : isDelayed
-                        ? 'border-yellow-500 bg-yellow-50/80 dark:bg-yellow-950/30'
-                        : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950'
+                        ? 'border-amber-300 bg-gradient-to-b from-amber-50/50 to-white dark:border-amber-950/30 dark:from-amber-950/10 dark:to-slate-950 shadow-amber-500/5'
+                        : 'border-slate-200 bg-white dark:border-slate-800/80 dark:bg-slate-950'
             }`}
         >
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h3 className="text-xl font-semibold text-slate-950 dark:text-white">Pedido #{pedido.id}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{pedido.mesa_nombre}</p>
+                    <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                        Pedido <span className="text-orange-600 dark:text-orange-500">#{pedido.id}</span>
+                    </h3>
+                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
+                        Mesa: <span className="text-slate-700 dark:text-slate-300 font-bold">{pedido.mesa_nombre}</span>
+                    </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                         <PagoBadge payment_status={pedido.payment_status} />
                         {isBlocked && (
-                            <Badge className="rounded-full bg-slate-700 px-2 py-1 text-[11px] text-slate-100">
-                                <Lock className="mr-1 h-3 w-3" />
-                                Esperando pago
+                            <Badge className="rounded-full bg-slate-200 text-slate-700 border border-slate-300/50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-750 px-2 py-0.5 text-[10px] font-bold">
+                                <Lock className="mr-1 h-3.5 w-3.5" />
+                                Esperando Pago
                             </Badge>
                         )}
                     </div>
                 </div>
+                
                 <div className="flex flex-col items-start gap-2 sm:items-end">
                     <div
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold ${
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black border transition-colors ${
                             isCritical
-                                ? 'bg-red-600 text-white'
+                                ? 'bg-red-500/10 text-red-500 border-red-500/25'
                                 : isDelayed
-                                  ? 'bg-yellow-600 text-white'
-                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
+                                  : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800'
                         }`}
                     >
-                        <Clock className="h-4 w-4" />
-                        {pedido.tiempo_transcurrido} min
+                        <Clock className={`h-3.5 w-3.5 ${isDelayed || isCritical ? 'animate-pulse' : ''}`} />
+                        <span>{pedido.tiempo_transcurrido}m</span>
+                        {(isDelayed || isCritical) && !isBlocked && (
+                            <span className="relative flex h-2 w-2">
+                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-400' : 'bg-amber-400'}`}></span>
+                                <span className={`relative inline-flex rounded-full h-2 w-2 ${isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
+                            </span>
+                        )}
                     </div>
-                    {isCritical && !isBlocked && (
-                        <Badge className="rounded-full bg-red-600 px-2 py-1 text-[11px] text-white">
-                            <AlertTriangle className="mr-1 h-3 w-3" />
-                            Demorado
-                        </Badge>
-                    )}
                 </div>
             </div>
 
             {/* Products */}
-            <div className="mb-4 space-y-2">
-                {pedido.productos.map((producto, idx) => (
-                    <div
-                        key={idx}
-                        className="flex items-start justify-between rounded-lg bg-gray-800 px-3 py-2"
-                    >
-                        <div>
-                            <span className="font-medium text-white">{producto.nombre}</span>
-                            {producto.notas && (
-                                <p className="mt-1 text-xs text-yellow-400 italic">📝 {producto.notas}</p>
-                            )}
-                            <span
-                                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                    producto.estado === 'listo'
-                                        ? 'bg-green-700 text-green-100'
-                                        : producto.estado === 'en_preparacion'
-                                          ? 'bg-blue-700 text-blue-100'
-                                          : 'bg-gray-600 text-gray-200'
-                                }`}
-                            >
-                                {producto.estado === 'listo'
-                                    ? '✓ Listo'
-                                    : producto.estado === 'en_preparacion'
-                                      ? '⏳ Preparando'
-                                      : '⏱ Pendiente'}
-                            </span>
+            <div className="mb-5 space-y-2.5">
+                {pedido.productos.map((producto, idx) => {
+                    const isDone = producto.estado === 'listo';
+                    const isPrep = producto.estado === 'en_preparacion';
+                    
+                    return (
+                        <div
+                            key={idx}
+                            className={`flex items-start justify-between rounded-2xl p-3 border transition-all duration-200 ${
+                                isDone
+                                    ? 'bg-slate-50/30 border-slate-100/50 dark:bg-slate-950/20 dark:border-slate-900/30 opacity-60'
+                                    : isPrep
+                                      ? 'bg-blue-500/5 border-blue-100 dark:bg-blue-950/10 dark:border-blue-900/30 shadow-sm shadow-blue-500/2'
+                                      : 'bg-slate-50/70 border-slate-100 dark:bg-slate-900/60 dark:border-slate-800/50'
+                            }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-black border transition-colors ${
+                                    isDone
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200/45 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-800/40'
+                                        : 'bg-orange-100 text-orange-700 border-orange-200/50 dark:bg-orange-950/45 dark:text-orange-300 dark:border-orange-900/30'
+                                }`}>
+                                    {producto.cantidad}x
+                                </span>
+                                <div className="min-w-0">
+                                    <p className={`font-semibold text-sm leading-tight text-slate-800 dark:text-slate-100 ${isDone ? 'line-through text-slate-400 dark:text-slate-650' : ''}`}>
+                                        {producto.nombre}
+                                    </p>
+                                    {producto.notas && (
+                                        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium italic">
+                                            📝 {producto.notas}
+                                        </p>
+                                    )}
+                                    <div className="mt-1.5">
+                                        <span
+                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide border ${
+                                                isDone
+                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                                    : isPrep
+                                                      ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                                                      : 'bg-slate-100 text-slate-500 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400'
+                                            }`}
+                                        >
+                                            {isDone ? (
+                                                <>
+                                                    <Check className="h-2.5 w-2.5" />
+                                                    Listo
+                                                </>
+                                            ) : isPrep ? (
+                                                <>
+                                                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
+                                                    Preparando
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-600" />
+                                                    Pendiente
+                                                </>
+                                            )}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span className="ml-2 rounded-full bg-gray-700 px-2 py-0.5 text-sm font-bold text-white">
-                            x{producto.cantidad}
-                        </span>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Order notes */}
             {pedido.notas && (
-                <div className="mb-4 rounded-lg border border-yellow-800 bg-yellow-950/50 px-3 py-2">
-                    <p className="text-sm text-yellow-300">
-                        <span className="font-bold">📋 Nota:</span> {pedido.notas}
-                    </p>
+                <div className="mb-5 rounded-2xl border border-amber-200/40 bg-amber-50/40 p-3 dark:border-amber-950/30 dark:bg-amber-950/15 flex gap-2 text-xs items-start">
+                    <span className="text-amber-500 dark:text-amber-400 text-sm">📋</span>
+                    <div className="text-amber-800 dark:text-amber-300 leading-normal font-medium">
+                        <span className="font-bold uppercase tracking-wider text-[9px] block mb-0.5 text-amber-500">Nota del Pedido</span>
+                        {pedido.notas}
+                    </div>
                 </div>
             )}
 
             {/* Action button */}
             {isBlocked ? (
-                <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-800 py-3 text-base font-bold text-gray-500">
+                <div className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 text-sm font-bold text-slate-400 dark:bg-slate-900/60 dark:text-slate-600 border border-slate-200 dark:border-slate-800">
                     <Lock className="h-4 w-4" />
                     Pendiente de pago en caja
                 </div>
@@ -431,9 +485,23 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
                 <button
                     onClick={handleAccion}
                     disabled={isUpdating}
-                    className={`w-full rounded-lg py-3 text-base font-bold text-white transition-all ${accionColor} disabled:cursor-not-allowed disabled:opacity-50`}
+                    className={`flex items-center justify-center gap-2 w-full rounded-2xl py-3.5 text-sm font-extrabold text-white transition-all shadow-md active:scale-[0.98] ${accionColor} hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50`}
                 >
-                    {isUpdating ? '⏳ Actualizando...' : accionLabel}
+                    {isUpdating ? (
+                        <>
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            <span>Actualizando...</span>
+                        </>
+                    ) : (
+                        <>
+                            {accionLabel.includes('Iniciar') ? (
+                                <Play className="h-4 w-4 fill-current" />
+                            ) : (
+                                <Check className="h-4 w-4 stroke-[3]" />
+                            )}
+                            <span>{accionLabel.replace(/^[▶✓]\s*/, '')}</span>
+                        </>
+                    )}
                 </button>
             )}
         </div>

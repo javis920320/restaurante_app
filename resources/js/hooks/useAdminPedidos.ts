@@ -67,7 +67,7 @@ export const useAdminPedidos = (filtros?: FiltrosPedidos): UseAdminPedidosResult
                 clearInterval(intervalId);
             }
         };
-    }, [filtros?.estado, filtros?.mesa_id, filtros?.page, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [filtros?.estado, filtros?.mesa_id, filtros?.fecha, filtros?.page, refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const cambiarEstado = async (pedidoId: number, estado: string) => {
         try {

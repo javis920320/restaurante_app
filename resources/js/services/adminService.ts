@@ -16,6 +16,7 @@ export interface CambiarEstadoData {
 export interface FiltrosPedidos {
     estado?: string;
     mesa_id?: number;
+    fecha?: 'hoy' | 'ayer' | 'semana';
     page?: number;
 }
 
@@ -35,6 +36,10 @@ const adminService = {
         if (filtros?.mesa_id) {
             params.append('mesa_id', filtros.mesa_id.toString());
         }
+        if (filtros?.fecha) {
+            params.append('fecha', filtros.fecha);
+        }
+
         if (filtros?.page) {
             params.append('page', filtros.page.toString());
         }

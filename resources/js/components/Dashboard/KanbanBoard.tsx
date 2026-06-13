@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -38,11 +37,11 @@ interface KanbanBoardProps {
 }
 
 const ESTADOS = [
-    { key: 'pendiente', label: 'Pendiente', color: 'bg-yellow-50 border-yellow-200' },
-    { key: 'confirmado', label: 'Confirmado', color: 'bg-blue-50 border-blue-200' },
-    { key: 'en_preparacion', label: 'En Preparación', color: 'bg-orange-50 border-orange-200' },
-    { key: 'listo', label: 'Listo', color: 'bg-green-50 border-green-200' },
-    { key: 'entregado', label: 'Entregado', color: 'bg-gray-50 border-gray-200' },
+    { key: 'pendiente', label: 'Pendiente', color: 'bg-slate-50/70 border-slate-200 text-slate-700 dark:bg-slate-900/30 dark:border-slate-800 dark:text-slate-350', dot: 'bg-slate-400' },
+    { key: 'confirmado', label: 'Confirmado', color: 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-950/15 dark:border-blue-900/30 dark:text-blue-300', dot: 'bg-blue-500' },
+    { key: 'en_preparacion', label: 'En Preparación', color: 'bg-amber-50/50 border-amber-200 text-amber-800 dark:bg-amber-950/15 dark:border-amber-900/30 dark:text-amber-300', dot: 'bg-amber-500' },
+    { key: 'listo', label: 'Listo', color: 'bg-emerald-50/50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/15 dark:border-emerald-900/30 dark:text-emerald-300', dot: 'bg-emerald-500' },
+    { key: 'entregado', label: 'Entregado', color: 'bg-blue-50/20 border-blue-200 text-blue-700 dark:bg-blue-950/5 dark:border-blue-900/20 dark:text-blue-400', dot: 'bg-blue-450' },
 ];
 
 const TRANSITIONS: Record<string, string[]> = {
@@ -72,9 +71,9 @@ export function KanbanBoard({ pedidos, loading, onCambiarEstado }: KanbanBoardPr
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                 {ESTADOS.map((estado) => (
                     <div key={estado.key} className="space-y-3">
-                        <Skeleton className="h-8 w-full" />
-                        <Skeleton className="h-48 w-full" />
-                        <Skeleton className="h-48 w-full" />
+                        <Skeleton className="h-12 w-full rounded-2xl" />
+                        <Skeleton className="h-48 w-full rounded-2xl" />
+                        <Skeleton className="h-48 w-full rounded-2xl" />
                     </div>
                 ))}
             </div>
@@ -87,10 +86,15 @@ export function KanbanBoard({ pedidos, loading, onCambiarEstado }: KanbanBoardPr
                 const pedidosEstado = pedidos[estado.key as keyof typeof pedidos] || [];
 
                 return (
-                    <div key={estado.key} className="flex flex-col">
-                        <div className={`mb-3 rounded-lg border p-3 ${estado.color}`}>
-                            <h3 className="font-semibold text-gray-900">{estado.label}</h3>
-                            <p className="text-sm text-gray-600">{pedidosEstado.length} pedido(s)</p>
+                    <div key={estado.key} className="flex flex-col space-y-4">
+                        <div className={`rounded-2xl border p-3 flex items-center justify-between shadow-sm ${estado.color}`}>
+                            <div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`h-2 w-2 rounded-full ${estado.dot}`} />
+                                    <h3 className="font-extrabold text-sm tracking-tight">{estado.label}</h3>
+                                </div>
+                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{pedidosEstado.length} pedido(s)</p>
+                            </div>
                         </div>
 
                         <div className="space-y-3">
@@ -105,8 +109,8 @@ export function KanbanBoard({ pedidos, loading, onCambiarEstado }: KanbanBoardPr
                             ))}
 
                             {pedidosEstado.length === 0 && (
-                                <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-                                    <p className="text-sm text-gray-500">Sin pedidos</p>
+                                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/40 p-6 text-center dark:border-slate-800 dark:bg-slate-950/20">
+                                    <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Sin pedidos</p>
                                 </div>
                             )}
                         </div>
@@ -125,7 +129,7 @@ interface PedidoCardProps {
 }
 
 function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions }: PedidoCardProps) {
-    const isDelayed = pedido.tiempo_transcurrido > 30; // More than 30 minutes
+    const isDelayed = pedido.tiempo_transcurrido > 30 && pedido.estado !== 'entregado' && pedido.estado !== 'listo';
 
     const estadoLabels: Record<string, string> = {
         confirmado: 'Confirmado',
@@ -137,41 +141,50 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
     };
 
     return (
-        <Card className={`${isDelayed ? 'border-red-300 bg-red-50' : ''}`}>
+        <Card className={`transition-all duration-300 rounded-3xl hover:shadow-md border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 ${
+            isDelayed 
+                ? 'border-red-300 bg-red-50/60 dark:border-red-900/30 dark:bg-red-950/10 shadow-sm shadow-red-500/5' 
+                : ''
+        }`}>
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-base">Pedido #{pedido.codigo}</CardTitle>
-                        <p className="text-sm text-gray-600">Mesa: {pedido.mesa.nombre}</p>
+                        <CardTitle className="text-base font-extrabold text-slate-850 dark:text-slate-100">Pedido #{pedido.codigo}</CardTitle>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Mesa: <span className="font-bold text-slate-700 dark:text-slate-300">{pedido.mesa.nombre}</span></p>
                     </div>
                     {isDelayed && (
-                        <AlertTriangle className="h-5 w-5 text-red-600" aria-label="Pedido demorado" />
+                        <AlertTriangle className="h-4.5 w-4.5 text-red-500 animate-pulse" aria-label="Pedido demorado" />
                     )}
                 </div>
             </CardHeader>
             <CardContent className="space-y-3">
                 {/* Time and total */}
                 <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-1 text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{pedido.tiempo_transcurrido} min</span>
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <Clock className={`h-3.5 w-3.5 ${isDelayed ? 'text-red-500 animate-pulse' : 'text-slate-400'}`} />
+                        <span>{pedido.tiempo_transcurrido}m</span>
                     </div>
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-extrabold text-sm text-slate-900 dark:text-slate-50">
                         ${pedido.total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                     </span>
                 </div>
 
                 {/* Products summary */}
-                <div className="space-y-1">
-                    <p className="text-xs font-medium text-gray-700">Productos:</p>
-                    {pedido.productos_resumen.slice(0, 3).map((producto, idx) => (
-                        <p key={idx} className="text-xs text-gray-600">
-                            {producto.cantidad}x {producto.nombre}
-                        </p>
-                    ))}
-                    {pedido.productos_resumen.length > 3 && (
-                        <p className="text-xs text-gray-500">+ {pedido.productos_resumen.length - 3} más...</p>
-                    )}
+                <div className="space-y-1.5 rounded-2xl bg-slate-50/50 border border-slate-100/60 p-3 dark:bg-slate-900/40 dark:border-slate-850">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Productos</p>
+                    <div className="space-y-1">
+                        {pedido.productos_resumen.slice(0, 3).map((producto, idx) => (
+                            <p key={idx} className="text-xs font-semibold text-slate-650 dark:text-slate-300 flex items-center justify-between">
+                                <span className="truncate">{producto.nombre}</span>
+                                <span className="shrink-0 font-bold text-slate-500 dark:text-slate-400 bg-slate-100/60 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-[10px] ml-1">x{producto.cantidad}</span>
+                            </p>
+                        ))}
+                        {pedido.productos_resumen.length > 3 && (
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 pt-0.5 italic">
+                                + {pedido.productos_resumen.length - 3} más...
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 {/* Actions */}
@@ -181,12 +194,12 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
                             onValueChange={(value) => onCambiarEstado(pedido.id, value)}
                             disabled={isUpdating}
                         >
-                            <SelectTrigger className="h-8 text-xs">
+                            <SelectTrigger className="h-9 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 text-xs font-semibold">
                                 <SelectValue placeholder="Cambiar estado" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="rounded-xl">
                                 {availableTransitions.map((estado) => (
-                                    <SelectItem key={estado} value={estado}>
+                                    <SelectItem key={estado} value={estado} className="text-xs font-medium rounded-lg">
                                         {estadoLabels[estado] || estado}
                                     </SelectItem>
                                 ))}
@@ -197,10 +210,10 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 w-full text-xs"
+                        className="h-9 w-full rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-900/80 text-xs font-bold gap-1"
                         onClick={() => (window.location.href = `/pedidos/${pedido.id}`)}
                     >
-                        <Eye className="mr-1 h-3 w-3" />
+                        <Eye className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                         Ver detalle
                     </Button>
                 </div>

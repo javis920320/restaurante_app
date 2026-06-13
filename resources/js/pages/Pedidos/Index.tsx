@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminPedidos } from '@/hooks/useAdminPedidos';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle2, ChefHat, Clock3, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search, X } from 'lucide-react';
+import { CheckCircle2, ChefHat, Clock3, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search, Table, X } from 'lucide-react';
 import React from 'react';
 
 const PEDIDOS_VISTA_KEY = 'pedidos:vista';
@@ -31,24 +31,36 @@ const ESTADO_FILTER_OPTIONS = [
     { value: 'pagado', label: 'Pagados' },
     { value: 'cancelado', label: 'Cancelados' },
 ] as const;
+
+const FECHA_FILTER_OPTIONS = [
+    { value: 'all', label: 'Todas' },
+    { value: 'hoy', label: 'Hoy' },
+    { value: 'ayer', label: 'Ayer' },
+    { value: 'semana', label: 'Últimos 7 días' },
+] as const;
+
 type EstadoFilter = (typeof ESTADO_FILTER_OPTIONS)[number]['value'];
+type FechaFilter = (typeof FECHA_FILTER_OPTIONS)[number]['value'];
 
 interface PageProps {
     filters?: {
         estado?: string;
         mesa_id?: number;
+        fecha?: 'hoy' | 'ayer' | 'semana';
     };
 }
 
 export default function Index({ filters }: PageProps) {
     const [filtroEstado, setFiltroEstado] = React.useState<EstadoFilter>((filters?.estado as EstadoFilter) || 'all');
     const [busqueda, setBusqueda] = React.useState('');
-    const [vista, setVista] = React.useState<'lista' | 'kanban'>(() => {
+    const [vista, setVista] = React.useState<'lista' | 'kanban' | 'tabla'>(() => {
         if (typeof window === 'undefined') return 'lista';
         const saved = window.localStorage.getItem(PEDIDOS_VISTA_KEY);
-        return saved === 'kanban' ? 'kanban' : 'lista';
+        return saved === 'kanban' || saved === 'tabla' ? saved : 'lista';
     });
     const [areaKanban, setAreaKanban] = React.useState<'kitchen' | 'bar'>('kitchen');
+    const [fechaFiltro, setFechaFiltro] = React.useState<FechaFilter>((filters?.fecha as FechaFilter) || 'all');
+    const [pagina, setPagina] = React.useState<number>(1);
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -56,8 +68,14 @@ export default function Index({ filters }: PageProps) {
         }
     }, [vista]);
 
-    const { pedidos, loading, error, refetch, cambiarEstado } = useAdminPedidos({
+    React.useEffect(() => {
+        setPagina(1);
+    }, [filtroEstado, busqueda, fechaFiltro]);
+
+    const { pedidos, loading, error, refetch, cambiarEstado, currentPage, lastPage, total } = useAdminPedidos({
         estado: filtroEstado !== 'all' ? filtroEstado : undefined,
+        fecha: fechaFiltro !== 'all' ? fechaFiltro : undefined,
+        page: pagina,
     });
 
     const handleCambiarEstado = async (pedidoId: number, nuevoEstado: string) => {
@@ -85,6 +103,9 @@ export default function Index({ filters }: PageProps) {
             return searchableValues.some((value) => value.toLowerCase().includes(term));
         });
     }, [pedidos, busqueda, filtroEstado]);
+
+    const paginaActual = currentPage;
+    const paginasTotales = lastPage;
 
     const pedidosPorEstado = React.useMemo(() => {
         return ESTADOS_ORDEN.reduce(
@@ -250,7 +271,7 @@ export default function Index({ filters }: PageProps) {
                     </div>
                 )}
 
-                {vista === 'lista' && (
+                {(vista === 'lista' || vista === 'tabla') && (
                     <>
                         <div className="space-y-4 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
                             <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -272,32 +293,53 @@ export default function Index({ filters }: PageProps) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="border-t border-slate-200/50 pt-2 dark:border-slate-800/50">
-                                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por estado</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {ESTADO_FILTER_OPTIONS.map((estado) => (
-                                        <button
-                                            key={estado.value}
-                                            onClick={() => setFiltroEstado(estado.value)}
-                                            className={`rounded-xl border px-3 py-1.5 text-xs transition ${
-                                                filtroEstado === estado.value
-                                                    ? 'border-indigo-600 bg-indigo-600 font-semibold text-white shadow-xs shadow-indigo-100 dark:shadow-none'
-                                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
-                                            }`}
-                                        >
-                                            {estado.label}
-                                        </button>
-                                    ))}
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div>
+                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por estado</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {ESTADO_FILTER_OPTIONS.map((estado) => (
+                                            <button
+                                                key={estado.value}
+                                                onClick={() => setFiltroEstado(estado.value)}
+                                                className={`rounded-xl border px-3 py-1.5 text-xs transition ${
+                                                    filtroEstado === estado.value
+                                                        ? 'border-indigo-600 bg-indigo-600 font-semibold text-white shadow-xs shadow-indigo-100 dark:shadow-none'
+                                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
+                                                }`}
+                                            >
+                                                {estado.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div>
+                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por fecha</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {FECHA_FILTER_OPTIONS.map((fecha) => (
+                                            <button
+                                                key={fecha.value}
+                                                onClick={() => setFechaFiltro(fecha.value)}
+                                                className={`rounded-xl border px-3 py-1.5 text-xs transition ${
+                                                    fechaFiltro === fecha.value
+                                                        ? 'border-indigo-600 bg-indigo-600 font-semibold text-white shadow-xs shadow-indigo-100 dark:shadow-none'
+                                                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
+                                                }`}
+                                            >
+                                                {fecha.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/50 pt-2 text-xs text-slate-500 dark:border-slate-800/50 dark:text-slate-400">
                                 <span>{pedidosFiltrados.length} pedido(s) visibles</span>
-                                {(filtroEstado !== 'all' || busqueda) && (
+                                {(filtroEstado !== 'all' || busqueda || fechaFiltro !== 'all') && (
                                     <button
                                         onClick={() => {
                                             setFiltroEstado('all');
                                             setBusqueda('');
+                                            setFechaFiltro('all');
                                         }}
                                         className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
                                     >
@@ -325,7 +367,47 @@ export default function Index({ filters }: PageProps) {
 
                         {!loading && pedidosFiltrados.length > 0 && (
                             <div className="space-y-8">
-                                {filtroEstado === 'all' ? (
+                                {vista === 'tabla' ? (
+                                    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                                        <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                                            <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.2em] text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                                                <tr>
+                                                    <th className="px-4 py-3">Pedido</th>
+                                                    <th className="px-4 py-3">Mesa</th>
+                                                    <th className="px-4 py-3">Cliente</th>
+                                                    <th className="px-4 py-3">Estado</th>
+                                                    <th className="px-4 py-3">Total</th>
+                                                    <th className="px-4 py-3">Fecha</th>
+                                                    <th className="px-4 py-3">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-950">
+                                                {pedidosFiltrados.map((pedido) => (
+                                                    <tr key={pedido.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                                                        <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">#{pedido.id}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{pedido.mesa?.nombre ?? `Mesa ${pedido.mesa_id}`}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{pedido.cliente ?? '-'}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                                                            <Badge variant="secondary" className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase">
+                                                                {ESTADOS_LABELS[pedido.estado] ?? pedido.estado}
+                                                            </Badge>
+                                                        </td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">${pedido.total.toFixed(2)}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{new Date(pedido.created_at).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                                                        <td className="px-4 py-4">
+                                                            <Link
+                                                                href={`/pedidos/${pedido.id}`}
+                                                                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                                                            >
+                                                                Ver
+                                                            </Link>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : filtroEstado === 'all' ? (
                                     <>
                                         {ESTADOS_ORDEN.map((estado) => {
                                             const pedidosEstado = pedidosPorEstado[estado];
@@ -386,6 +468,23 @@ export default function Index({ filters }: PageProps) {
                                         Ver todos los pedidos
                                     </Button>
                                 )}
+                            </div>
+                        )}
+
+                        {paginasTotales > 1 && (
+                            <div className="flex flex-wrap items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
+                                <span className="mr-2 text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Página</span>
+                                {Array.from({ length: paginasTotales }, (_, index) => index + 1).map((page) => (
+                                    <Button
+                                        key={page}
+                                        variant={page === paginaActual ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => setPagina(page)}
+                                    >
+                                        {page}
+                                    </Button>
+                                ))}
+                                <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">de {paginasTotales} • {total} pedidos</span>
                             </div>
                         )}
                     </>

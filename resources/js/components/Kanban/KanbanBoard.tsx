@@ -18,10 +18,10 @@ interface KanbanBoardProps {
 }
 
 const COLUMNS: { status: ItemStatus; label: string; dotColor: string }[] = [
-    { status: 'pendiente', label: 'Pendiente', dotColor: 'bg-gray-400' },
-    { status: 'en_preparacion', label: 'En Preparación', dotColor: 'bg-blue-500' },
-    { status: 'listo', label: 'Listo', dotColor: 'bg-green-500' },
-    { status: 'entregado', label: 'Entregado', dotColor: 'bg-purple-500' },
+    { status: 'pendiente', label: 'Pendiente', dotColor: 'bg-slate-400' },
+    { status: 'en_preparacion', label: 'En Preparación', dotColor: 'bg-amber-500' },
+    { status: 'listo', label: 'Listo', dotColor: 'bg-emerald-500' },
+    { status: 'entregado', label: 'Entregado', dotColor: 'bg-blue-500' },
 ];
 
 export default function KanbanBoard({ area, title, pollingInterval = 10 }: KanbanBoardProps) {

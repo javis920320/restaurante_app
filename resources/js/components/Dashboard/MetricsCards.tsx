@@ -47,50 +47,50 @@ export function MetricsCards({ metrics, loading }: MetricsCardsProps) {
             title: 'Pedidos Pendientes',
             value: metrics.pedidos_pendientes,
             icon: AlertCircle,
-            color: 'text-yellow-600',
-            bgColor: 'bg-yellow-50',
+            color: 'text-amber-600 dark:text-amber-400',
+            bgColor: 'bg-amber-50 dark:bg-amber-500/10 border-amber-100/50 dark:border-amber-500/20',
         },
         {
             title: 'En Preparación',
             value: metrics.pedidos_en_preparacion,
             icon: Clock,
-            color: 'text-blue-600',
-            bgColor: 'bg-blue-50',
+            color: 'text-blue-600 dark:text-blue-400',
+            bgColor: 'bg-blue-50 dark:bg-blue-500/10 border-blue-100/50 dark:border-blue-500/20',
         },
         {
             title: 'Pedidos Listos',
             value: metrics.pedidos_listos,
             icon: CheckCircle2,
-            color: 'text-green-600',
-            bgColor: 'bg-green-50',
+            color: 'text-emerald-600 dark:text-emerald-400',
+            bgColor: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100/50 dark:border-emerald-500/20',
         },
         {
             title: 'Mesas Ocupadas',
             value: metrics.mesas_ocupadas,
             icon: Users,
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50',
+            color: 'text-purple-600 dark:text-purple-400',
+            bgColor: 'bg-purple-50 dark:bg-purple-500/10 border-purple-100/50 dark:border-purple-500/20',
         },
         {
             title: 'Mesas Libres',
             value: metrics.mesas_libres,
             icon: ShoppingBag,
-            color: 'text-gray-600',
-            bgColor: 'bg-gray-50',
+            color: 'text-slate-600 dark:text-slate-450',
+            bgColor: 'bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700/50',
         },
         {
             title: 'Ventas del Día',
             value: `$${metrics.ventas_dia.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
             icon: DollarSign,
-            color: 'text-green-600',
-            bgColor: 'bg-green-50',
+            color: 'text-emerald-600 dark:text-emerald-400',
+            bgColor: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100/50 dark:border-emerald-500/20',
         },
         {
             title: 'Ticket Promedio',
             value: `$${metrics.ticket_promedio.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
             icon: TrendingUp,
-            color: 'text-indigo-600',
-            bgColor: 'bg-indigo-50',
+            color: 'text-indigo-600 dark:text-indigo-400',
+            bgColor: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100/50 dark:border-indigo-500/20',
         },
     ];
 
@@ -99,15 +99,15 @@ export function MetricsCards({ metrics, loading }: MetricsCardsProps) {
             {cards.map((card, index) => {
                 const Icon = card.icon;
                 return (
-                    <Card key={index}>
+                    <Card key={index} className="shadow-sm border-slate-100 hover:shadow-md transition-shadow duration-300 dark:border-slate-800 dark:bg-slate-950">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                            <div className={`rounded-full p-2 ${card.bgColor}`}>
-                                <Icon className={`h-4 w-4 ${card.color}`} />
+                            <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400">{card.title}</CardTitle>
+                            <div className={`rounded-full p-2 border ${card.bgColor}`}>
+                                <Icon className={`h-4.5 w-4.5 ${card.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{card.value}</div>
+                            <div className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">{card.value}</div>
                         </CardContent>
                     </Card>
                 );

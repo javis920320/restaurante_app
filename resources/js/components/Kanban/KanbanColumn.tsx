@@ -10,17 +10,17 @@ interface KanbanColumnProps {
 }
 
 const COLUMN_BG: Record<ItemStatus, string> = {
-    pendiente: 'bg-gray-100 border-gray-300 dark:bg-gray-900 dark:border-gray-600',
-    en_preparacion: 'bg-blue-50 border-blue-300 dark:bg-blue-950 dark:border-blue-700',
-    listo: 'bg-green-50 border-green-300 dark:bg-green-950 dark:border-green-700',
-    entregado: 'bg-purple-50 border-purple-300 dark:bg-purple-950 dark:border-purple-700',
+    pendiente: 'bg-slate-100/70 border-slate-200 dark:bg-slate-900/40 dark:border-slate-800',
+    en_preparacion: 'bg-amber-50/70 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30',
+    listo: 'bg-emerald-50/70 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30',
+    entregado: 'bg-blue-50/40 border-blue-200 dark:bg-blue-950/10 dark:border-blue-900/20',
 };
 
 const BADGE_COLORS: Record<ItemStatus, string> = {
-    pendiente: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
-    en_preparacion: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200',
-    listo: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200',
-    entregado: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200',
+    pendiente: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
+    en_preparacion: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+    listo: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
+    entregado: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
 };
 
 export default function KanbanColumn({ status, label, cards, dotColor }: KanbanColumnProps) {

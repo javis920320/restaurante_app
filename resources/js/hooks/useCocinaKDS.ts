@@ -42,6 +42,7 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
     const [actionError, setActionError] = useState<string | null>(null);
     const [refreshKey, setRefreshKey] = useState<number>(0);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const isFirstLoad = useRef(true);
 
     const refetch = useCallback(() => {
         setRefreshKey((prev) => prev + 1);
@@ -61,7 +62,10 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
             }
         };
 
-        setLoading(true);
+        if (isFirstLoad.current) {
+            setLoading(true);
+            isFirstLoad.current = false;
+        }
         fetchPedidos();
 
         intervalRef.current = setInterval(fetchPedidos, pollingInterval * 1000);
