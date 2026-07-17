@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { isAxiosError } from 'axios';
 import api from '@/services/api';
+import { isAxiosError } from 'axios';
+import { useEffect, useState } from 'react';
 
 interface VentaPorHora {
     hora: number;

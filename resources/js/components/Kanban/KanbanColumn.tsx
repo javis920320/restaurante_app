@@ -1,4 +1,4 @@
-import { type KanbanCard as KanbanCardType, type ItemStatus } from '@/hooks/useKanbanItems';
+import { type ItemStatus, type KanbanCard as KanbanCardType } from '@/hooks/useKanbanItems';
 import { useDroppable } from '@dnd-kit/core';
 import KanbanCard from './KanbanCard';
 
@@ -29,16 +29,12 @@ export default function KanbanColumn({ status, label, cards, dotColor }: KanbanC
     return (
         <div className="flex w-72 shrink-0 flex-col">
             {/* Column header */}
-            <div
-                className={`mb-2 flex items-center justify-between rounded-t-lg border px-3 py-2 ${COLUMN_BG[status]}`}
-            >
+            <div className={`mb-2 flex items-center justify-between rounded-t-lg border px-3 py-2 ${COLUMN_BG[status]}`}>
                 <div className="flex items-center gap-2">
                     <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
                     <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{label}</h3>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_COLORS[status]}`}>
-                    {cards.length}
-                </span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${BADGE_COLORS[status]}`}>{cards.length}</span>
             </div>
 
             {/* Droppable area */}

@@ -120,7 +120,9 @@ export default function CarritoSidebar({ qrToken, showAsModal = false, onClose }
                     {showConfirmacion ? (
                         <div className="space-y-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950">
                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">¿Confirmar pedido?</p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">Se enviará tu pedido a la cocina con {cantidadTotal} producto(s)</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                Se enviará tu pedido a la cocina con {cantidadTotal} producto(s)
+                            </p>
                             <div className="flex gap-2">
                                 <Button onClick={handleConfirmarPedido} disabled={loading} className="flex-1">
                                     {loading ? (

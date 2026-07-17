@@ -1,16 +1,16 @@
+import { KanbanBoard } from '@/components/Kanban';
+import PagoBadge from '@/components/Pedidos/PagoBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { KanbanBoard } from '@/components/Kanban';
-import PagoBadge from '@/components/Pedidos/PagoBadge';
 import { useCocinaKDS, type PedidoCocina } from '@/hooks/useCocinaKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Check, CheckCircle2, ChefHat, Clock, Kanban, LayoutList, Lock, Play, RefreshCw } from 'lucide-react';
-import { ChangeEvent, useState, useEffect, useMemo } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 const COCINA_VISTA_KEY = 'cocina:vista';
 
@@ -83,7 +83,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
             <Head title="Panel de Cocina" />
 
             <div className="min-h-screen space-y-6 p-6">
-                <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between pb-6 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex flex-col gap-6 border-b border-slate-200 pb-6 xl:flex-row xl:items-start xl:justify-between dark:border-slate-800">
                     <div className="flex items-start gap-4">
                         <div className="rounded-3xl bg-orange-600 p-4 shadow-lg shadow-orange-950/20">
                             <ChefHat className="h-7 w-7 text-white" />
@@ -91,7 +91,8 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                         <div>
                             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">Panel de Cocina</h1>
                             <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
-                                Visualiza los pedidos en curso, filtra por estado y mueve los platillos entre preparación y listo con una experiencia más ordenada.
+                                Visualiza los pedidos en curso, filtra por estado y mueve los platillos entre preparación y listo con una experiencia
+                                más ordenada.
                             </p>
                             {requirePaymentBeforePreparation && (
                                 <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-50/70 px-3 py-1 text-sm text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-300">
@@ -103,7 +104,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                     </div>
 
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 shadow-sm overflow-hidden">
+                        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
                             <button
                                 onClick={() => setVista('kds')}
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold transition ${
@@ -142,46 +143,48 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <Card className="border-orange-100 bg-orange-50/80 dark:border-orange-950/20 dark:bg-orange-950/10">
                         <CardContent className="p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Pedidos activos</p>
+                            <p className="text-xs font-semibold tracking-[0.16em] text-orange-600 uppercase">Pedidos activos</p>
                             <p className="text-3xl font-black text-slate-950 dark:text-white">{totalPedidos}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pedidos visibles en el tablero</p>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pedidos visibles en el tablero</p>
                         </CardContent>
                     </Card>
                     <Card className="border-yellow-100 bg-yellow-50/80 dark:border-yellow-950/20 dark:bg-yellow-950/10">
                         <CardContent className="p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-yellow-700">Pendientes</p>
+                            <p className="text-xs font-semibold tracking-[0.16em] text-yellow-700 uppercase">Pendientes</p>
                             <p className="text-3xl font-black text-slate-950 dark:text-white">{pendientes.length}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pedidos nuevos y confirmados</p>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pedidos nuevos y confirmados</p>
                         </CardContent>
                     </Card>
                     <Card className="border-sky-100 bg-sky-50/80 dark:border-sky-950/20 dark:bg-sky-950/10">
                         <CardContent className="p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">En preparación</p>
+                            <p className="text-xs font-semibold tracking-[0.16em] text-sky-700 uppercase">En preparación</p>
                             <p className="text-3xl font-black text-slate-950 dark:text-white">{enPreparacion.length}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pedidos en curso</p>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pedidos en curso</p>
                         </CardContent>
                     </Card>
                     <Card className="border-rose-100 bg-rose-50/80 dark:border-rose-950/20 dark:bg-rose-950/10">
                         <CardContent className="p-4">
-                            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-rose-700">Retrasados</p>
+                            <p className="text-xs font-semibold tracking-[0.16em] text-rose-700 uppercase">Retrasados</p>
                             <p className="text-3xl font-black text-slate-950 dark:text-white">{retrasados.length}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pedidos con tiempo elevado</p>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pedidos con tiempo elevado</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
-                    <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr] items-center">
+                    <div className="grid items-center gap-4 lg:grid-cols-[1.5fr_1fr]">
                         <div>
-                            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Buscar y filtrar</p>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Encuentra un pedido rápido por mesa, número, producto o nota.</p>
+                            <p className="text-sm font-semibold tracking-[0.18em] text-slate-500 uppercase dark:text-slate-400">Buscar y filtrar</p>
+                            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                                Encuentra un pedido rápido por mesa, número, producto o nota.
+                            </p>
                         </div>
                         <div className="space-y-3">
                             <Input
                                 value={query}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
                                 placeholder="Buscar pedidos por mesa, plato o nota..."
-                                className="h-11 rounded-2xl bg-white text-slate-900 border-slate-200 dark:bg-slate-900 dark:text-white dark:border-slate-700"
+                                className="h-11 rounded-2xl border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                             />
                             <div className="flex flex-wrap gap-2">
                                 {[
@@ -208,17 +211,9 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                     </div>
                 </div>
 
-                {error && (
-                    <div className="rounded-2xl border border-rose-500 bg-rose-50/80 p-4 text-rose-700">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="rounded-2xl border border-rose-500 bg-rose-50/80 p-4 text-rose-700">{error}</div>}
 
-                {actionError && (
-                    <div className="rounded-2xl border border-amber-500 bg-amber-50/80 p-4 text-amber-800">
-                        {actionError}
-                    </div>
-                )}
+                {actionError && <div className="rounded-2xl border border-amber-500 bg-amber-50/80 p-4 text-amber-800">{actionError}</div>}
 
                 {vista === 'kanban' && (
                     <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
@@ -237,15 +232,15 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                         ) : (
                             <div className="grid gap-6 lg:grid-cols-2">
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-50/80 to-transparent p-4 dark:border-amber-900/30 dark:from-amber-950/20 shadow-sm">
+                                    <div className="flex items-center justify-between rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-50/80 to-transparent p-4 shadow-sm dark:border-amber-900/30 dark:from-amber-950/20">
                                         <div className="flex items-center gap-2.5">
                                             <span className="relative flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                                                <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-500"></span>
                                             </span>
                                             <h2 className="text-lg font-bold text-slate-950 dark:text-white">Nuevos Pedidos</h2>
                                         </div>
-                                        <Badge className="rounded-2xl bg-amber-500 px-3 py-1 font-extrabold text-white dark:bg-amber-600 shadow-sm shadow-amber-500/10">
+                                        <Badge className="rounded-2xl bg-amber-500 px-3 py-1 font-extrabold text-white shadow-sm shadow-amber-500/10 dark:bg-amber-600">
                                             {pendientes.length}
                                         </Badge>
                                     </div>
@@ -270,12 +265,12 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-50/80 to-transparent p-4 dark:border-sky-900/30 dark:from-sky-950/20 shadow-sm">
+                                    <div className="flex items-center justify-between rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-50/80 to-transparent p-4 shadow-sm dark:border-sky-900/30 dark:from-sky-950/20">
                                         <div className="flex items-center gap-2.5">
-                                            <ChefHat className="h-5 w-5 text-sky-600 dark:text-sky-400 animate-bounce" />
+                                            <ChefHat className="h-5 w-5 animate-bounce text-sky-600 dark:text-sky-400" />
                                             <h2 className="text-lg font-bold text-slate-950 dark:text-white">En Preparación</h2>
                                         </div>
-                                        <Badge className="rounded-2xl bg-sky-600 px-3 py-1 font-extrabold text-white dark:bg-sky-500 shadow-sm shadow-sky-500/10">
+                                        <Badge className="rounded-2xl bg-sky-600 px-3 py-1 font-extrabold text-white shadow-sm shadow-sky-500/10 dark:bg-sky-500">
                                             {enPreparacion.length}
                                         </Badge>
                                     </div>
@@ -344,13 +339,13 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
 
     return (
         <div
-            className={`rounded-3xl border p-6 transition-all duration-300 shadow-md hover:shadow-lg ${
+            className={`rounded-3xl border p-6 shadow-md transition-all duration-300 hover:shadow-lg ${
                 isBlocked
-                    ? 'border-slate-200 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/50 opacity-90'
+                    ? 'border-slate-200 bg-slate-50/80 opacity-90 dark:border-slate-800 dark:bg-slate-900/50'
                     : isCritical
-                      ? 'border-red-300 bg-gradient-to-b from-red-50/50 to-white dark:border-red-950/30 dark:from-red-950/10 dark:to-slate-950 shadow-red-500/5'
+                      ? 'border-red-300 bg-gradient-to-b from-red-50/50 to-white shadow-red-500/5 dark:border-red-950/30 dark:from-red-950/10 dark:to-slate-950'
                       : isDelayed
-                        ? 'border-amber-300 bg-gradient-to-b from-amber-50/50 to-white dark:border-amber-950/30 dark:from-amber-950/10 dark:to-slate-950 shadow-amber-500/5'
+                        ? 'border-amber-300 bg-gradient-to-b from-amber-50/50 to-white shadow-amber-500/5 dark:border-amber-950/30 dark:from-amber-950/10 dark:to-slate-950'
                         : 'border-slate-200 bg-white dark:border-slate-800/80 dark:bg-slate-950'
             }`}
         >
@@ -359,36 +354,38 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
                     <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                         Pedido <span className="text-orange-600 dark:text-orange-500">#{pedido.id}</span>
                     </h3>
-                    <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
-                        Mesa: <span className="text-slate-700 dark:text-slate-300 font-bold">{pedido.mesa_nombre}</span>
+                    <p className="mt-1 text-xs font-semibold tracking-widest text-slate-400 uppercase dark:text-slate-500">
+                        Mesa: <span className="font-bold text-slate-700 dark:text-slate-300">{pedido.mesa_nombre}</span>
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                         <PagoBadge payment_status={pedido.payment_status} />
                         {isBlocked && (
-                            <Badge className="rounded-full bg-slate-200 text-slate-700 border border-slate-300/50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-750 px-2 py-0.5 text-[10px] font-bold">
+                            <Badge className="dark:border-slate-750 rounded-full border border-slate-300/50 bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                                 <Lock className="mr-1 h-3.5 w-3.5" />
                                 Esperando Pago
                             </Badge>
                         )}
                     </div>
                 </div>
-                
+
                 <div className="flex flex-col items-start gap-2 sm:items-end">
                     <div
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black border transition-colors ${
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-black transition-colors ${
                             isCritical
-                                ? 'bg-red-500/10 text-red-500 border-red-500/25'
+                                ? 'border-red-500/25 bg-red-500/10 text-red-500'
                                 : isDelayed
-                                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25'
-                                  : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800'
+                                  ? 'border-amber-500/25 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                  : 'border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300'
                         }`}
                     >
                         <Clock className={`h-3.5 w-3.5 ${isDelayed || isCritical ? 'animate-pulse' : ''}`} />
                         <span>{pedido.tiempo_transcurrido}m</span>
                         {(isDelayed || isCritical) && !isBlocked && (
                             <span className="relative flex h-2 w-2">
-                                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-400' : 'bg-amber-400'}`}></span>
-                                <span className={`relative inline-flex rounded-full h-2 w-2 ${isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
+                                <span
+                                    className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${isCritical ? 'bg-red-400' : 'bg-amber-400'}`}
+                                ></span>
+                                <span className={`relative inline-flex h-2 w-2 rounded-full ${isCritical ? 'bg-red-500' : 'bg-amber-500'}`}></span>
                             </span>
                         )}
                     </div>
@@ -400,43 +397,45 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
                 {pedido.productos.map((producto, idx) => {
                     const isDone = producto.estado === 'listo';
                     const isPrep = producto.estado === 'en_preparacion';
-                    
+
                     return (
                         <div
                             key={idx}
-                            className={`flex items-start justify-between rounded-2xl p-3 border transition-all duration-200 ${
+                            className={`flex items-start justify-between rounded-2xl border p-3 transition-all duration-200 ${
                                 isDone
-                                    ? 'bg-slate-50/30 border-slate-100/50 dark:bg-slate-950/20 dark:border-slate-900/30 opacity-60'
+                                    ? 'border-slate-100/50 bg-slate-50/30 opacity-60 dark:border-slate-900/30 dark:bg-slate-950/20'
                                     : isPrep
-                                      ? 'bg-blue-500/5 border-blue-100 dark:bg-blue-950/10 dark:border-blue-900/30 shadow-sm shadow-blue-500/2'
-                                      : 'bg-slate-50/70 border-slate-100 dark:bg-slate-900/60 dark:border-slate-800/50'
+                                      ? 'border-blue-100 bg-blue-500/5 shadow-sm shadow-blue-500/2 dark:border-blue-900/30 dark:bg-blue-950/10'
+                                      : 'border-slate-100 bg-slate-50/70 dark:border-slate-800/50 dark:bg-slate-900/60'
                             }`}
                         >
                             <div className="flex items-center gap-3">
-                                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-black border transition-colors ${
-                                    isDone
-                                        ? 'bg-slate-100 text-slate-400 border-slate-200/45 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-800/40'
-                                        : 'bg-orange-100 text-orange-700 border-orange-200/50 dark:bg-orange-950/45 dark:text-orange-300 dark:border-orange-900/30'
-                                }`}>
+                                <span
+                                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border text-xs font-black transition-colors ${
+                                        isDone
+                                            ? 'border-slate-200/45 bg-slate-100 text-slate-400 dark:border-slate-800/40 dark:bg-slate-900 dark:text-slate-600'
+                                            : 'border-orange-200/50 bg-orange-100 text-orange-700 dark:border-orange-900/30 dark:bg-orange-950/45 dark:text-orange-300'
+                                    }`}
+                                >
                                     {producto.cantidad}x
                                 </span>
                                 <div className="min-w-0">
-                                    <p className={`font-semibold text-sm leading-tight text-slate-800 dark:text-slate-100 ${isDone ? 'line-through text-slate-400 dark:text-slate-650' : ''}`}>
+                                    <p
+                                        className={`text-sm leading-tight font-semibold text-slate-800 dark:text-slate-100 ${isDone ? 'dark:text-slate-650 text-slate-400 line-through' : ''}`}
+                                    >
                                         {producto.nombre}
                                     </p>
                                     {producto.notas && (
-                                        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium italic">
-                                            📝 {producto.notas}
-                                        </p>
+                                        <p className="mt-1 text-xs font-medium text-amber-600 italic dark:text-amber-400">📝 {producto.notas}</p>
                                     )}
                                     <div className="mt-1.5">
                                         <span
-                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide border ${
+                                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${
                                                 isDone
-                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                                    ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600'
                                                     : isPrep
-                                                      ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-                                                      : 'bg-slate-100 text-slate-500 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400'
+                                                      ? 'border-blue-500/20 bg-blue-500/10 text-blue-600'
+                                                      : 'border-slate-200/60 bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
                                             }`}
                                         >
                                             {isDone ? (
@@ -466,10 +465,10 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
 
             {/* Order notes */}
             {pedido.notas && (
-                <div className="mb-5 rounded-2xl border border-amber-200/40 bg-amber-50/40 p-3 dark:border-amber-950/30 dark:bg-amber-950/15 flex gap-2 text-xs items-start">
-                    <span className="text-amber-500 dark:text-amber-400 text-sm">📋</span>
-                    <div className="text-amber-800 dark:text-amber-300 leading-normal font-medium">
-                        <span className="font-bold uppercase tracking-wider text-[9px] block mb-0.5 text-amber-500">Nota del Pedido</span>
+                <div className="mb-5 flex items-start gap-2 rounded-2xl border border-amber-200/40 bg-amber-50/40 p-3 text-xs dark:border-amber-950/30 dark:bg-amber-950/15">
+                    <span className="text-sm text-amber-500 dark:text-amber-400">📋</span>
+                    <div className="leading-normal font-medium text-amber-800 dark:text-amber-300">
+                        <span className="mb-0.5 block text-[9px] font-bold tracking-wider text-amber-500 uppercase">Nota del Pedido</span>
                         {pedido.notas}
                     </div>
                 </div>
@@ -477,7 +476,7 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
 
             {/* Action button */}
             {isBlocked ? (
-                <div className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 py-3.5 text-sm font-bold text-slate-400 dark:bg-slate-900/60 dark:text-slate-600 border border-slate-200 dark:border-slate-800">
+                <div className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-100 py-3.5 text-sm font-bold text-slate-400 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-600">
                     <Lock className="h-4 w-4" />
                     Pendiente de pago en caja
                 </div>
@@ -485,7 +484,7 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
                 <button
                     onClick={handleAccion}
                     disabled={isUpdating}
-                    className={`flex items-center justify-center gap-2 w-full rounded-2xl py-3.5 text-sm font-extrabold text-white transition-all shadow-md active:scale-[0.98] ${accionColor} hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50`}
+                    className={`flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-extrabold text-white shadow-md transition-all active:scale-[0.98] ${accionColor} hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                     {isUpdating ? (
                         <>
@@ -494,11 +493,7 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
                         </>
                     ) : (
                         <>
-                            {accionLabel.includes('Iniciar') ? (
-                                <Play className="h-4 w-4 fill-current" />
-                            ) : (
-                                <Check className="h-4 w-4 stroke-[3]" />
-                            )}
+                            {accionLabel.includes('Iniciar') ? <Play className="h-4 w-4 fill-current" /> : <Check className="h-4 w-4 stroke-[3]" />}
                             <span>{accionLabel.replace(/^[▶✓]\s*/, '')}</span>
                         </>
                     )}
@@ -507,4 +502,3 @@ function PedidoKDSCard({ pedido, onAccion, accionLabel, accionColor, requirePaym
         </div>
     );
 }
-

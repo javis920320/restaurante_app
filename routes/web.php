@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $menu = \App\Models\Menu::where('estado', 'publicado')->first();
+    return Inertia::render('welcome', [
+        'menuSlug' => $menu ? $menu->slug : null,
+    ]);
 })->name('home');
 
 // Ruta pública del menú QR

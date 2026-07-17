@@ -1,5 +1,5 @@
-import PedidoCard from '@/components/Pedidos/PedidoCard';
 import { KanbanBoard } from '@/components/Kanban';
+import PedidoCard from '@/components/Pedidos/PedidoCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminPedidos } from '@/hooks/useAdminPedidos';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle2, ChefHat, Clock3, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search, Table, X } from 'lucide-react';
+import { CheckCircle2, ChefHat, Clock3, GlassWater, Kanban, LayoutList, Plus, RefreshCw, Search, X } from 'lucide-react';
 import React from 'react';
 
 const PEDIDOS_VISTA_KEY = 'pedidos:vista';
@@ -165,7 +165,10 @@ export default function Index({ filters }: PageProps) {
                                 Kanban
                             </button>
                         </div>
-                        <Button asChild className="h-11 rounded-xl bg-indigo-600 px-5 font-semibold text-white shadow-md shadow-indigo-100 hover:bg-indigo-700 dark:shadow-none">
+                        <Button
+                            asChild
+                            className="h-11 rounded-xl bg-indigo-600 px-5 font-semibold text-white shadow-md shadow-indigo-100 hover:bg-indigo-700 dark:shadow-none"
+                        >
                             <Link href="/pedidos/crear">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Nuevo Pedido
@@ -185,40 +188,42 @@ export default function Index({ filters }: PageProps) {
                                 <LayoutList className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Total pedidos</p>
+                                <p className="text-[11px] font-semibold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
+                                    Total pedidos
+                                </p>
                                 <p className="text-2xl font-black text-slate-900 dark:text-slate-100">{stats.total}</p>
                             </div>
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-amber-150 bg-amber-50/10 p-4 dark:border-amber-950/40 dark:bg-amber-950/10">
+                    <div className="border-amber-150 rounded-2xl border bg-amber-50/10 p-4 dark:border-amber-950/40 dark:bg-amber-950/10">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-amber-100 p-2 dark:bg-amber-900">
                                 <Clock3 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Pendientes</p>
+                                <p className="text-[11px] font-semibold tracking-wider text-amber-600 uppercase dark:text-amber-400">Pendientes</p>
                                 <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{stats.pendientes}</p>
                             </div>
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-blue-150 bg-blue-50/10 p-4 dark:border-blue-950/40 dark:bg-blue-950/10">
+                    <div className="border-blue-150 rounded-2xl border bg-blue-50/10 p-4 dark:border-blue-950/40 dark:bg-blue-950/10">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-blue-100 p-2 dark:bg-blue-900">
                                 <ChefHat className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">En producción</p>
+                                <p className="text-[11px] font-semibold tracking-wider text-blue-600 uppercase dark:text-blue-400">En producción</p>
                                 <p className="text-2xl font-black text-blue-700 dark:text-blue-400">{stats.enProduccion}</p>
                             </div>
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-emerald-150 bg-emerald-50/10 p-4 dark:border-emerald-950/40 dark:bg-emerald-950/10">
+                    <div className="border-emerald-150 rounded-2xl border bg-emerald-50/10 p-4 dark:border-emerald-950/40 dark:bg-emerald-950/10">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-emerald-100 p-2 dark:bg-emerald-900">
                                 <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Listos</p>
+                                <p className="text-[11px] font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">Listos</p>
                                 <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{stats.listos}</p>
                             </div>
                         </div>
@@ -229,7 +234,7 @@ export default function Index({ filters }: PageProps) {
                                 <RefreshCw className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cerrados</p>
+                                <p className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">Cerrados</p>
                                 <p className="text-2xl font-black text-slate-700 dark:text-slate-300">{stats.cerrados}</p>
                             </div>
                         </div>
@@ -239,7 +244,7 @@ export default function Index({ filters }: PageProps) {
                 {vista === 'kanban' && (
                     <div className="space-y-4">
                         <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
-                            <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Seleccionar estación de trabajo</p>
+                            <p className="mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">Seleccionar estación de trabajo</p>
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setAreaKanban('kitchen')}
@@ -277,7 +282,7 @@ export default function Index({ filters }: PageProps) {
                             <div className="flex flex-col gap-4 md:flex-row md:items-center">
                                 <div className="flex-1">
                                     <div className="relative">
-                                        <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute top-3 left-3.5 h-4 w-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             placeholder="Buscar por mesa, pedido o notas..."
@@ -286,7 +291,10 @@ export default function Index({ filters }: PageProps) {
                                             className="h-11 rounded-xl border-slate-200 bg-white pl-10 dark:border-slate-700 dark:bg-slate-950"
                                         />
                                         {busqueda && (
-                                            <button onClick={() => setBusqueda('')} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                                            <button
+                                                onClick={() => setBusqueda('')}
+                                                className="absolute top-3 right-3 text-slate-400 hover:text-slate-600"
+                                            >
                                                 <X className="h-4 w-4" />
                                             </button>
                                         )}
@@ -295,7 +303,7 @@ export default function Index({ filters }: PageProps) {
                             </div>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
-                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por estado</p>
+                                    <p className="mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">Filtrar por estado</p>
                                     <div className="flex flex-wrap gap-1.5">
                                         {ESTADO_FILTER_OPTIONS.map((estado) => (
                                             <button
@@ -313,7 +321,7 @@ export default function Index({ filters }: PageProps) {
                                     </div>
                                 </div>
                                 <div>
-                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Filtrar por fecha</p>
+                                    <p className="mb-2 text-[11px] font-bold tracking-wider text-slate-400 uppercase">Filtrar por fecha</p>
                                     <div className="flex flex-wrap gap-1.5">
                                         {FECHA_FILTER_OPTIONS.map((fecha) => (
                                             <button
@@ -370,7 +378,7 @@ export default function Index({ filters }: PageProps) {
                                 {vista === 'tabla' ? (
                                     <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
                                         <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-                                            <thead className="bg-slate-50 text-left text-xs uppercase tracking-[0.2em] text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                                            <thead className="bg-slate-50 text-left text-xs tracking-[0.2em] text-slate-500 uppercase dark:bg-slate-900 dark:text-slate-400">
                                                 <tr>
                                                     <th className="px-4 py-3">Pedido</th>
                                                     <th className="px-4 py-3">Mesa</th>
@@ -385,15 +393,25 @@ export default function Index({ filters }: PageProps) {
                                                 {pedidosFiltrados.map((pedido) => (
                                                     <tr key={pedido.id} className="hover:bg-slate-50 dark:hover:bg-slate-900">
                                                         <td className="px-4 py-4 font-semibold text-slate-900 dark:text-slate-100">#{pedido.id}</td>
-                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{pedido.mesa?.nombre ?? `Mesa ${pedido.mesa_id}`}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                                                            {pedido.mesa?.nombre ?? `Mesa ${pedido.mesa_id}`}
+                                                        </td>
                                                         <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{pedido.cliente ?? '-'}</td>
                                                         <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                                                            <Badge variant="secondary" className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase">
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase"
+                                                            >
                                                                 {ESTADOS_LABELS[pedido.estado] ?? pedido.estado}
                                                             </Badge>
                                                         </td>
                                                         <td className="px-4 py-4 text-slate-600 dark:text-slate-300">${pedido.total.toFixed(2)}</td>
-                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">{new Date(pedido.created_at).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                                                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                                                            {new Date(pedido.created_at).toLocaleString('es-ES', {
+                                                                dateStyle: 'short',
+                                                                timeStyle: 'short',
+                                                            })}
+                                                        </td>
                                                         <td className="px-4 py-4">
                                                             <Link
                                                                 href={`/pedidos/${pedido.id}`}
@@ -416,7 +434,9 @@ export default function Index({ filters }: PageProps) {
                                             return (
                                                 <section key={estado} className="space-y-4">
                                                     <div className="flex items-center justify-between">
-                                                        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">{ESTADOS_LABELS[estado]}</h2>
+                                                        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                                                            {ESTADOS_LABELS[estado]}
+                                                        </h2>
                                                         <Badge
                                                             variant="secondary"
                                                             className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
@@ -473,7 +493,7 @@ export default function Index({ filters }: PageProps) {
 
                         {paginasTotales > 1 && (
                             <div className="flex flex-wrap items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-                                <span className="mr-2 text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Página</span>
+                                <span className="mr-2 text-xs tracking-[0.2em] text-slate-500 uppercase dark:text-slate-400">Página</span>
                                 {Array.from({ length: paginasTotales }, (_, index) => index + 1).map((page) => (
                                     <Button
                                         key={page}
@@ -484,7 +504,9 @@ export default function Index({ filters }: PageProps) {
                                         {page}
                                     </Button>
                                 ))}
-                                <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">de {paginasTotales} • {total} pedidos</span>
+                                <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
+                                    de {paginasTotales} • {total} pedidos
+                                </span>
                             </div>
                         )}
                     </>

@@ -5,7 +5,6 @@ import ConfiguracionLayout from '@/layouts/configuracion/layout';
 import { BreadcrumbItem, type Mesa } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Table } from 'lucide-react';
-import React from 'react';
 import FormularioMesa from './FormularioMesa';
 
 interface Restaurante {
@@ -32,9 +31,8 @@ export default function Edit({ mesa, restaurantes }: EditProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Editar ${mesa.nombre}`} />
             <ConfiguracionLayout>
-                
                 {/* Header */}
-                <div className="flex items-center gap-4 pb-6 border-b border-slate-100 dark:border-slate-800 mb-6">
+                <div className="mb-6 flex items-center gap-4 border-b border-slate-100 pb-6 dark:border-slate-800">
                     <Button asChild variant="outline" size="sm" className="rounded-xl">
                         <Link href={route('mesas.index')}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -42,23 +40,23 @@ export default function Edit({ mesa, restaurantes }: EditProps) {
                         </Link>
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-155 flex items-center gap-2">
+                        <h1 className="dark:text-gray-155 flex items-center gap-2 text-2xl font-bold text-gray-900">
                             Editar {mesa.nombre} <Table className="h-5 w-5 text-indigo-500" />
                         </h1>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                             Token de mesa: <span className="font-mono text-[10px] text-slate-600 dark:text-slate-400">{mesa.qr_token}</span>
                         </p>
                     </div>
                 </div>
 
                 <div className="max-w-lg">
-                    <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm">
+                    <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
                         <CardHeader>
                             <CardTitle className="text-lg font-bold">Modificar Atributos</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <FormularioMesa 
-                                restaurantes={restaurantes} 
+                            <FormularioMesa
+                                restaurantes={restaurantes}
                                 mesa={mesa}
                                 onSuccess={handleSuccess}
                                 onCancel={() => router.visit(route('mesas.index'))}
@@ -66,7 +64,6 @@ export default function Edit({ mesa, restaurantes }: EditProps) {
                         </CardContent>
                     </Card>
                 </div>
-
             </ConfiguracionLayout>
         </AppLayout>
     );

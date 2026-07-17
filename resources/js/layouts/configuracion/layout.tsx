@@ -70,7 +70,7 @@ export default function ConfiguracionLayout({ children }: PropsWithChildren) {
                     </nav>
                 </aside>
                 <Separator className="my-6 md:hidden" />
-                <div className="flex-1 w-full">
+                <div className="w-full flex-1">
                     <section className="w-full space-y-8">{children}</section>
                 </div>
             </div>

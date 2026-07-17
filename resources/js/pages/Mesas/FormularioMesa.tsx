@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { type Mesa } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { Check, RefreshCw, Table, Users } from 'lucide-react';
 import React from 'react';
-import { Table, Users, Store, Check, RefreshCw, Layers } from 'lucide-react';
 
 interface Restaurante {
     id: number;
@@ -59,9 +59,7 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                 activa: data.activa,
             };
 
-            const respuesta = isEdit
-                ? await axios.put(url, payload)
-                : await axios.post(url, payload);
+            const respuesta = isEdit ? await axios.put(url, payload) : await axios.post(url, payload);
 
             if (respuesta.status === 200 || respuesta.status === 201) {
                 if (!isEdit) reset();
@@ -86,10 +84,10 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                         Nombre de la Mesa
                     </Label>
                     <div className="relative">
-                        <Table className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+                        <Table className="absolute top-2.5 left-3 h-4.5 w-4.5 text-slate-400" />
                         <Input
                             id="nombre"
-                            className="pl-10 h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
+                            className="h-10 rounded-xl border-slate-200 pl-10 focus-visible:ring-indigo-500"
                             placeholder="Ej: Mesa 1, Mesa de Terraza A..."
                             value={data.nombre}
                             onChange={(e) => setData('nombre', e.target.value)}
@@ -100,18 +98,18 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                 </div>
 
                 {/* Fila: Capacidad y Restaurante */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {/* Capacidad */}
                     <div className="space-y-1">
                         <Label htmlFor="capacidad" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             Capacidad (Personas)
                         </Label>
                         <div className="relative">
-                            <Users className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+                            <Users className="absolute top-2.5 left-3 h-4.5 w-4.5 text-slate-400" />
                             <Input
                                 id="capacidad"
                                 type="number"
-                                className="pl-10 h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
+                                className="h-10 rounded-xl border-slate-200 pl-10 focus-visible:ring-indigo-500"
                                 placeholder="4"
                                 value={data.capacidad || ''}
                                 min={1}
@@ -129,15 +127,12 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                             Restaurante
                         </Label>
                         {restaurantes.length === 0 ? (
-                            <div className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-xl border border-amber-200/50">
+                            <div className="rounded-xl border border-amber-200/50 bg-amber-50 px-3 py-2 text-xs text-amber-600 dark:bg-amber-950/20">
                                 No hay locales activos.
                             </div>
                         ) : (
-                            <Select
-                                value={data.restaurante_id}
-                                onValueChange={(value) => setData('restaurante_id', value)}
-                            >
-                                <SelectTrigger id="restaurante_id" className="h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl">
+                            <Select value={data.restaurante_id} onValueChange={(value) => setData('restaurante_id', value)}>
+                                <SelectTrigger id="restaurante_id" className="h-10 rounded-xl border-slate-200 focus-visible:ring-indigo-500">
                                     <SelectValue placeholder="Selecciona local" />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl">
@@ -158,11 +153,8 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                     <Label htmlFor="estado" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                         Estado
                     </Label>
-                    <Select
-                        value={data.estado}
-                        onValueChange={(value) => setData('estado', value as 'disponible' | 'ocupada')}
-                    >
-                        <SelectTrigger id="estado" className="h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl">
+                    <Select value={data.estado} onValueChange={(value) => setData('estado', value as 'disponible' | 'ocupada')}>
+                        <SelectTrigger id="estado" className="h-10 rounded-xl border-slate-200 focus-visible:ring-indigo-500">
                             <SelectValue placeholder="Seleccionar estado" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -174,37 +166,31 @@ export default function FormularioMesa({ restaurantes, mesa, onSuccess, onCancel
                 </div>
 
                 {/* Mesa Activa */}
-                <div className="flex items-center space-x-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800/40">
+                <div className="flex items-center space-x-3 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800/40 dark:bg-slate-900/50">
                     <input
                         type="checkbox"
                         id="activa"
                         checked={data.activa}
                         onChange={(e) => setData('activa', e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <Label htmlFor="activa" className="text-sm text-slate-700 dark:text-slate-350 cursor-pointer font-medium select-none">
+                    <Label htmlFor="activa" className="dark:text-slate-350 cursor-pointer text-sm font-medium text-slate-700 select-none">
                         Habilitar Mesa (Mesa Activa)
                     </Label>
                 </div>
             </div>
 
             {/* Botones de acción */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t">
+            <div className="flex items-center justify-end gap-3 border-t pt-4">
                 {onCancel && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                        disabled={processing}
-                        className="rounded-xl px-4"
-                    >
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={processing} className="rounded-xl px-4">
                         Cancelar
                     </Button>
                 )}
                 <Button
                     type="submit"
                     disabled={processing || restaurantes.length === 0}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-5 shadow-sm shadow-indigo-100"
+                    className="rounded-xl bg-indigo-600 px-5 text-white shadow-sm shadow-indigo-100 hover:bg-indigo-700"
                 >
                     {processing ? (
                         <span className="flex items-center gap-2">

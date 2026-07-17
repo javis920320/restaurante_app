@@ -14,11 +14,9 @@ interface CarritoState {
 }
 
 // Key to uniquely identify a cart item (product + option combination)
-const itemKey = (productoId: number, opcionId?: number) =>
-    opcionId ? `${productoId}-${opcionId}` : `${productoId}`;
+const itemKey = (productoId: number, opcionId?: number) => (opcionId ? `${productoId}-${opcionId}` : `${productoId}`);
 
-const itemPrecio = (item: CarritoItem): number =>
-    Number(item.producto.precio) + Number(item.opcion?.precio_extra ?? 0);
+const itemPrecio = (item: CarritoItem): number => Number(item.producto.precio) + Number(item.opcion?.precio_extra ?? 0);
 
 type CarritoAction =
     | { type: 'AGREGAR_PRODUCTO'; payload: { producto: Producto; notas?: string; opcion?: Opcion } }
@@ -49,9 +47,7 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
     switch (action.type) {
         case 'AGREGAR_PRODUCTO': {
             const key = itemKey(action.payload.producto.id, action.payload.opcion?.id);
-            const existingItemIndex = state.items.findIndex(
-                (item) => itemKey(item.producto.id, item.opcion?.id) === key,
-            );
+            const existingItemIndex = state.items.findIndex((item) => itemKey(item.producto.id, item.opcion?.id) === key);
 
             let newItems: CarritoItem[];
 
@@ -90,9 +86,7 @@ const carritoReducer = (state: CarritoState, action: CarritoAction): CarritoStat
         case 'DISMINUIR_CANTIDAD': {
             const key = itemKey(action.payload.productoId, action.payload.opcionId);
             const newItems = state.items
-                .map((item) =>
-                    itemKey(item.producto.id, item.opcion?.id) === key ? { ...item, cantidad: item.cantidad - 1 } : item,
-                )
+                .map((item) => (itemKey(item.producto.id, item.opcion?.id) === key ? { ...item, cantidad: item.cantidad - 1 } : item))
                 .filter((item) => item.cantidad > 0);
 
             return {

@@ -1,14 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-    AlertCircle,
-    CheckCircle2,
-    Clock,
-    DollarSign,
-    ShoppingBag,
-    TrendingUp,
-    Users,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, DollarSign, ShoppingBag, TrendingUp, Users } from 'lucide-react';
 
 interface MetricsCardsProps {
     metrics: {
@@ -99,10 +91,13 @@ export function MetricsCards({ metrics, loading }: MetricsCardsProps) {
             {cards.map((card, index) => {
                 const Icon = card.icon;
                 return (
-                    <Card key={index} className="shadow-sm border-slate-100 hover:shadow-md transition-shadow duration-300 dark:border-slate-800 dark:bg-slate-950">
+                    <Card
+                        key={index}
+                        className="border-slate-100 shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+                    >
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-semibold text-slate-500 dark:text-slate-400">{card.title}</CardTitle>
-                            <div className={`rounded-full p-2 border ${card.bgColor}`}>
+                            <div className={`rounded-full border p-2 ${card.bgColor}`}>
                                 <Icon className={`h-4.5 w-4.5 ${card.color}`} />
                             </div>
                         </CardHeader>

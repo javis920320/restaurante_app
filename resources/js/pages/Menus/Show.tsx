@@ -40,7 +40,13 @@ export default function MenuShow({ menu: initialMenu }: Props) {
 
     // Plato inline form
     const [platoFormCategoriaId, setPlatoFormCategoriaId] = useState<number | null>(null);
-    const [nuevoPlato, setNuevoPlato] = useState({ nombre: '', precio: '', descripcion: '', stock: '', production_area: 'none' as 'none' | 'kitchen' | 'bar' });
+    const [nuevoPlato, setNuevoPlato] = useState({
+        nombre: '',
+        precio: '',
+        descripcion: '',
+        stock: '',
+        production_area: 'none' as 'none' | 'kitchen' | 'bar',
+    });
     const [platoError, setPlatoError] = useState('');
     const [savingPlato, setSavingPlato] = useState(false);
 
@@ -130,9 +136,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                 production_area: nuevoPlato.production_area,
             });
             const platoNuevo: Plato = response.data.plato;
-            setCategorias((prev) =>
-                prev.map((c) => (c.id === categoriaId ? { ...c, platos: [...(c.platos ?? []), platoNuevo] } : c)),
-            );
+            setCategorias((prev) => prev.map((c) => (c.id === categoriaId ? { ...c, platos: [...(c.platos ?? []), platoNuevo] } : c)));
             setNuevoPlato({ nombre: '', precio: '', descripcion: '', stock: '', production_area: 'none' });
             setPlatoFormCategoriaId(null);
         } catch (error: unknown) {
@@ -148,9 +152,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
         if (!confirm('¿Eliminar este producto?')) return;
         try {
             await axios.delete(route('platos.destroy', platoId));
-            setCategorias((prev) =>
-                prev.map((c) => (c.id === categoriaId ? { ...c, platos: (c.platos ?? []).filter((p) => p.id !== platoId) } : c)),
-            );
+            setCategorias((prev) => prev.map((c) => (c.id === categoriaId ? { ...c, platos: (c.platos ?? []).filter((p) => p.id !== platoId) } : c)));
         } catch (error) {
             console.error(error);
         }
@@ -179,11 +181,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                variant={menu.estado === 'publicado' ? 'outline' : 'default'}
-                                onClick={handleToggleEstado}
-                            >
+                            <Button size="sm" variant={menu.estado === 'publicado' ? 'outline' : 'default'} onClick={handleToggleEstado}>
                                 {menu.estado === 'publicado' ? 'Despublicar' : 'Publicar Menú'}
                             </Button>
                             {menu.estado === 'publicado' && (
@@ -241,7 +239,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                             {categorias.map((categoria) => (
                                 <div key={categoria.id} className="rounded-lg border">
                                     {/* Categoría header */}
-                                    <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-3">
+                                    <div className="bg-muted/50 flex items-center justify-between border-b px-4 py-3">
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium">{categoria.nombre}</span>
                                             <Badge variant={categoria.activo ? 'default' : 'secondary'} className="text-xs">
@@ -252,9 +250,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                                     {PRODUCTION_AREA_LABELS[categoria.production_area]}
                                                 </Badge>
                                             )}
-                                            <span className="text-muted-foreground text-xs">
-                                                {(categoria.platos ?? []).length} producto(s)
-                                            </span>
+                                            <span className="text-muted-foreground text-xs">{(categoria.platos ?? []).length} producto(s)</span>
                                         </div>
                                         <div className="flex gap-2">
                                             <Button
@@ -285,7 +281,7 @@ export default function MenuShow({ menu: initialMenu }: Props) {
 
                                     {/* Formulario inline para nuevo plato */}
                                     {platoFormCategoriaId === categoria.id && (
-                                        <form onSubmit={(e) => handleCrearPlato(categoria.id, e)} className="border-b bg-muted/20 p-4">
+                                        <form onSubmit={(e) => handleCrearPlato(categoria.id, e)} className="bg-muted/20 border-b p-4">
                                             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                                 <div className="space-y-1">
                                                     <Label>Nombre *</Label>
@@ -311,7 +307,9 @@ export default function MenuShow({ menu: initialMenu }: Props) {
                                                     <Label>Área de producción</Label>
                                                     <Select
                                                         value={nuevoPlato.production_area}
-                                                        onValueChange={(v) => setNuevoPlato((p) => ({ ...p, production_area: v as 'none' | 'kitchen' | 'bar' }))}
+                                                        onValueChange={(v) =>
+                                                            setNuevoPlato((p) => ({ ...p, production_area: v as 'none' | 'kitchen' | 'bar' }))
+                                                        }
                                                     >
                                                         <SelectTrigger>
                                                             <SelectValue />

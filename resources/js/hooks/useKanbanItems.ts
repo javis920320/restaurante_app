@@ -61,11 +61,7 @@ const EMPTY_COLUMNS: KanbanColumns = {
     entregado: [],
 };
 
-export function useKanbanItems({
-    area,
-    pollingInterval = 10,
-    enabled = true,
-}: UseKanbanItemsOptions): UseKanbanItemsResult {
+export function useKanbanItems({ area, pollingInterval = 10, enabled = true }: UseKanbanItemsOptions): UseKanbanItemsResult {
     const [columns, setColumns] = useState<KanbanColumns>(EMPTY_COLUMNS);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -115,9 +111,7 @@ export function useKanbanItems({
     const moverGrupo = useCallback(
         async (card: KanbanCard, fromStatus: ItemStatus, toStatus: ItemStatus) => {
             if (!VALID_TRANSITIONS[fromStatus].includes(toStatus)) {
-                setActionError(
-                    `Movimiento no permitido: ${fromStatus} → ${toStatus}`,
-                );
+                setActionError(`Movimiento no permitido: ${fromStatus} → ${toStatus}`);
                 return;
             }
 
@@ -161,9 +155,7 @@ export function useKanbanItems({
                 });
 
                 if (isAxiosError(err)) {
-                    setActionError(
-                        err.response?.data?.message || 'Error al mover el pedido',
-                    );
+                    setActionError(err.response?.data?.message || 'Error al mover el pedido');
                 } else {
                     setActionError('Error al mover el pedido');
                 }

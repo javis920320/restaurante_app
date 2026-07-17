@@ -78,12 +78,8 @@ export default function Index() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            Reportes y Analítica
-                        </h1>
-                        <p className="mt-1 text-gray-600 dark:text-gray-400">
-                            Análisis del rendimiento del negocio
-                        </p>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Reportes y Analítica</h1>
+                        <p className="mt-1 text-gray-600 dark:text-gray-400">Análisis del rendimiento del negocio</p>
                     </div>
                 </div>
 
@@ -184,9 +180,7 @@ export default function Index() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">Ventas Totales</p>
-                                            <p className="text-2xl font-bold text-green-600">
-                                                {formatCurrency(totalVentas)}
-                                            </p>
+                                            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalVentas)}</p>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -213,13 +207,9 @@ export default function Index() {
                                             <BarChart3 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                Ticket Promedio
-                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Ticket Promedio</p>
                                             <p className="text-2xl font-bold">
-                                                {reportes.total_pedidos_dia > 0
-                                                    ? formatCurrency(totalVentas / reportes.total_pedidos_dia)
-                                                    : '$0'}
+                                                {reportes.total_pedidos_dia > 0 ? formatCurrency(totalVentas / reportes.total_pedidos_dia) : '$0'}
                                             </p>
                                         </div>
                                     </div>
@@ -233,12 +223,8 @@ export default function Index() {
                                             <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                Tiempo Promedio
-                                            </p>
-                                            <p className="text-2xl font-bold">
-                                                {reportes.tiempo_promedio_preparacion} min
-                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">Tiempo Promedio</p>
+                                            <p className="text-2xl font-bold">{reportes.tiempo_promedio_preparacion} min</p>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -259,17 +245,12 @@ export default function Index() {
                                         <div className="space-y-3">
                                             {reportes.productos_mas_vendidos.map((producto, idx) => (
                                                 <div key={idx} className="flex items-center gap-3">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="w-8 justify-center text-xs"
-                                                    >
+                                                    <Badge variant="outline" className="w-8 justify-center text-xs">
                                                         #{idx + 1}
                                                     </Badge>
                                                     <div className="flex-1">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                                                                {producto.producto}
-                                                            </span>
+                                                            <span className="font-medium text-gray-900 dark:text-gray-100">{producto.producto}</span>
                                                             <span className="text-sm font-semibold text-green-600">
                                                                 {formatCurrency(producto.ventas)}
                                                             </span>
@@ -280,30 +261,22 @@ export default function Index() {
                                                                     className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
                                                                     style={{
                                                                         width: `${
-                                                                            reportes.productos_mas_vendidos[0]
-                                                                                ?.cantidad > 0
-                                                                                ? (producto.cantidad /
-                                                                                      reportes
-                                                                                          .productos_mas_vendidos[0]
-                                                                                          .cantidad) *
+                                                                            reportes.productos_mas_vendidos[0]?.cantidad > 0
+                                                                                ? (producto.cantidad / reportes.productos_mas_vendidos[0].cantidad) *
                                                                                   100
                                                                                 : 0
                                                                         }%`,
                                                                     }}
                                                                 />
                                                             </div>
-                                                            <span className="w-16 text-right text-xs text-gray-500">
-                                                                {producto.cantidad} uds
-                                                            </span>
+                                                            <span className="w-16 text-right text-xs text-gray-500">{producto.cantidad} uds</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="py-8 text-center text-gray-500">
-                                            No hay datos de ventas para este período
-                                        </p>
+                                        <p className="py-8 text-center text-gray-500">No hay datos de ventas para este período</p>
                                     )}
                                 </CardContent>
                             </Card>
@@ -320,8 +293,7 @@ export default function Index() {
                                     {reportes.ventas_por_hora.length > 0 ? (
                                         <div className="space-y-2">
                                             {reportes.ventas_por_hora.map((venta, idx) => {
-                                                const percentage =
-                                                    maxVenta > 0 ? (venta.total_ventas / maxVenta) * 100 : 0;
+                                                const percentage = maxVenta > 0 ? (venta.total_ventas / maxVenta) * 100 : 0;
                                                 return (
                                                     <div key={idx} className="flex items-center gap-3">
                                                         <span className="w-14 text-right text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -336,8 +308,7 @@ export default function Index() {
                                                                         minWidth: percentage > 0 ? '48px' : '0',
                                                                     }}
                                                                 >
-                                                                    {percentage > 15 &&
-                                                                        `${venta.total_pedidos} ped.`}
+                                                                    {percentage > 15 && `${venta.total_pedidos} ped.`}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -349,9 +320,7 @@ export default function Index() {
                                             })}
                                         </div>
                                     ) : (
-                                        <p className="py-8 text-center text-gray-500">
-                                            No hay datos de ventas por hora para este período
-                                        </p>
+                                        <p className="py-8 text-center text-gray-500">No hay datos de ventas por hora para este período</p>
                                     )}
                                 </CardContent>
                             </Card>

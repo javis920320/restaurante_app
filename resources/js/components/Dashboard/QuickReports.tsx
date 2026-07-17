@@ -59,7 +59,7 @@ export function QuickReports({ reportes, loading }: QuickReportsProps) {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between rounded-2xl border border-slate-150 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+                    <div className="border-slate-150 flex items-center justify-between rounded-2xl border bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
                                 <ShoppingCart className="h-5 w-5" />
@@ -69,7 +69,7 @@ export function QuickReports({ reportes, loading }: QuickReportsProps) {
                         <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-50">{reportes.total_pedidos_dia}</span>
                     </div>
 
-                    <div className="flex items-center justify-between rounded-2xl border border-slate-150 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+                    <div className="border-slate-150 flex items-center justify-between rounded-2xl border bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
                                 <Clock className="h-5 w-5" />
@@ -93,12 +93,15 @@ export function QuickReports({ reportes, loading }: QuickReportsProps) {
                     {reportes.productos_mas_vendidos.length > 0 ? (
                         <div className="space-y-2">
                             {reportes.productos_mas_vendidos.slice(0, 5).map((producto, idx) => (
-                                <div key={idx} className="flex items-center justify-between rounded-2xl border border-slate-150 bg-slate-50/30 p-3 dark:border-slate-850 dark:bg-slate-900/20 hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors">
+                                <div
+                                    key={idx}
+                                    className="border-slate-150 dark:border-slate-850 flex items-center justify-between rounded-2xl border bg-slate-50/30 p-3 transition-colors hover:bg-slate-50/80 dark:bg-slate-900/20 dark:hover:bg-slate-900/50"
+                                >
                                     <div>
-                                        <p className="font-bold text-sm text-slate-850 dark:text-slate-200">{producto.producto}</p>
-                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-450 mt-0.5">{producto.cantidad} unidades</p>
+                                        <p className="text-slate-850 text-sm font-bold dark:text-slate-200">{producto.producto}</p>
+                                        <p className="dark:text-slate-450 mt-0.5 text-xs font-medium text-slate-500">{producto.cantidad} unidades</p>
                                     </div>
-                                    <span className="font-extrabold text-sm text-emerald-600 dark:text-emerald-400">
+                                    <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
                                         ${producto.ventas.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -128,7 +131,7 @@ export function QuickReports({ reportes, loading }: QuickReportsProps) {
                                             {venta.hora.toString().padStart(2, '0')}:00
                                         </span>
                                         <div className="relative flex-1">
-                                            <div className="h-9 rounded-xl bg-slate-100 dark:bg-slate-900 overflow-hidden border border-slate-200/20 dark:border-slate-800/30">
+                                            <div className="h-9 overflow-hidden rounded-xl border border-slate-200/20 bg-slate-100 dark:border-slate-800/30 dark:bg-slate-900">
                                                 <div
                                                     className="flex h-full items-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-3 text-xs font-black text-white shadow-sm"
                                                     style={{ width: `${percentage}%`, minWidth: percentage > 0 ? '60px' : '0' }}

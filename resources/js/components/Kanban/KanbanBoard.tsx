@@ -1,10 +1,4 @@
-import {
-    type ItemStatus,
-    type KanbanCard as KanbanCardType,
-    type ProductionArea,
-    VALID_TRANSITIONS,
-    useKanbanItems,
-} from '@/hooks/useKanbanItems';
+import { type ItemStatus, type KanbanCard as KanbanCardType, type ProductionArea, VALID_TRANSITIONS, useKanbanItems } from '@/hooks/useKanbanItems';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
@@ -110,13 +104,7 @@ export default function KanbanBoard({ area, title, pollingInterval = 10 }: Kanba
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                 <div className="flex gap-4 overflow-x-auto pb-4">
                     {COLUMNS.map(({ status, label, dotColor }) => (
-                        <KanbanColumn
-                            key={status}
-                            status={status}
-                            label={label}
-                            cards={columns[status]}
-                            dotColor={dotColor}
-                        />
+                        <KanbanColumn key={status} status={status} label={label} cards={columns[status]} dotColor={dotColor} />
                     ))}
                 </div>
 

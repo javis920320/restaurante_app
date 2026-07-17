@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
 import cajaService, { CashMovement, CashRegister, CashSummary } from '@/services/cajaService';
+import { useCallback, useEffect, useState } from 'react';
 
 interface UseCajaResult {
     registros: CashRegister[];
@@ -13,13 +13,7 @@ interface UseCajaResult {
     createRegistro: (nombre: string) => Promise<void>;
     abrirCaja: (montoInicial: number) => Promise<void>;
     cerrarCaja: (montoReal: number, notas?: string) => Promise<void>;
-    registrarMovimiento: (
-        tipo: string,
-        subtipo: string,
-        monto: number,
-        metodoPago?: string,
-        descripcion?: string,
-    ) => Promise<void>;
+    registrarMovimiento: (tipo: string, subtipo: string, monto: number, metodoPago?: string, descripcion?: string) => Promise<void>;
     refetch: () => void;
 }
 
@@ -47,8 +41,12 @@ export const useCaja = (): UseCajaResult => {
 
                 // Keep selectedRegistro in sync with fresh data
                 setSelectedRegistro((prev) => {
-                    if (!prev) return null;
-                    return res.data.registros.find((r) => r.id === prev.id) ?? null;
+                    if (prev) {
+                        return res.data.registros.find((r) => r.id === prev.id) ?? null;
+                    }
+                    // Auto-select the active open box on first load, or fallback to first register
+                    const openReg = res.data.registros.find((r) => r.estado === 'abierta');
+                    return openReg ?? res.data.registros[0] ?? null;
                 });
             } catch {
                 setError('Error al cargar los registros de caja');
@@ -71,12 +69,10 @@ export const useCaja = (): UseCajaResult => {
             try {
                 const [movRes, resRes] = await Promise.all([
                     cajaService.getMovimientos(selectedRegistro.id),
-                    selectedRegistro.estado === 'abierta'
-                        ? cajaService.getResumen(selectedRegistro.id)
-                        : Promise.resolve(null),
+                    selectedRegistro.estado === 'abierta' ? cajaService.getResumen(selectedRegistro.id) : Promise.resolve(null),
                 ]);
                 setMovimientos(movRes.data.movimientos);
-                setResumen(resRes ? resRes.data : null);
+                setResumen(resRes ? resRes.data.resumen : null);
             } catch {
                 setError('Error al cargar detalles del registro');
             }
@@ -116,13 +112,7 @@ export const useCaja = (): UseCajaResult => {
     );
 
     const registrarMovimiento = useCallback(
-        async (
-            tipo: string,
-            subtipo: string,
-            monto: number,
-            metodoPago = 'efectivo',
-            descripcion?: string,
-        ) => {
+        async (tipo: string, subtipo: string, monto: number, metodoPago = 'efectivo', descripcion?: string) => {
             if (!selectedRegistro) throw new Error('No hay registro seleccionado');
             await cajaService.registrarMovimiento(selectedRegistro.id, {
                 tipo,

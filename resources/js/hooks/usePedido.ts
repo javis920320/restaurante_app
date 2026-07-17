@@ -32,10 +32,7 @@ export const usePedido = (codigo: string): UsePedidoResult => {
                 setPedido(data);
                 setError(null);
             } catch (err) {
-                setError(
-                    (err as { response?: { data?: { message?: string } } }).response?.data
-                        ?.message || 'Error al obtener el pedido',
-                );
+                setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Error al obtener el pedido');
                 console.error('Error fetching pedido:', err);
             } finally {
                 setLoading(false);

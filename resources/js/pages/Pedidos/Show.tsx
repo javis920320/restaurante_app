@@ -1,33 +1,31 @@
 import EstadoBadge from '@/components/Pedidos/EstadoBadge';
 import EstadoSelector from '@/components/Pedidos/EstadoSelector';
-import PagoBadge from '@/components/Pedidos/PagoBadge';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAdminPedidos } from '@/hooks/useAdminPedidos';
 import AppLayout from '@/layouts/app-layout';
 import { HistorialEstado, Pedido } from '@/services/pedidoService';
 import { Head, Link } from '@inertiajs/react';
-import { 
-    ArrowLeft, 
-    CheckCircle, 
-    Clock, 
-    FileText, 
-    MapPin, 
-    QrCode, 
-    User, 
-    Utensils,
-    ChefHat,
-    Bell,
-    Truck,
-    Calendar,
-    MessageSquare,
+import {
     AlertCircle,
-    UserCheck,
+    ArrowLeft,
+    Bell,
+    Calendar,
+    CheckCircle,
+    CheckCircle2,
+    ChefHat,
     ChevronRight,
+    Clock,
     DollarSign,
-    CheckCircle2
+    FileText,
+    MapPin,
+    MessageSquare,
+    QrCode,
+    Truck,
+    User,
+    UserCheck,
+    Utensils,
 } from 'lucide-react';
-import React, { useState } from 'react';
 
 interface ShowProps {
     pedido: Pedido;
@@ -67,29 +65,37 @@ function HistorialTimeline({ historial }: { historial: HistorialEstado[] }) {
     };
 
     return (
-        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-xs">
-            <h2 className="mb-4 text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-655" />
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
+            <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-zinc-900 dark:text-white">
+                <Clock className="text-blue-655 h-5 w-5" />
                 Historial de Estados
             </h2>
-            <ol className="relative border-l border-zinc-200 dark:border-zinc-800 ml-2 space-y-4">
+            <ol className="relative ml-2 space-y-4 border-l border-zinc-200 dark:border-zinc-800">
                 {historial.map((entrada) => (
-                    <li key={entrada.id} className="ml-5 relative">
-                        <div className="absolute -left-[26px] mt-1 h-3 w-3 rounded-full border-2 border-white dark:border-zinc-900 bg-zinc-400" />
-                        <div className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${ESTADOS_COLORS[entrada.estado_nuevo] ?? 'bg-zinc-100 text-zinc-800 border-zinc-200'}`}>
+                    <li key={entrada.id} className="relative ml-5">
+                        <div className="absolute -left-[26px] mt-1 h-3 w-3 rounded-full border-2 border-white bg-zinc-400 dark:border-zinc-900" />
+                        <div
+                            className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${ESTADOS_COLORS[entrada.estado_nuevo] ?? 'border-zinc-200 bg-zinc-100 text-zinc-800'}`}
+                        >
                             {ESTADOS_LABELS[entrada.estado_nuevo] ?? entrada.estado_nuevo}
                         </div>
-                        <p className="mt-1 text-[11px] text-zinc-400 dark:text-zinc-500 font-medium">{formatDateTime(entrada.created_at)}</p>
+                        <p className="mt-1 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">{formatDateTime(entrada.created_at)}</p>
                         {entrada.user && (
-                            <p className="mt-0.5 text-xs text-zinc-655 dark:text-zinc-400">
+                            <p className="text-zinc-655 mt-0.5 text-xs dark:text-zinc-400">
                                 Por: <span className="font-semibold">{entrada.user.name}</span>
                                 {entrada.canal && (
-                                    <span className="ml-1 text-zinc-400 dark:text-zinc-600 font-medium">
+                                    <span className="ml-1 font-medium text-zinc-400 dark:text-zinc-600">
                                         (
                                         {entrada.canal === 'qr' ? (
-                                            <><QrCode className="mr-0.5 inline h-3 w-3" />QR</>
+                                            <>
+                                                <QrCode className="mr-0.5 inline h-3 w-3" />
+                                                QR
+                                            </>
                                         ) : (
-                                            <><Utensils className="mr-0.5 inline h-3 w-3" />Mesero</>
+                                            <>
+                                                <Utensils className="mr-0.5 inline h-3 w-3" />
+                                                Mesero
+                                            </>
                                         )}
                                         )
                                     </span>
@@ -97,7 +103,7 @@ function HistorialTimeline({ historial }: { historial: HistorialEstado[] }) {
                             </p>
                         )}
                         {!entrada.user && entrada.canal === 'qr' && (
-                            <p className="mt-0.5 text-xs text-zinc-500 font-medium">
+                            <p className="mt-0.5 text-xs font-medium text-zinc-500">
                                 <QrCode className="mr-0.5 inline h-3 w-3" />
                                 Pedido por QR
                             </p>
@@ -156,10 +162,10 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
         { value: 'entregado', label: 'Entregado', icon: Truck },
     ];
 
-    const currentStepIndex = STEPPER_STEPS.findIndex(s => s.value === pedidoInicial.estado);
+    const currentStepIndex = STEPPER_STEPS.findIndex((s) => s.value === pedidoInicial.estado);
     const isCanceled = pedidoInicial.estado === 'cancelado';
     const isPaidHistorical = pedidoInicial.estado === 'pagado';
-    
+
     // Si ya está facturado/cerrado en estado operativo histórico, marcar todos como completados
     const activeStepIndex = isPaidHistorical ? STEPPER_STEPS.length - 1 : currentStepIndex;
 
@@ -169,39 +175,46 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
 
             <div className="space-y-6">
                 {/* Header Premium */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-5 dark:border-zinc-800">
+                <div className="flex flex-col justify-between gap-4 border-b border-zinc-100 pb-5 md:flex-row md:items-center dark:border-zinc-800">
                     <div className="flex items-center gap-3">
-                        <Button asChild variant="outline" size="sm" className="h-9 px-3 rounded-lg border-zinc-200 dark:border-zinc-850">
+                        <Button asChild variant="outline" size="sm" className="dark:border-zinc-850 h-9 rounded-lg border-zinc-200 px-3">
                             <Link href="/pedidos">
                                 <ArrowLeft className="mr-1.5 h-4 w-4" />
                                 Volver
                             </Link>
                         </Button>
                         <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <h1 className="text-2xl font-black tracking-tight text-zinc-900 sm:text-3xl dark:text-white">
                                     Pedido #{pedidoInicial.id}
                                 </h1>
                                 {pedidoInicial.canal && (
-                                    <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 gap-1 px-2.5 py-0.5 rounded-full">
+                                    <Badge
+                                        variant="outline"
+                                        className="gap-1 rounded-full border-zinc-200 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-zinc-500 uppercase dark:border-zinc-800 dark:text-zinc-400"
+                                    >
                                         {pedidoInicial.canal === 'qr' ? (
-                                            <><QrCode className="h-3 w-3" /> QR</>
+                                            <>
+                                                <QrCode className="h-3 w-3" /> QR
+                                            </>
                                         ) : (
-                                            <><Utensils className="h-3 w-3" /> Mesero</>
+                                            <>
+                                                <Utensils className="h-3 w-3" /> Mesero
+                                            </>
                                         )}
                                     </Badge>
                                 )}
                             </div>
-                            <p className="text-xs text-zinc-400 dark:text-zinc-550 mt-1 font-medium">
+                            <p className="dark:text-zinc-550 mt-1 text-xs font-medium text-zinc-400">
                                 Registrado el {formatDate(pedidoInicial.created_at)}
                             </p>
                         </div>
                     </div>
 
                     {/* Estados contiguos (Eje Operativo + Eje Financiero) */}
-                    <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
+                    <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
                         <EstadoBadge estado={pedidoInicial.estado} />
-                     {/*    {pedidoInicial.payment_status && (
+                        {/*    {pedidoInicial.payment_status && (
                             <PagoBadge payment_status={pedidoInicial.payment_status} />
                         )} */}
                     </div>
@@ -212,34 +225,36 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                     <div className="space-y-6 lg:col-span-2">
                         {/* Stepper de Progreso o Banner de Cancelado */}
                         {isCanceled ? (
-                            <div className="rounded-2xl border border-red-200 bg-red-50/50 p-5 dark:border-red-950/20 dark:bg-red-950/15 flex items-start gap-3.5">
-                                <div className="p-3 bg-red-650 text-white rounded-xl shadow-xs">
+                            <div className="flex items-start gap-3.5 rounded-2xl border border-red-200 bg-red-50/50 p-5 dark:border-red-950/20 dark:bg-red-950/15">
+                                <div className="bg-red-650 rounded-xl p-3 text-white shadow-xs">
                                     <AlertCircle className="h-6 w-6 stroke-[2]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-red-900 dark:text-red-400 font-extrabold text-base">Pedido Cancelado</h3>
-                                    <p className="text-xs text-red-700 dark:text-red-300 mt-1 leading-relaxed">
-                                        Esta orden fue dada de baja del sistema. Para ver más detalles, por favor revisa el historial de estados al pie de la página.
+                                    <h3 className="text-base font-extrabold text-red-900 dark:text-red-400">Pedido Cancelado</h3>
+                                    <p className="mt-1 text-xs leading-relaxed text-red-700 dark:text-red-300">
+                                        Esta orden fue dada de baja del sistema. Para ver más detalles, por favor revisa el historial de estados al
+                                        pie de la página.
                                     </p>
                                 </div>
                             </div>
                         ) : (
-                            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-850 dark:bg-zinc-900">
-                                <h3 className="text-xs font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+                            <div className="dark:border-zinc-850 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:bg-zinc-900">
+                                <h3 className="mb-4 flex items-center gap-1.5 text-xs font-extrabold tracking-widest text-zinc-400 uppercase dark:text-zinc-500">
                                     <CheckCircle className="h-4 w-4" />
                                     Progreso de la Orden
                                 </h3>
                                 {/* Stepper Progress Bar */}
-                                <div className="relative flex justify-between items-center w-full mt-2 px-1.5 sm:px-6">
+                                <div className="relative mt-2 flex w-full items-center justify-between px-1.5 sm:px-6">
                                     {/* Línea de fondo */}
-                                    <div className="absolute top-[18px] left-[32px] left-[32px] sm:left-[54px] sm:right-[54px] h-1 bg-zinc-100 dark:bg-zinc-800 z-0" />
+                                    <div className="absolute top-[18px] left-[32px] z-0 h-1 bg-zinc-100 sm:right-[54px] sm:left-[54px] dark:bg-zinc-800" />
                                     {/* Línea activa */}
-                                    <div 
-                                        className="absolute top-[18px] left-[32px] sm:left-[54px] h-1 bg-blue-600 dark:bg-blue-500 z-0 transition-all duration-500" 
-                                        style={{ 
-                                            width: activeStepIndex >= 0 
-                                                ? `calc(${ (activeStepIndex / (STEPPER_STEPS.length - 1)) * 100 }% - ${activeStepIndex === STEPPER_STEPS.length - 1 ? '16px' : '0px'})` 
-                                                : '0%' 
+                                    <div
+                                        className="absolute top-[18px] left-[32px] z-0 h-1 bg-blue-600 transition-all duration-500 sm:left-[54px] dark:bg-blue-500"
+                                        style={{
+                                            width:
+                                                activeStepIndex >= 0
+                                                    ? `calc(${(activeStepIndex / (STEPPER_STEPS.length - 1)) * 100}% - ${activeStepIndex === STEPPER_STEPS.length - 1 ? '16px' : '0px'})`
+                                                    : '0%',
                                         }}
                                     />
 
@@ -251,32 +266,39 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                         const stepTime = getStepTime(step.value);
 
                                         return (
-                                            <div key={step.value} className="flex flex-col items-center z-10 text-center relative group min-w-[50px] sm:min-w-[70px]">
+                                            <div
+                                                key={step.value}
+                                                className="group relative z-10 flex min-w-[50px] flex-col items-center text-center sm:min-w-[70px]"
+                                            >
                                                 {/* Círculo */}
-                                                <div 
-                                                    className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                                                        isCompleted 
-                                                            ? 'bg-blue-600 border-blue-600 text-white dark:bg-blue-500 dark:border-blue-500' 
+                                                <div
+                                                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300 sm:h-10 sm:w-10 ${
+                                                        isCompleted
+                                                            ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-500 dark:bg-blue-500'
                                                             : isActive
-                                                                ? 'bg-white border-blue-600 text-blue-600 dark:bg-zinc-900 dark:border-blue-500 dark:text-blue-400 ring-4 ring-blue-500/10 dark:ring-blue-500/20 font-black animate-pulse-slow' 
-                                                                : 'bg-zinc-50 border-zinc-200 text-zinc-400 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-650'
+                                                              ? 'animate-pulse-slow border-blue-600 bg-white font-black text-blue-600 ring-4 ring-blue-500/10 dark:border-blue-500 dark:bg-zinc-900 dark:text-blue-400 dark:ring-blue-500/20'
+                                                              : 'dark:text-zinc-650 border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-800 dark:bg-zinc-950'
                                                     }`}
                                                 >
                                                     <StepIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                                                 </div>
                                                 {/* Etiqueta */}
-                                                <span className={`text-[10px] sm:text-xs font-bold mt-2 tracking-tight ${
-                                                    isCompleted || isActive ? 'text-zinc-850 dark:text-zinc-200 font-extrabold' : 'text-zinc-400 dark:text-zinc-600'
-                                                }`}>
+                                                <span
+                                                    className={`mt-2 text-[10px] font-bold tracking-tight sm:text-xs ${
+                                                        isCompleted || isActive
+                                                            ? 'text-zinc-850 font-extrabold dark:text-zinc-200'
+                                                            : 'text-zinc-400 dark:text-zinc-600'
+                                                    }`}
+                                                >
                                                     {step.label}
                                                 </span>
                                                 {/* Hora del estado */}
                                                 {stepTime ? (
-                                                    <span className="text-[9px] font-semibold text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.2 rounded-md mt-1">
+                                                    <span className="py-0.2 mt-1 rounded-md bg-emerald-50 px-1.5 text-[9px] font-semibold text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-500">
                                                         {stepTime}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[9px] text-transparent select-none mt-1">-</span>
+                                                    <span className="mt-1 text-[9px] text-transparent select-none">-</span>
                                                 )}
                                             </div>
                                         );
@@ -286,9 +308,9 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                         )}
 
                         {/* Listado de Platos */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-850 dark:bg-zinc-900">
-                            <h2 className="mb-4 text-base font-bold text-zinc-900 dark:text-white flex items-center gap-2 border-b pb-3 dark:border-zinc-800">
-                                <Utensils className="h-5 w-5 text-blue-655" />
+                        <div className="dark:border-zinc-850 rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs dark:bg-zinc-900">
+                            <h2 className="mb-4 flex items-center gap-2 border-b pb-3 text-base font-bold text-zinc-900 dark:border-zinc-800 dark:text-white">
+                                <Utensils className="text-blue-655 h-5 w-5" />
                                 Detalle de Consumo
                             </h2>
 
@@ -298,33 +320,33 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                         {pedidoInicial.detalles.map((detalle) => (
                                             <div
                                                 key={detalle.id}
-                                                className="flex items-center gap-4 py-4 first:pt-0 last:pb-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 px-2 rounded-xl transition-all duration-150"
+                                                className="flex items-center gap-4 rounded-xl px-2 py-4 transition-all duration-150 first:pt-0 last:pb-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20"
                                             >
                                                 {/* Cantidad */}
-                                                <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-blue-50 text-blue-750 dark:bg-blue-955/40 dark:text-blue-400 font-black text-sm shrink-0 border border-blue-100/50 dark:border-blue-900/10">
+                                                <div className="text-blue-750 dark:bg-blue-955/40 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100/50 bg-blue-50 text-sm font-black dark:border-blue-900/10 dark:text-blue-400">
                                                     x{detalle.cantidad}
                                                 </div>
 
                                                 {/* Información Plato */}
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="font-bold text-sm sm:text-base text-zinc-850 dark:text-zinc-250 truncate">
+                                                    <h3 className="text-zinc-850 dark:text-zinc-250 truncate text-sm font-bold sm:text-base">
                                                         {detalle.producto.nombre}
                                                     </h3>
-                                                    <p className="text-xs text-zinc-500 dark:text-zinc-450 mt-0.5 font-medium">
+                                                    <p className="dark:text-zinc-450 mt-0.5 text-xs font-medium text-zinc-500">
                                                         Precio unitario: {formatPrice(detalle.precio_unitario)}
                                                     </p>
                                                     {/* Notas específicas del plato */}
                                                     {detalle.notas && (
-                                                        <div className="mt-2 inline-flex items-start gap-1.5 bg-amber-50/70 dark:bg-amber-950/25 text-amber-800 dark:text-amber-300 border border-amber-100/50 dark:border-amber-900/30 py-1 px-2.5 rounded-lg text-xs leading-normal">
-                                                            <FileText className="h-3.5 w-3.5 mt-0.5 text-amber-600 dark:text-amber-500 shrink-0" />
+                                                        <div className="mt-2 inline-flex items-start gap-1.5 rounded-lg border border-amber-100/50 bg-amber-50/70 px-2.5 py-1 text-xs leading-normal text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/25 dark:text-amber-300">
+                                                            <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-500" />
                                                             <span className="font-semibold italic">Nota: {detalle.notas}</span>
                                                         </div>
                                                     )}
                                                 </div>
 
                                                 {/* Subtotal Item */}
-                                                <div className="text-right shrink-0">
-                                                    <span className="font-black text-sm sm:text-base text-zinc-900 dark:text-white">
+                                                <div className="shrink-0 text-right">
+                                                    <span className="text-sm font-black text-zinc-900 sm:text-base dark:text-white">
                                                         {formatPrice(detalle.subtotal)}
                                                     </span>
                                                 </div>
@@ -333,25 +355,25 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                                     </div>
 
                                     {/* Caja de Totales Premium */}
-                                    <div className="space-y-3 border-t pt-4 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-950/10 p-4 rounded-xl mt-4">
-                                        <div className="flex justify-between text-xs sm:text-sm font-medium text-zinc-550 dark:text-zinc-400">
+                                    <div className="mt-4 space-y-3 rounded-xl border-t bg-zinc-50/40 p-4 pt-4 dark:border-zinc-800 dark:bg-zinc-950/10">
+                                        <div className="text-zinc-550 flex justify-between text-xs font-medium sm:text-sm dark:text-zinc-400">
                                             <span>Subtotal</span>
                                             <span>{formatPrice(pedidoInicial.subtotal)}</span>
                                         </div>
                                         <div className="flex items-center justify-between border-t pt-3 dark:border-zinc-800">
-                                            <span className="text-sm sm:text-base font-bold text-zinc-850 dark:text-zinc-200 flex items-center gap-1.5">
+                                            <span className="text-zinc-850 flex items-center gap-1.5 text-sm font-bold sm:text-base dark:text-zinc-200">
                                                 <DollarSign className="h-4 w-4 text-emerald-500" />
                                                 Total Facturado
                                             </span>
-                                            <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                                            <span className="text-xl font-black text-emerald-600 sm:text-2xl dark:text-emerald-400">
                                                 {formatPrice(pedidoInicial.total)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-zinc-400 dark:text-zinc-650 border border-dashed rounded-xl">
-                                    <Utensils className="h-10 w-10 mx-auto mb-2 opacity-50 stroke-[1.5]" />
+                                <div className="dark:text-zinc-650 rounded-xl border border-dashed py-8 text-center text-zinc-400">
+                                    <Utensils className="mx-auto mb-2 h-10 w-10 stroke-[1.5] opacity-50" />
                                     <p className="text-sm font-medium">No hay productos registrados en esta orden</p>
                                 </div>
                             )}
@@ -359,16 +381,16 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
 
                         {/* Notas del pedido generales */}
                         {pedidoInicial.notas && (
-                            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-850 dark:bg-zinc-900">
+                            <div className="dark:border-zinc-850 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:bg-zinc-900">
                                 <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-xl">
+                                    <div className="rounded-xl bg-amber-50 p-2 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
                                         <MessageSquare className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h2 className="mb-1 text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider">
+                                        <h2 className="mb-1 text-sm font-bold tracking-wider text-zinc-900 uppercase dark:text-white">
                                             Notas Generales del Pedido
                                         </h2>
-                                        <p className="text-sm text-zinc-655 dark:text-zinc-400 leading-relaxed font-medium mt-1">
+                                        <p className="text-zinc-655 mt-1 text-sm leading-relaxed font-medium dark:text-zinc-400">
                                             {pedidoInicial.notas}
                                         </p>
                                     </div>
@@ -377,17 +399,15 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                         )}
 
                         {/* Historial de estados (Timeline) */}
-                        {pedidoInicial.historial && pedidoInicial.historial.length > 0 && (
-                            <HistorialTimeline historial={pedidoInicial.historial} />
-                        )}
+                        {pedidoInicial.historial && pedidoInicial.historial.length > 0 && <HistorialTimeline historial={pedidoInicial.historial} />}
                     </div>
 
                     {/* Panel Derecho: Cambiar Estado y Metadatos */}
                     <div className="space-y-6">
                         {/* Cambiar estado */}
                         {puedeEditarEstado && (
-                            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-850 dark:bg-zinc-900 space-y-3">
-                                <h2 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                            <div className="dark:border-zinc-850 space-y-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:bg-zinc-900">
+                                <h2 className="flex items-center gap-1.5 text-sm font-bold tracking-wider text-zinc-900 uppercase dark:text-white">
                                     <ChevronRight className="h-4 w-4 text-blue-600" />
                                     Cambiar Estado Operativo
                                 </h2>
@@ -400,32 +420,34 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
                         )}
 
                         {/* Información del pedido (Metadatos) */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:border-zinc-850 dark:bg-zinc-900">
-                            <h2 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 border-b pb-3 dark:border-zinc-800 mb-4">
-                                <FileText className="h-4.5 w-4.5 text-blue-655" />
+                        <div className="dark:border-zinc-850 rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs dark:bg-zinc-900">
+                            <h2 className="mb-4 flex items-center gap-1.5 border-b pb-3 text-sm font-bold tracking-wider text-zinc-900 uppercase dark:border-zinc-800 dark:text-white">
+                                <FileText className="text-blue-655 h-4.5 w-4.5" />
                                 Información de Servicio
                             </h2>
 
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 rounded-xl shrink-0">
+                                    <div className="text-zinc-650 shrink-0 rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800 dark:text-zinc-400">
                                         <MapPin className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Mesa</p>
-                                        <p className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">
+                                        <p className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">Mesa</p>
+                                        <p className="truncate text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
                                             {pedidoInicial.mesa?.nombre || `Mesa #${pedidoInicial.mesa_id}`}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 rounded-xl shrink-0">
+                                    <div className="text-zinc-650 shrink-0 rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800 dark:text-zinc-400">
                                         <Calendar className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Fecha y hora de Registro</p>
-                                        <p className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">
+                                        <p className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+                                            Fecha y hora de Registro
+                                        </p>
+                                        <p className="truncate text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
                                             {formatDate(pedidoInicial.created_at)}
                                         </p>
                                     </div>
@@ -433,12 +455,14 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
 
                                 {pedidoInicial.user && (
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-400 rounded-xl shrink-0">
+                                        <div className="text-zinc-650 shrink-0 rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800 dark:text-zinc-400">
                                             <UserCheck className="h-4 w-4" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Atendido por</p>
-                                            <p className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">
+                                            <p className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+                                                Atendido por
+                                            </p>
+                                            <p className="truncate text-sm font-extrabold text-zinc-800 dark:text-zinc-200">
                                                 {pedidoInicial.user.name}
                                             </p>
                                         </div>
@@ -447,12 +471,14 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
 
                                 {pedidoInicial.cliente && (
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-655 dark:text-zinc-400 rounded-xl shrink-0">
+                                        <div className="text-zinc-655 shrink-0 rounded-xl bg-zinc-100 p-2.5 dark:bg-zinc-800 dark:text-zinc-400">
                                             <User className="h-4 w-4" />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider">Cliente de la Mesa</p>
-                                            <p className="font-extrabold text-sm text-zinc-850 dark:text-zinc-200 truncate">
+                                            <p className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+                                                Cliente de la Mesa
+                                            </p>
+                                            <p className="text-zinc-850 truncate text-sm font-extrabold dark:text-zinc-200">
                                                 {pedidoInicial.cliente}
                                             </p>
                                         </div>
@@ -465,5 +491,4 @@ export default function Show({ pedido: pedidoInicial }: ShowProps) {
             </div>
         </AppLayout>
     );
-
 }

@@ -22,15 +22,27 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index() {
-    const { metrics, loading: metricsLoading, refetch: refetchMetrics } = useDashboardMetrics({
+    const {
+        metrics,
+        loading: metricsLoading,
+        refetch: refetchMetrics,
+    } = useDashboardMetrics({
         pollingInterval: 10,
     });
 
-    const { pedidos, loading: pedidosLoading, cambiarEstado } = usePedidosKanban({
+    const {
+        pedidos,
+        loading: pedidosLoading,
+        cambiarEstado,
+    } = usePedidosKanban({
         pollingInterval: 10,
     });
 
-    const { mesas, loading: mesasLoading, refetch: refetchMesas } = useMesasStatus({
+    const {
+        mesas,
+        loading: mesasLoading,
+        refetch: refetchMesas,
+    } = useMesasStatus({
         pollingInterval: 15,
     });
 
@@ -106,10 +118,7 @@ export default function Index() {
 
                 {/* Auto-refresh indicator */}
                 <div className="text-center text-sm text-gray-500">
-                    <p>
-                        Dashboard actualizado automáticamente • Métricas: cada 10s • Mesas: cada 15s • Reportes: cada
-                        60s
-                    </p>
+                    <p>Dashboard actualizado automáticamente • Métricas: cada 10s • Mesas: cada 15s • Reportes: cada 60s</p>
                 </div>
             </div>
         </AppLayout>

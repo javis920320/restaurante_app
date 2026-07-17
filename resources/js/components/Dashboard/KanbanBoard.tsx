@@ -37,11 +37,36 @@ interface KanbanBoardProps {
 }
 
 const ESTADOS = [
-    { key: 'pendiente', label: 'Pendiente', color: 'bg-slate-50/70 border-slate-200 text-slate-700 dark:bg-slate-900/30 dark:border-slate-800 dark:text-slate-350', dot: 'bg-slate-400' },
-    { key: 'confirmado', label: 'Confirmado', color: 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-950/15 dark:border-blue-900/30 dark:text-blue-300', dot: 'bg-blue-500' },
-    { key: 'en_preparacion', label: 'En Preparación', color: 'bg-amber-50/50 border-amber-200 text-amber-800 dark:bg-amber-950/15 dark:border-amber-900/30 dark:text-amber-300', dot: 'bg-amber-500' },
-    { key: 'listo', label: 'Listo', color: 'bg-emerald-50/50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/15 dark:border-emerald-900/30 dark:text-emerald-300', dot: 'bg-emerald-500' },
-    { key: 'entregado', label: 'Entregado', color: 'bg-blue-50/20 border-blue-200 text-blue-700 dark:bg-blue-950/5 dark:border-blue-900/20 dark:text-blue-400', dot: 'bg-blue-450' },
+    {
+        key: 'pendiente',
+        label: 'Pendiente',
+        color: 'bg-slate-50/70 border-slate-200 text-slate-700 dark:bg-slate-900/30 dark:border-slate-800 dark:text-slate-350',
+        dot: 'bg-slate-400',
+    },
+    {
+        key: 'confirmado',
+        label: 'Confirmado',
+        color: 'bg-blue-50/50 border-blue-200 text-blue-800 dark:bg-blue-950/15 dark:border-blue-900/30 dark:text-blue-300',
+        dot: 'bg-blue-500',
+    },
+    {
+        key: 'en_preparacion',
+        label: 'En Preparación',
+        color: 'bg-amber-50/50 border-amber-200 text-amber-800 dark:bg-amber-950/15 dark:border-amber-900/30 dark:text-amber-300',
+        dot: 'bg-amber-500',
+    },
+    {
+        key: 'listo',
+        label: 'Listo',
+        color: 'bg-emerald-50/50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/15 dark:border-emerald-900/30 dark:text-emerald-300',
+        dot: 'bg-emerald-500',
+    },
+    {
+        key: 'entregado',
+        label: 'Entregado',
+        color: 'bg-blue-50/20 border-blue-200 text-blue-700 dark:bg-blue-950/5 dark:border-blue-900/20 dark:text-blue-400',
+        dot: 'bg-blue-450',
+    },
 ];
 
 const TRANSITIONS: Record<string, string[]> = {
@@ -87,13 +112,15 @@ export function KanbanBoard({ pedidos, loading, onCambiarEstado }: KanbanBoardPr
 
                 return (
                     <div key={estado.key} className="flex flex-col space-y-4">
-                        <div className={`rounded-2xl border p-3 flex items-center justify-between shadow-sm ${estado.color}`}>
+                        <div className={`flex items-center justify-between rounded-2xl border p-3 shadow-sm ${estado.color}`}>
                             <div>
                                 <div className="flex items-center gap-1.5">
                                     <span className={`h-2 w-2 rounded-full ${estado.dot}`} />
-                                    <h3 className="font-extrabold text-sm tracking-tight">{estado.label}</h3>
+                                    <h3 className="text-sm font-extrabold tracking-tight">{estado.label}</h3>
                                 </div>
-                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{pedidosEstado.length} pedido(s)</p>
+                                <p className="mt-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                    {pedidosEstado.length} pedido(s)
+                                </p>
                             </div>
                         </div>
 
@@ -141,46 +168,48 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
     };
 
     return (
-        <Card className={`transition-all duration-300 rounded-3xl hover:shadow-md border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 ${
-            isDelayed 
-                ? 'border-red-300 bg-red-50/60 dark:border-red-900/30 dark:bg-red-950/10 shadow-sm shadow-red-500/5' 
-                : ''
-        }`}>
+        <Card
+            className={`rounded-3xl border-slate-200 bg-white transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950 ${
+                isDelayed ? 'border-red-300 bg-red-50/60 shadow-sm shadow-red-500/5 dark:border-red-900/30 dark:bg-red-950/10' : ''
+            }`}
+        >
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-base font-extrabold text-slate-850 dark:text-slate-100">Pedido #{pedido.codigo}</CardTitle>
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Mesa: <span className="font-bold text-slate-700 dark:text-slate-300">{pedido.mesa.nombre}</span></p>
+                        <CardTitle className="text-slate-850 text-base font-extrabold dark:text-slate-100">Pedido #{pedido.codigo}</CardTitle>
+                        <p className="mt-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            Mesa: <span className="font-bold text-slate-700 dark:text-slate-300">{pedido.mesa.nombre}</span>
+                        </p>
                     </div>
-                    {isDelayed && (
-                        <AlertTriangle className="h-4.5 w-4.5 text-red-500 animate-pulse" aria-label="Pedido demorado" />
-                    )}
+                    {isDelayed && <AlertTriangle className="h-4.5 w-4.5 animate-pulse text-red-500" aria-label="Pedido demorado" />}
                 </div>
             </CardHeader>
             <CardContent className="space-y-3">
                 {/* Time and total */}
                 <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        <Clock className={`h-3.5 w-3.5 ${isDelayed ? 'text-red-500 animate-pulse' : 'text-slate-400'}`} />
+                        <Clock className={`h-3.5 w-3.5 ${isDelayed ? 'animate-pulse text-red-500' : 'text-slate-400'}`} />
                         <span>{pedido.tiempo_transcurrido}m</span>
                     </div>
-                    <span className="font-extrabold text-sm text-slate-900 dark:text-slate-50">
+                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-50">
                         ${pedido.total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                     </span>
                 </div>
 
                 {/* Products summary */}
-                <div className="space-y-1.5 rounded-2xl bg-slate-50/50 border border-slate-100/60 p-3 dark:bg-slate-900/40 dark:border-slate-850">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Productos</p>
+                <div className="dark:border-slate-850 space-y-1.5 rounded-2xl border border-slate-100/60 bg-slate-50/50 p-3 dark:bg-slate-900/40">
+                    <p className="text-[10px] font-black tracking-wider text-slate-400 uppercase dark:text-slate-500">Productos</p>
                     <div className="space-y-1">
                         {pedido.productos_resumen.slice(0, 3).map((producto, idx) => (
-                            <p key={idx} className="text-xs font-semibold text-slate-650 dark:text-slate-300 flex items-center justify-between">
+                            <p key={idx} className="text-slate-650 flex items-center justify-between text-xs font-semibold dark:text-slate-300">
                                 <span className="truncate">{producto.nombre}</span>
-                                <span className="shrink-0 font-bold text-slate-500 dark:text-slate-400 bg-slate-100/60 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-[10px] ml-1">x{producto.cantidad}</span>
+                                <span className="ml-1 shrink-0 rounded-md bg-slate-100/60 px-1.5 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                    x{producto.cantidad}
+                                </span>
                             </p>
                         ))}
                         {pedido.productos_resumen.length > 3 && (
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 pt-0.5 italic">
+                            <p className="pt-0.5 text-[10px] font-bold text-slate-400 italic dark:text-slate-500">
                                 + {pedido.productos_resumen.length - 3} más...
                             </p>
                         )}
@@ -190,16 +219,13 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
                 {/* Actions */}
                 <div className="space-y-2">
                     {availableTransitions.length > 0 && (
-                        <Select
-                            onValueChange={(value) => onCambiarEstado(pedido.id, value)}
-                            disabled={isUpdating}
-                        >
-                            <SelectTrigger className="h-9 rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 text-xs font-semibold">
+                        <Select onValueChange={(value) => onCambiarEstado(pedido.id, value)} disabled={isUpdating}>
+                            <SelectTrigger className="h-9 rounded-xl border-slate-200 text-xs font-semibold dark:border-slate-800 dark:bg-slate-900">
                                 <SelectValue placeholder="Cambiar estado" />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl">
                                 {availableTransitions.map((estado) => (
-                                    <SelectItem key={estado} value={estado} className="text-xs font-medium rounded-lg">
+                                    <SelectItem key={estado} value={estado} className="rounded-lg text-xs font-medium">
                                         {estadoLabels[estado] || estado}
                                     </SelectItem>
                                 ))}
@@ -210,7 +236,7 @@ function PedidoCard({ pedido, onCambiarEstado, isUpdating, availableTransitions 
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 w-full rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-900/80 text-xs font-bold gap-1"
+                        className="h-9 w-full gap-1 rounded-xl border-slate-200 text-xs font-bold hover:bg-slate-100 hover:text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-900/80"
                         onClick={() => (window.location.href = `/pedidos/${pedido.id}`)}
                     >
                         <Eye className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />

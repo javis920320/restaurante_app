@@ -1,14 +1,14 @@
+import { KanbanBoard } from '@/components/Kanban';
+import PagoBadge from '@/components/Pedidos/PagoBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { KanbanBoard } from '@/components/Kanban';
-import PagoBadge from '@/components/Pedidos/PagoBadge';
 import { useBarKDS, type PedidoBar } from '@/hooks/useBarKDS';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Clock, GlassWater, Kanban, LayoutList, Lock, RefreshCw } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const BAR_VISTA_KEY = 'bar:vista';
 
@@ -42,7 +42,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Panel de Bar" />
 
-            <div className="min-h-screen space-y-6  p-6 text-white">
+            <div className="min-h-screen space-y-6 p-6 text-white">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -51,9 +51,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-white">Panel de Bar</h1>
-                            <p className="text-gray-400">
-                                {pedidos.length} pedido(s) activo(s) • Actualización automática cada 10s
-                            </p>
+                            <p className="text-gray-400">{pedidos.length} pedido(s) activo(s) • Actualización automática cada 10s</p>
                             {requirePaymentBeforePreparation && (
                                 <p className="mt-1 flex items-center gap-1 text-sm text-yellow-400">
                                     <Lock className="h-4 w-4" />
@@ -64,13 +62,11 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                     </div>
                     <div className="flex items-center gap-2">
                         {/* View toggle */}
-                        <div className="flex rounded-lg border border-gray-600 overflow-hidden">
+                        <div className="flex overflow-hidden rounded-lg border border-gray-600">
                             <button
                                 onClick={() => setVista('kds')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
-                                    vista === 'kds'
-                                        ? 'bg-purple-700 text-white'
-                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                    vista === 'kds' ? 'bg-purple-700 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                             >
                                 <LayoutList className="h-4 w-4" />
@@ -79,21 +75,14 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                             <button
                                 onClick={() => setVista('kanban')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${
-                                    vista === 'kanban'
-                                        ? 'bg-purple-700 text-white'
-                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                    vista === 'kanban' ? 'bg-purple-700 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                             >
                                 <Kanban className="h-4 w-4" />
                                 Kanban
                             </button>
                         </div>
-                        <Button
-                            onClick={refetch}
-                            variant="outline"
-                            size="sm"
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                        >
+                        <Button onClick={refetch} variant="outline" size="sm" className="border-gray-600 text-gray-300 hover:bg-gray-800">
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Actualizar
                         </Button>
@@ -114,7 +103,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
 
                 {/* Kanban view */}
                 {vista === 'kanban' && (
-                    <div className="rounded-xl  p-4">
+                    <div className="rounded-xl p-4">
                         <KanbanBoard area="bar" pollingInterval={10} />
                     </div>
                 )}
@@ -134,13 +123,11 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 rounded-lg bg-yellow-900 px-4 py-2">
                                         <AlertTriangle className="h-5 w-5 text-yellow-400" />
-                                        <h2 className="text-lg font-bold text-yellow-300">
-                                            Nuevos Pedidos ({pendientes.length})
-                                        </h2>
+                                        <h2 className="text-lg font-bold text-yellow-300">Nuevos Pedidos ({pendientes.length})</h2>
                                     </div>
 
                                     {pendientes.length === 0 ? (
-                                        <div className="rounded-xl border border-gray-700  p-8 text-center">
+                                        <div className="rounded-xl border border-gray-700 p-8 text-center">
                                             <CheckCircle2 className="mx-auto h-12 w-12 text-gray-600" />
                                             <p className="mt-3 text-gray-500">Sin pedidos nuevos</p>
                                         </div>
@@ -162,13 +149,11 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 rounded-lg bg-purple-900 px-4 py-2">
                                         <GlassWater className="h-5 w-5 text-purple-400" />
-                                        <h2 className="text-lg font-bold text-purple-300">
-                                            En Preparación ({enPreparacion.length})
-                                        </h2>
+                                        <h2 className="text-lg font-bold text-purple-300">En Preparación ({enPreparacion.length})</h2>
                                     </div>
 
                                     {enPreparacion.length === 0 ? (
-                                        <div className="rounded-xl border border-gray-700  p-8 text-center">
+                                        <div className="rounded-xl border border-gray-700 p-8 text-center">
                                             <GlassWater className="mx-auto h-12 w-12 text-gray-600" />
                                             <p className="mt-3 text-gray-500">Sin pedidos en preparación</p>
                                         </div>
@@ -190,7 +175,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
 
                         {/* Empty state */}
                         {!loading && pedidos.length === 0 && (
-                            <div className="rounded-xl border border-gray-700  py-20 text-center">
+                            <div className="rounded-xl border border-gray-700 py-20 text-center">
                                 <GlassWater className="mx-auto h-20 w-20 text-gray-700" />
                                 <h3 className="mt-4 text-2xl font-bold text-gray-400">¡Todo al día!</h3>
                                 <p className="mt-2 text-gray-500">No hay pedidos activos en el bar</p>
@@ -200,9 +185,7 @@ export default function Index({ requirePaymentBeforePreparation = false }: Props
                 )}
 
                 {/* Footer */}
-                <div className="text-center text-sm text-gray-600">
-                    Panel de Bar • Restaurante App • Actualización automática cada 10 segundos
-                </div>
+                <div className="text-center text-sm text-gray-600">Panel de Bar • Restaurante App • Actualización automática cada 10 segundos</div>
             </div>
         </AppLayout>
     );
@@ -251,11 +234,7 @@ function PedidoBarCard({ pedido, onItemAccion, accionLabel, accionColor, require
                 <div className="flex flex-col items-end gap-2">
                     <div
                         className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold ${
-                            isCritical
-                                ? 'bg-red-600 text-white'
-                                : isDelayed
-                                  ? 'bg-yellow-600 text-white'
-                                  : 'bg-gray-700 text-gray-300'
+                            isCritical ? 'bg-red-600 text-white' : isDelayed ? 'bg-yellow-600 text-white' : 'bg-gray-700 text-gray-300'
                         }`}
                     >
                         <Clock className="h-4 w-4" />
@@ -328,9 +307,7 @@ function BarItemRow({ producto, onAccion, accionLabel, accionColor, blocked }: B
         <div className="flex items-center justify-between gap-3 rounded-lg bg-gray-800 px-3 py-2">
             <div className="flex-1">
                 <span className="font-medium text-white">{producto.nombre}</span>
-                {producto.notas && (
-                    <p className="mt-1 text-xs text-yellow-400 italic">📝 {producto.notas}</p>
-                )}
+                {producto.notas && <p className="mt-1 text-xs text-yellow-400 italic">📝 {producto.notas}</p>}
                 <span
                     className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
                         producto.estado === 'listo'
@@ -340,16 +317,10 @@ function BarItemRow({ producto, onAccion, accionLabel, accionColor, blocked }: B
                               : 'bg-gray-600 text-gray-200'
                     }`}
                 >
-                    {producto.estado === 'listo'
-                        ? '✓ Listo'
-                        : producto.estado === 'en_preparacion'
-                          ? '⏳ Preparando'
-                          : '⏱ Pendiente'}
+                    {producto.estado === 'listo' ? '✓ Listo' : producto.estado === 'en_preparacion' ? '⏳ Preparando' : '⏱ Pendiente'}
                 </span>
             </div>
-            <span className="rounded-full bg-gray-700 px-2 py-0.5 text-sm font-bold text-white">
-                x{producto.cantidad}
-            </span>
+            <span className="rounded-full bg-gray-700 px-2 py-0.5 text-sm font-bold text-white">x{producto.cantidad}</span>
             {!isDone && !blocked && (
                 <button
                     onClick={handleAccion}
@@ -359,10 +330,7 @@ function BarItemRow({ producto, onAccion, accionLabel, accionColor, blocked }: B
                     {isUpdating ? '⏳' : accionLabel}
                 </button>
             )}
-            {!isDone && blocked && (
-                <Lock className="h-4 w-4 text-gray-500" />
-            )}
+            {!isDone && blocked && <Lock className="h-4 w-4 text-gray-500" />}
         </div>
     );
 }
-

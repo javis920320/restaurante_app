@@ -42,7 +42,7 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
     };
 
     return (
-        <div className="rounded-lg border border-gray-200  p-4 shadow-sm transition-shadow hover:shadow-md ">
+        <div className="rounded-lg border border-gray-200 p-4 shadow-sm transition-shadow hover:shadow-md">
             {/* Header */}
             <div className="mb-3 flex items-start justify-between">
                 <div className="flex-1">
@@ -72,7 +72,7 @@ export default function PedidoCard({ pedido, onCambiarEstado, showEstadoSelector
                             <span className="text-gray-600 dark:text-gray-400">{formatPrice(detalle.subtotal)}</span>
                         </div>
                     ))}
-                    {pedido.detalles.length > 3 && <p className="text-xs italic text-gray-500">+{pedido.detalles.length - 3} producto(s) más</p>}
+                    {pedido.detalles.length > 3 && <p className="text-xs text-gray-500 italic">+{pedido.detalles.length - 3} producto(s) más</p>}
                 </div>
             )}
 

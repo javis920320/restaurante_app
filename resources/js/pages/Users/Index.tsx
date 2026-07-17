@@ -42,9 +42,7 @@ export default function Index({ users, roles }: UsersIndexProps) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Gestión de Usuarios</h1>
-                        <p className="mt-1 text-gray-600 dark:text-gray-400">
-                            Administra los usuarios, roles y accesos del sistema
-                        </p>
+                        <p className="mt-1 text-gray-600 dark:text-gray-400">Administra los usuarios, roles y accesos del sistema</p>
                     </div>
                     <Button onClick={() => setShowCreate(true)}>
                         <Plus className="mr-2 h-4 w-4" />
@@ -54,15 +52,9 @@ export default function Index({ users, roles }: UsersIndexProps) {
 
                 {/* Flash messages */}
                 {flash.success && (
-                    <div className="rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">
-                        {flash.success}
-                    </div>
+                    <div className="rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">{flash.success}</div>
                 )}
-                {flash.error && (
-                    <div className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">
-                        {flash.error}
-                    </div>
-                )}
+                {flash.error && <div className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">{flash.error}</div>}
 
                 {/* Summary */}
                 <div className="grid gap-4 md:grid-cols-2">
@@ -87,9 +79,7 @@ export default function Index({ users, roles }: UsersIndexProps) {
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600 dark:text-gray-400">Activos</p>
-                                    <p className="text-2xl font-bold text-green-600">
-                                        {usersData.filter((u) => u.activo).length}
-                                    </p>
+                                    <p className="text-2xl font-bold text-green-600">{usersData.filter((u) => u.activo).length}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -103,31 +93,24 @@ export default function Index({ users, roles }: UsersIndexProps) {
                     </CardHeader>
                     <CardContent>
                         {usersData.length === 0 ? (
-                            <div className="py-12 text-center text-gray-500 dark:text-gray-400">
-                                No hay usuarios registrados
-                            </div>
+                            <div className="py-12 text-center text-gray-500 dark:text-gray-400">No hay usuarios registrados</div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b text-left text-gray-600 dark:border-gray-700 dark:text-gray-400">
-                                            <th className="pb-3 pr-4 font-medium">Nombre</th>
-                                            <th className="pb-3 pr-4 font-medium">Email</th>
-                                            <th className="pb-3 pr-4 font-medium">Roles</th>
-                                            <th className="pb-3 pr-4 font-medium">Estado</th>
+                                            <th className="pr-4 pb-3 font-medium">Nombre</th>
+                                            <th className="pr-4 pb-3 font-medium">Email</th>
+                                            <th className="pr-4 pb-3 font-medium">Roles</th>
+                                            <th className="pr-4 pb-3 font-medium">Estado</th>
                                             <th className="pb-3 font-medium">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {usersData.map((user) => (
-                                            <tr
-                                                key={user.id}
-                                                className="border-b last:border-0 dark:border-gray-700"
-                                            >
+                                            <tr key={user.id} className="border-b last:border-0 dark:border-gray-700">
                                                 <td className="py-3 pr-4 font-medium">{user.name}</td>
-                                                <td className="py-3 pr-4 text-gray-600 dark:text-gray-400">
-                                                    {user.email}
-                                                </td>
+                                                <td className="py-3 pr-4 text-gray-600 dark:text-gray-400">{user.email}</td>
                                                 <td className="py-3 pr-4">
                                                     <div className="flex flex-wrap gap-1">
                                                         {(user.roles as string[])?.map((role) => (
@@ -166,11 +149,7 @@ export default function Index({ users, roles }: UsersIndexProps) {
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() =>
-                                                                router.post(
-                                                                    route('usuarios.toggle-activo', user.id),
-                                                                    {},
-                                                                    { preserveScroll: true },
-                                                                )
+                                                                router.post(route('usuarios.toggle-activo', user.id), {}, { preserveScroll: true })
                                                             }
                                                             title={user.activo ? 'Desactivar' : 'Activar'}
                                                             className={
@@ -187,23 +166,15 @@ export default function Index({ users, roles }: UsersIndexProps) {
                                                                     variant="destructive"
                                                                     size="sm"
                                                                     onClick={() => {
-                                                                        router.delete(
-                                                                            route('usuarios.destroy', user.id),
-                                                                            {
-                                                                                preserveScroll: true,
-                                                                                onSuccess: () =>
-                                                                                    setConfirmDelete(null),
-                                                                            },
-                                                                        );
+                                                                        router.delete(route('usuarios.destroy', user.id), {
+                                                                            preserveScroll: true,
+                                                                            onSuccess: () => setConfirmDelete(null),
+                                                                        });
                                                                     }}
                                                                 >
                                                                     ¿Confirmar?
                                                                 </Button>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => setConfirmDelete(null)}
-                                                                >
+                                                                <Button variant="outline" size="sm" onClick={() => setConfirmDelete(null)}>
                                                                     Cancelar
                                                                 </Button>
                                                             </>
@@ -247,21 +218,10 @@ export default function Index({ users, roles }: UsersIndexProps) {
             </div>
 
             {/* Create User Dialog */}
-            {showCreate && (
-                <UserFormDialog
-                    roles={roles}
-                    onClose={() => setShowCreate(false)}
-                />
-            )}
+            {showCreate && <UserFormDialog roles={roles} onClose={() => setShowCreate(false)} />}
 
             {/* Edit User Dialog */}
-            {editingUser && (
-                <UserFormDialog
-                    user={editingUser}
-                    roles={roles}
-                    onClose={() => setEditingUser(null)}
-                />
-            )}
+            {editingUser && <UserFormDialog user={editingUser} roles={roles} onClose={() => setEditingUser(null)} />}
         </AppLayout>
     );
 }
@@ -303,7 +263,10 @@ function UserFormDialog({ user, roles, onClose }: UserFormDialogProps) {
     const toggleRole = (roleName: string) => {
         const current = form.data.roles as string[];
         if (current.includes(roleName)) {
-            form.setData('roles', current.filter((r) => r !== roleName));
+            form.setData(
+                'roles',
+                current.filter((r) => r !== roleName),
+            );
         } else {
             form.setData('roles', [...current, roleName]);
         }
@@ -319,35 +282,18 @@ function UserFormDialog({ user, roles, onClose }: UserFormDialogProps) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Nombre</Label>
-                        <Input
-                            id="name"
-                            value={form.data.name}
-                            onChange={(e) => form.setData('name', e.target.value)}
-                            required
-                        />
-                        {form.errors.name && (
-                            <p className="text-sm text-red-600">{form.errors.name}</p>
-                        )}
+                        <Input id="name" value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} required />
+                        {form.errors.name && <p className="text-sm text-red-600">{form.errors.name}</p>}
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            value={form.data.email}
-                            onChange={(e) => form.setData('email', e.target.value)}
-                            required
-                        />
-                        {form.errors.email && (
-                            <p className="text-sm text-red-600">{form.errors.email}</p>
-                        )}
+                        <Input id="email" type="email" value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} required />
+                        {form.errors.email && <p className="text-sm text-red-600">{form.errors.email}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password">
-                            {isEdit ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña'}
-                        </Label>
+                        <Label htmlFor="password">{isEdit ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña'}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -355,9 +301,7 @@ function UserFormDialog({ user, roles, onClose }: UserFormDialogProps) {
                             onChange={(e) => form.setData('password', e.target.value)}
                             required={!isEdit}
                         />
-                        {form.errors.password && (
-                            <p className="text-sm text-red-600">{form.errors.password}</p>
-                        )}
+                        {form.errors.password && <p className="text-sm text-red-600">{form.errors.password}</p>}
                     </div>
 
                     <div className="space-y-2">
@@ -372,11 +316,7 @@ function UserFormDialog({ user, roles, onClose }: UserFormDialogProps) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="activo"
-                            checked={form.data.activo}
-                            onCheckedChange={(checked) => form.setData('activo', !!checked)}
-                        />
+                        <Checkbox id="activo" checked={form.data.activo} onCheckedChange={(checked) => form.setData('activo', !!checked)} />
                         <Label htmlFor="activo">Usuario activo</Label>
                     </div>
 
@@ -397,9 +337,7 @@ function UserFormDialog({ user, roles, onClose }: UserFormDialogProps) {
                                 </div>
                             ))}
                         </div>
-                        {form.errors.roles && (
-                            <p className="text-sm text-red-600">{form.errors.roles}</p>
-                        )}
+                        {form.errors.roles && <p className="text-sm text-red-600">{form.errors.roles}</p>}
                     </div>
 
                     <DialogFooter>

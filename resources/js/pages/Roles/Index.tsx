@@ -50,9 +50,7 @@ export default function Index({ roles, permissions }: RolesIndexProps) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Roles y Permisos</h1>
-                        <p className="mt-1 text-gray-600 dark:text-gray-400">
-                            Define roles y configura los permisos de acceso del sistema
-                        </p>
+                        <p className="mt-1 text-gray-600 dark:text-gray-400">Define roles y configura los permisos de acceso del sistema</p>
                     </div>
                     <Button onClick={() => setShowCreate(true)}>
                         <Plus className="mr-2 h-4 w-4" />
@@ -62,15 +60,9 @@ export default function Index({ roles, permissions }: RolesIndexProps) {
 
                 {/* Flash messages */}
                 {flash.success && (
-                    <div className="rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">
-                        {flash.success}
-                    </div>
+                    <div className="rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-950 dark:text-green-200">{flash.success}</div>
                 )}
-                {flash.error && (
-                    <div className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">
-                        {flash.error}
-                    </div>
-                )}
+                {flash.error && <div className="rounded-md bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200">{flash.error}</div>}
 
                 {/* Roles Grid */}
                 {roles.length === 0 ? (
@@ -78,9 +70,7 @@ export default function Index({ roles, permissions }: RolesIndexProps) {
                         <CardContent className="py-16 text-center">
                             <Shield className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600" />
                             <h3 className="mt-4 text-lg font-medium">No hay roles configurados</h3>
-                            <p className="mt-2 text-gray-600 dark:text-gray-400">
-                                Crea el primer rol para comenzar a gestionar el acceso
-                            </p>
+                            <p className="mt-2 text-gray-600 dark:text-gray-400">Crea el primer rol para comenzar a gestionar el acceso</p>
                             <Button className="mt-4" onClick={() => setShowCreate(true)}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Crear Primer Rol
@@ -118,9 +108,7 @@ export default function Index({ roles, permissions }: RolesIndexProps) {
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {Object.entries(permissionGroups).map(([group, perms]) => (
                                 <div key={group} className="space-y-1">
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                                        {group}
-                                    </p>
+                                    <p className="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">{group}</p>
                                     {perms.map((perm) => (
                                         <Badge key={perm.id} variant="outline" className="mr-1 text-xs">
                                             {perm.name}
@@ -134,18 +122,10 @@ export default function Index({ roles, permissions }: RolesIndexProps) {
             </div>
 
             {/* Create Role Dialog */}
-            {showCreate && (
-                <RoleFormDialog permissions={permissions} onClose={() => setShowCreate(false)} />
-            )}
+            {showCreate && <RoleFormDialog permissions={permissions} onClose={() => setShowCreate(false)} />}
 
             {/* Edit Role Dialog */}
-            {editingRole && (
-                <RoleFormDialog
-                    role={editingRole}
-                    permissions={permissions}
-                    onClose={() => setEditingRole(null)}
-                />
-            )}
+            {editingRole && <RoleFormDialog role={editingRole} permissions={permissions} onClose={() => setEditingRole(null)} />}
         </AppLayout>
     );
 }
@@ -192,9 +172,7 @@ function RoleCard({ role, onEdit, onDelete, isConfirmingDelete, onCancelDelete }
                 {/* Actions */}
                 {isConfirmingDelete ? (
                     <div className="space-y-2">
-                        <p className="text-center text-xs font-medium text-red-600 dark:text-red-400">
-                            ¿Confirmar eliminación?
-                        </p>
+                        <p className="text-center text-xs font-medium text-red-600 dark:text-red-400">¿Confirmar eliminación?</p>
                         <div className="flex gap-2">
                             <Button variant="destructive" size="sm" className="flex-1 text-xs" onClick={onDelete}>
                                 Eliminar
@@ -261,13 +239,20 @@ function RoleFormDialog({ role, permissions, onClose }: RoleFormDialogProps) {
     const togglePermission = (permName: string) => {
         const current = form.data.permissions as string[];
         if (current.includes(permName)) {
-            form.setData('permissions', current.filter((p) => p !== permName));
+            form.setData(
+                'permissions',
+                current.filter((p) => p !== permName),
+            );
         } else {
             form.setData('permissions', [...current, permName]);
         }
     };
 
-    const selectAll = () => form.setData('permissions', permissions.map((p) => p.name));
+    const selectAll = () =>
+        form.setData(
+            'permissions',
+            permissions.map((p) => p.name),
+        );
     const selectNone = () => form.setData('permissions', []);
 
     return (
@@ -287,9 +272,7 @@ function RoleFormDialog({ role, permissions, onClose }: RoleFormDialogProps) {
                             placeholder="ej: supervisor"
                             required
                         />
-                        {form.errors.name && (
-                            <p className="text-sm text-red-600">{form.errors.name}</p>
-                        )}
+                        {form.errors.name && <p className="text-sm text-red-600">{form.errors.name}</p>}
                     </div>
 
                     {/* Permissions */}
@@ -297,19 +280,11 @@ function RoleFormDialog({ role, permissions, onClose }: RoleFormDialogProps) {
                         <div className="flex items-center justify-between">
                             <Label>Permisos</Label>
                             <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    className="text-xs text-blue-600 hover:underline dark:text-blue-400"
-                                    onClick={selectAll}
-                                >
+                                <button type="button" className="text-xs text-blue-600 hover:underline dark:text-blue-400" onClick={selectAll}>
                                     Todos
                                 </button>
                                 <span className="text-xs text-gray-400">|</span>
-                                <button
-                                    type="button"
-                                    className="text-xs text-gray-600 hover:underline dark:text-gray-400"
-                                    onClick={selectNone}
-                                >
+                                <button type="button" className="text-xs text-gray-600 hover:underline dark:text-gray-400" onClick={selectNone}>
                                     Ninguno
                                 </button>
                             </div>
@@ -330,9 +305,7 @@ function RoleFormDialog({ role, permissions, onClose }: RoleFormDialogProps) {
                             ))}
                         </div>
 
-                        {form.errors.permissions && (
-                            <p className="text-sm text-red-600">{form.errors.permissions}</p>
-                        )}
+                        {form.errors.permissions && <p className="text-sm text-red-600">{form.errors.permissions}</p>}
                     </div>
 
                     <DialogFooter>

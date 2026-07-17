@@ -90,9 +90,7 @@ export default function MenusIndex({ menus: initialMenus, restaurantes }: Props)
                 <div className="space-y-6">
                     <div>
                         <h3 className="text-lg font-medium">Menús Digitales</h3>
-                        <p className="text-muted-foreground text-sm">
-                            Crea y administra menús digitales con código QR para tus restaurantes.
-                        </p>
+                        <p className="text-muted-foreground text-sm">Crea y administra menús digitales con código QR para tus restaurantes.</p>
                     </div>
 
                     {/* Formulario de creación */}
@@ -161,11 +159,7 @@ export default function MenusIndex({ menus: initialMenus, restaurantes }: Props)
                                         >
                                             {menu.estado === 'publicado' ? 'Despublicar' : 'Publicar'}
                                         </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => router.visit(route('menus.show', menu.id))}
-                                        >
+                                        <Button size="sm" variant="outline" onClick={() => router.visit(route('menus.show', menu.id))}>
                                             <Eye className="h-4 w-4" />
                                         </Button>
                                         {menu.estado === 'publicado' && (

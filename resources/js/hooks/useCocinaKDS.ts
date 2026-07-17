@@ -77,27 +77,33 @@ export const useCocinaKDS = ({ pollingInterval = 10 }: UseCocinaKDSOptions = {})
         };
     }, [pollingInterval, refreshKey]);
 
-    const marcarEnPreparacion = useCallback(async (pedidoId: number) => {
-        try {
-            await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
-            setActionError(null);
-            refetch();
-        } catch (err) {
-            setActionError(`Error al iniciar preparación del pedido #${pedidoId}`);
-            console.error('Error al iniciar preparación:', err);
-        }
-    }, [refetch]);
+    const marcarEnPreparacion = useCallback(
+        async (pedidoId: number) => {
+            try {
+                await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
+                setActionError(null);
+                refetch();
+            } catch (err) {
+                setActionError(`Error al iniciar preparación del pedido #${pedidoId}`);
+                console.error('Error al iniciar preparación:', err);
+            }
+        },
+        [refetch],
+    );
 
-    const marcarListo = useCallback(async (pedidoId: number) => {
-        try {
-            await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'listo' });
-            setActionError(null);
-            refetch();
-        } catch (err) {
-            setActionError(`Error al marcar como listo el pedido #${pedidoId}`);
-            console.error('Error al marcar como listo:', err);
-        }
-    }, [refetch]);
+    const marcarListo = useCallback(
+        async (pedidoId: number) => {
+            try {
+                await api.patch(`/pedidos/${pedidoId}/estado`, { estado: 'listo' });
+                setActionError(null);
+                refetch();
+            } catch (err) {
+                setActionError(`Error al marcar como listo el pedido #${pedidoId}`);
+                console.error('Error al marcar como listo:', err);
+            }
+        },
+        [refetch],
+    );
 
     return {
         pedidos,

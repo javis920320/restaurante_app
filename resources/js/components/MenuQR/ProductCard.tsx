@@ -66,9 +66,7 @@ export default function ProductCard({ producto }: ProductCardProps) {
                                         }`}
                                     >
                                         {opcion.nombre}
-                                        {opcion.precio_extra > 0 && (
-                                            <span className="ml-1 text-green-600">+{formatPrice(opcion.precio_extra)}</span>
-                                        )}
+                                        {opcion.precio_extra > 0 && <span className="ml-1 text-green-600">+{formatPrice(opcion.precio_extra)}</span>}
                                     </button>
                                 ))}
                             </div>

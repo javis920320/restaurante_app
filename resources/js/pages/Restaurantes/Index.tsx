@@ -222,22 +222,14 @@ export default function RestaurantesIndex({ restaurantes }: { restaurantes: Rest
                                                             Inactivo
                                                         </span>
                                                     )}
-                                                    {restaurante.direccion && (
-                                                        <p className="text-sm text-gray-500">{restaurante.direccion}</p>
-                                                    )}
+                                                    {restaurante.direccion && <p className="text-sm text-gray-500">{restaurante.direccion}</p>}
                                                     <p className="text-xs text-gray-400">{restaurante.mesas_count} mesa(s)</p>
                                                 </div>
                                                 <div className="flex gap-2">
-                                                    <button
-                                                        onClick={() => startEditing(restaurante)}
-                                                        className="text-blue-500 hover:text-blue-700"
-                                                    >
+                                                    <button onClick={() => startEditing(restaurante)} className="text-blue-500 hover:text-blue-700">
                                                         Editar
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleDelete(restaurante.id)}
-                                                        className="text-red-500 hover:text-red-700"
-                                                    >
+                                                    <button onClick={() => handleDelete(restaurante.id)} className="text-red-500 hover:text-red-700">
                                                         Eliminar
                                                     </button>
                                                 </div>

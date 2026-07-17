@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { type Plato } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { Check, Clipboard, DollarSign, Image, RefreshCw, Utensils } from 'lucide-react';
 import React from 'react';
-import { Utensils, DollarSign, Image, Clipboard, Check, RefreshCw } from 'lucide-react';
 
 interface FormularioProps {
     categorias: { id: number; nombre: string }[];
@@ -70,9 +70,7 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                 production_area: data.production_area,
             };
 
-            const respuesta = isEdit 
-                ? await axios.put(url, payload) 
-                : await axios.post(url, payload);
+            const respuesta = isEdit ? await axios.put(url, payload) : await axios.post(url, payload);
 
             if (respuesta.status === 200 || respuesta.status === 201) {
                 if (!isEdit) reset();
@@ -97,10 +95,10 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                         Nombre del Plato
                     </Label>
                     <div className="relative">
-                        <Utensils className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+                        <Utensils className="absolute top-2.5 left-3 h-4.5 w-4.5 text-slate-400" />
                         <Input
                             id="nombre"
-                            className="pl-10 h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
+                            className="h-10 rounded-xl border-slate-200 pl-10 focus-visible:ring-indigo-500"
                             placeholder="Ej: Lomo Saltado Premium"
                             value={data.nombre}
                             onChange={(e) => setData('nombre', e.target.value)}
@@ -111,19 +109,19 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                 </div>
 
                 {/* Fila: Precio e Imagen url */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {/* Precio */}
                     <div className="space-y-1">
                         <Label htmlFor="precio" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                             Precio ($)
                         </Label>
                         <div className="relative">
-                            <DollarSign className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+                            <DollarSign className="absolute top-2.5 left-3 h-4.5 w-4.5 text-slate-400" />
                             <Input
                                 id="precio"
                                 type="number"
                                 step="0.01"
-                                className="pl-10 h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
+                                className="h-10 rounded-xl border-slate-200 pl-10 focus-visible:ring-indigo-500"
                                 placeholder="0.00"
                                 value={data.precio || ''}
                                 min={0}
@@ -143,7 +141,7 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                             value={data.categoria_id ? data.categoria_id.toString() : undefined}
                             onValueChange={(value) => setData('categoria_id', parseInt(value))}
                         >
-                            <SelectTrigger id="categoria" className="h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl">
+                            <SelectTrigger id="categoria" className="h-10 rounded-xl border-slate-200 focus-visible:ring-indigo-500">
                                 <SelectValue placeholder="Selecciona categoría" />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl">
@@ -163,11 +161,8 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                     <Label htmlFor="production_area" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                         Área de Producción (Preparación)
                     </Label>
-                    <Select
-                        value={data.production_area}
-                        onValueChange={(value) => setData('production_area', value as 'none' | 'kitchen' | 'bar')}
-                    >
-                        <SelectTrigger id="production_area" className="h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl">
+                    <Select value={data.production_area} onValueChange={(value) => setData('production_area', value as 'none' | 'kitchen' | 'bar')}>
+                        <SelectTrigger id="production_area" className="h-10 rounded-xl border-slate-200 focus-visible:ring-indigo-500">
                             <SelectValue placeholder="Selecciona área de producción" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -187,10 +182,10 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                         Descripción
                     </Label>
                     <div className="relative">
-                        <Clipboard className="absolute left-3 top-3 h-4.5 w-4.5 text-slate-400" />
+                        <Clipboard className="absolute top-3 left-3 h-4.5 w-4.5 text-slate-400" />
                         <textarea
                             id="descripcion"
-                            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none min-h-[90px] text-sm"
+                            className="min-h-[90px] w-full rounded-xl border border-slate-200 py-2 pr-4 pl-10 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                             placeholder="Escribe los ingredientes o detalles del plato..."
                             value={data.descripcion}
                             onChange={(e) => setData('descripcion', e.target.value)}
@@ -205,10 +200,10 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                         URL de la Imagen
                     </Label>
                     <div className="relative">
-                        <Image className="absolute left-3 top-2.5 h-4.5 w-4.5 text-slate-400" />
+                        <Image className="absolute top-2.5 left-3 h-4.5 w-4.5 text-slate-400" />
                         <Input
                             id="imagen"
-                            className="pl-10 h-10 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
+                            className="h-10 rounded-xl border-slate-200 pl-10 focus-visible:ring-indigo-500"
                             placeholder="https://ejemplo.com/plato.jpg"
                             value={data.imagen}
                             onChange={(e) => setData('imagen', e.target.value)}
@@ -218,8 +213,8 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
 
                     {/* Vista previa en tiempo real */}
                     {data.imagen.trim() && (
-                        <div className="mt-3 flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl">
-                            <div className="h-16 w-16 overflow-hidden rounded-lg border bg-white flex-shrink-0">
+                        <div className="mt-3 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900">
+                            <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border bg-white">
                                 <img
                                     src={data.imagen}
                                     alt="Preview"
@@ -231,46 +226,38 @@ export default function Formulario({ categorias, plato, onSuccess, onCancel }: F
                             </div>
                             <div>
                                 <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Vista previa</p>
-                                <p className="text-[10px] text-slate-500 line-clamp-1 max-w-[200px] sm:max-w-[300px]">
-                                    {data.imagen}
-                                </p>
+                                <p className="line-clamp-1 max-w-[200px] text-[10px] text-slate-500 sm:max-w-[300px]">{data.imagen}</p>
                             </div>
                         </div>
                     )}
                 </div>
 
                 {/* Disponible */}
-                <div className="flex items-center space-x-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800/40">
+                <div className="flex items-center space-x-3 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800/40 dark:bg-slate-900/50">
                     <input
                         type="checkbox"
                         id="disponible"
                         checked={data.disponible}
                         onChange={(e) => setData('disponible', e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <Label htmlFor="disponible" className="text-sm text-slate-700 dark:text-slate-300 cursor-pointer font-medium select-none">
+                    <Label htmlFor="disponible" className="cursor-pointer text-sm font-medium text-slate-700 select-none dark:text-slate-300">
                         Disponible de inmediato
                     </Label>
                 </div>
             </div>
 
             {/* Acciones */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t">
+            <div className="flex items-center justify-end gap-3 border-t pt-4">
                 {onCancel && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                        disabled={processing}
-                        className="rounded-xl px-4"
-                    >
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={processing} className="rounded-xl px-4">
                         Cancelar
                     </Button>
                 )}
                 <Button
                     type="submit"
                     disabled={processing}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-5 shadow-sm shadow-indigo-100"
+                    className="rounded-xl bg-indigo-600 px-5 text-white shadow-sm shadow-indigo-100 hover:bg-indigo-700"
                 >
                     {processing ? (
                         <span className="flex items-center gap-2">

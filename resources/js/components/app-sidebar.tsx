@@ -5,7 +5,22 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { usePermissions } from '@/hooks/use-permissions';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, ChefHat, ClipboardList, CreditCard, Folder, GlassWater, LayoutGrid, MenuSquare, Settings, Shield, Table2, UserCog, UtensilsCrossed } from 'lucide-react';
+import {
+    BarChart3,
+    BookOpen,
+    ChefHat,
+    ClipboardList,
+    CreditCard,
+    Folder,
+    GlassWater,
+    LayoutGrid,
+    MenuSquare,
+    Settings,
+    Shield,
+    Table2,
+    UserCog,
+    UtensilsCrossed,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -110,9 +125,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} label="Operaciones" />
                 <NavMain items={configNavItems} label="Configuración" />
-                {(can('gestionar usuarios') || can('gestionar roles')) && (
-                    <NavMain items={adminNavItems} label="Administración" />
-                )}
+                {(can('gestionar usuarios') || can('gestionar roles')) && <NavMain items={adminNavItems} label="Administración" />}
             </SidebarContent>
 
             <SidebarFooter>

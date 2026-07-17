@@ -238,17 +238,23 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
                                             <div className="relative flex flex-col items-center">
                                                 <div
                                                     className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                                                        isCompleted ? config.bgColor + ' ' + config.color : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                                                        isCompleted
+                                                            ? config.bgColor + ' ' + config.color
+                                                            : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
                                                     } border-2 ${isActive ? config.borderColor : 'border-gray-200 dark:border-gray-700'}`}
                                                 >
                                                     {isCompleted && <CheckCircle className="h-5 w-5" />}
                                                 </div>
                                                 {index < array.length - 1 && (
-                                                    <div className={`absolute top-8 h-full w-0.5 ${isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'}`} />
+                                                    <div
+                                                        className={`absolute top-8 h-full w-0.5 ${isCompleted ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'}`}
+                                                    />
                                                 )}
                                             </div>
                                             <div className="flex-1 pt-1">
-                                                <p className={`font-medium ${isActive ? config.color : 'text-gray-900 dark:text-gray-100'}`}>{config.label}</p>
+                                                <p className={`font-medium ${isActive ? config.color : 'text-gray-900 dark:text-gray-100'}`}>
+                                                    {config.label}
+                                                </p>
                                             </div>
                                         </div>
                                     );
@@ -257,7 +263,9 @@ export default function Status({ codigo, pedidoInicial }: PedidoStatusProps) {
                     </div>
 
                     {/* Actualización automática */}
-                    <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">Esta página se actualiza automáticamente cada 10 segundos</p>
+                    <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        Esta página se actualiza automáticamente cada 10 segundos
+                    </p>
                 </div>
             </div>
         </>

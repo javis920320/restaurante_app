@@ -28,12 +28,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
     const [listCategorias, setCategorias] = useState<Categoria[]>(categorias);
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const categoriaExist = listCategorias.length > 0 ? true : false;
-    const {
-        setData,
-        data,
-        errors,
-        setError,
-    } = useForm({
+    const { setData, data, errors, setError } = useForm({
         nombre: '',
         production_area: 'none' as 'none' | 'kitchen' | 'bar',
     });
@@ -61,15 +56,12 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
     const toggleActivo = async (id: number) => {
         try {
             const response = await axios.post(route('categorias.toggle-activo', id));
-            setCategorias((prev) =>
-                prev.map((cat) => (cat.id === id ? { ...cat, activo: response.data.categoria.activo } : cat)),
-            );
+            setCategorias((prev) => prev.map((cat) => (cat.id === id ? { ...cat, activo: response.data.categoria.activo } : cat)));
         } catch (error) {
             console.error(error);
         }
     };
 
-  
     const handleEliminar = async (id: number) => {
         setDeleteError(null);
         try {
@@ -119,9 +111,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                         </button>
                     </form>
 
-                    {deleteError && (
-                        <div className="mt-2 rounded-md bg-red-100 p-2 text-sm text-red-700">{deleteError}</div>
-                    )}
+                    {deleteError && <div className="mt-2 rounded-md bg-red-100 p-2 text-sm text-red-700">{deleteError}</div>}
 
                     {categoriaExist && (
                         <div>
@@ -133,9 +123,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                                             <span
                                                 className={`inline-block h-2 w-2 rounded-full ${categoria.activo ? 'bg-green-500' : 'bg-gray-400'}`}
                                             />
-                                            <span className={categoria.activo ? '' : 'text-gray-400 line-through'}>
-                                                {categoria.nombre}
-                                            </span>
+                                            <span className={categoria.activo ? '' : 'text-gray-400 line-through'}>{categoria.nombre}</span>
                                             {categoria.production_area && categoria.production_area !== 'none' && (
                                                 <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
                                                     {PRODUCTION_AREA_LABELS[categoria.production_area]}
@@ -154,10 +142,7 @@ export default function CategoriasIndex({ categorias }: { categorias: Categoria[
                                             >
                                                 {categoria.activo ? 'Desactivar' : 'Activar'}
                                             </button>
-                                            <button
-                                                className="text-red-500 hover:text-red-700"
-                                                onClick={() => handleEliminar(categoria.id)}
-                                            >
+                                            <button className="text-red-500 hover:text-red-700" onClick={() => handleEliminar(categoria.id)}>
                                                 Eliminar
                                             </button>
                                         </div>

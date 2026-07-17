@@ -32,10 +32,7 @@ interface UseCajaKDSResult {
     refetch: () => void;
 }
 
-export const useCajaKDS = ({
-    pollingInterval = 15,
-    initialData,
-}: UseCajaKDSOptions = {}): UseCajaKDSResult => {
+export const useCajaKDS = ({ pollingInterval = 15, initialData }: UseCajaKDSOptions = {}): UseCajaKDSResult => {
     const [data, setData] = useState<CajaData>(initialData ?? { pending: [], paid: [] });
     const [loading, setLoading] = useState<boolean>(!initialData);
     const [error, setError] = useState<string | null>(null);
